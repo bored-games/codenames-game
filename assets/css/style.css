@@ -1,3 +1,7 @@
+::selection {
+  background: rgba(0, 0, 0, .2);
+}
+
 body {
   padding: 0;
   margin: 0;
@@ -74,29 +78,27 @@ main {
 
 .card_border {
   flex: 0 0 18%;
-  background: #fbce97;
+  background: #ccc5b3;
   height: 17%;
   box-sizing: border-box;
-  padding: 5px;
-  border: 1px solid #f7cd93;
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, .2);
   cursor: default;
-  transition: .15s linear all;
+  transition: .1s linear all;
   display: flex;
+ /* overflow: hidden; rem/ */
 }
 
 .card_border:hover {
   box-shadow: 0 0 15px rgba(0, 0, 0, .8);
+  margin-bottom: 2px;
+  margin-top: -2px;
 }
 
 .card {
   width: 100%;
-  border: 1px solid white;
 	border-radius: 8px;
-	padding: 5px;
-	border: 3px solid #945f3f;
-  background: #fec693;
+  background: #ccc9c0;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -112,21 +114,24 @@ main {
 
 .decor_line {
   flex: 1 1 auto;
-  border-bottom: 2px solid #b47e5a;
-  margin-right: 0.5rem;
+  /* border-bottom: 3px solid #a24832; */
+/*  margin-right: 0.5rem; */
 }
 
 .spy {
   flex: 0 0 20%;
   box-sizing: border-box;
-	border: 3px solid #eaeaea;
-	height: 100%;
+	border: 2px solid #eaeaea;
+	height: 75%;
 	width: 20%;
 	display: inline-block;
   background: #555;
   background-position: center center;
 	background-size: cover;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  margin-right: 5px;
+  z-index: 10;
+  margin-top: 5px;
 }
 
 #c00 .spy { background-image: url('../static/spies/anthony-blunt.png'); }
@@ -157,19 +162,51 @@ main {
 
 .wordbox {
   flex: 0 0 auto;
-  color: #351e11;
-  background: #ffefce;
+  color: #0c0b13;
+   /* background: #bc5c44; */
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
-  font-weight: 800;
+  font-weight: 400;
   text-transform: uppercase;
   text-align: center;
   font-size: 1.8rem;
   display: flex;
   align-items: center;
-  margin-top: 5px;
-  line-height: 2.5rem;
+  line-height: 2.8rem;
+  font-family:Josefin Sans;
+  position: relative;
+  width: 100%;
+  z-index: 5;
 }
+
+
+.wordbox:before{
+  content:"";
+  position:absolute;
+  top:-30px;
+  bottom:-50px;
+  left:-50%;
+  right:-50%;
+  background:#c0a78a;
+  transform: rotate(9deg) translate(-0, 10%);
+  z-index: -1;
+  opacity: 0.7;
+}
+
+.wordbox:after{
+  content:"";
+  position:absolute;
+  top:-20px;
+  bottom:-50%;
+  left:-50%;
+  right:-50%;
+  background:#7f7869;
+  transform: rotate(4deg) translate(0px, 0px);
+  z-index: -2;
+  opacity: 1;
+}
+
+
 
 .wordbox span {
   width: 100%;
@@ -240,18 +277,23 @@ main {
   transform: translateY(10px);
 }
 
-
-.bottom > div {
-  flex: 0 0 auto;
-  padding: 10px;
-  text-shadow: -2px -3px 4px rgba(0, 0, 0, .4);
+.bottom_center::selection {
+  background: transparent;
 }
 
 
-.bottom_center {
-  flex: 2 2 auto;
-  min-width: 25%;
+.bottom > div {
+  flex: 0 0 auto;
+  padding: 0.5rem;
+  text-shadow: -2px -3px 4px rgba(0, 0, 0, .4);
+}
+
+.bottom_no_stretch {
+  flex: 0 0 auto !important;
   align-self: stretch;
+  align-content: center;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .bottom_left, .bottom_right {
@@ -264,24 +306,46 @@ main {
   text-align: center;
 }
 
-.settings_button {
-  background: rgba(0, 0, 0, .3);
-  padding: 10px;
-  height: 100%;
+.settings_button, .info_button {
+  height: 6.5vh;
+  width: 6.5vh;
+  border-radius: .5vh;
+  background: url('../static/settings.svg') no-repeat center center;
+  background-size: 85%;
+  transition: .15s linear all;
+  cursor: pointer;
+}
+
+.settings_button:hover, .info_button:hover {
+  background-color: rgba(255, 255, 255, .1);
+}
+
+.info_button {
+  background-image: url('../static/info.svg');
 }
 
 .red_remaining {
-	display: block;
-	color: #ffbbc8;
+  color: #ffbbc8;
 }
 
 .blue_remaining {
-	display: block;
 	color: #aeddff;
 }
 
 em {
 	font-style: normal;
+}
+
+.button {
+  border-radius: 8px;
+  padding: 0 0.5rem;
+}
+
+.button:hover {
+  background-color: rgba(255, 255, 255, .05);
+  color: #fff;
+  cursor: pointer;
+  transition: .15s linear all;
 }
 
 .turn_text {

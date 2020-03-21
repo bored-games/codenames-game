@@ -80,6 +80,271 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.0/optimize for better performance and smaller assets.');
 
 
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	/**/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = elm$core$Set$toList(x);
+		y = elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = elm$core$Dict$toList(x);
+		y = elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**_UNUSED/
+	if (x.$ < 0)
+	{
+		x = elm$core$Dict$toList(x);
+		y = elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**_UNUSED/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? elm$core$Basics$LT : n ? elm$core$Basics$GT : elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
+
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
+
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -525,271 +790,6 @@ function _Debug_regionToString(region)
 	}
 	return 'on lines ' + region.start.line + ' through ' + region.end.line;
 }
-
-
-
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	/**/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = elm$core$Set$toList(x);
-		y = elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = elm$core$Dict$toList(x);
-		y = elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**_UNUSED/
-	if (x.$ < 0)
-	{
-		x = elm$core$Dict$toList(x);
-		y = elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**_UNUSED/
-	if (typeof x.$ === 'undefined')
-	//*/
-	/**/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? elm$core$Basics$LT : n ? elm$core$Basics$GT : elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
-
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -4401,41 +4401,22 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$Model = F7(
-	function (nameInProgress, board, lastCell, turn, currentTimer, debugString, toggleSidebar) {
-		return {board: board, currentTimer: currentTimer, debugString: debugString, lastCell: lastCell, nameInProgress: nameInProgress, toggleSidebar: toggleSidebar, turn: turn};
+var author$project$Main$Model = F9(
+	function (nameInProgress, lastCell, turn, currentTimer, debugString, toggleSidebar, redRemaining, blueRemaining, hideSpies) {
+		return {blueRemaining: blueRemaining, currentTimer: currentTimer, debugString: debugString, hideSpies: hideSpies, lastCell: lastCell, nameInProgress: nameInProgress, redRemaining: redRemaining, toggleSidebar: toggleSidebar, turn: turn};
 	});
-var elm$core$Basics$negate = function (n) {
-	return -n;
+var elm$core$Basics$False = {$: 'False'};
+var elm$core$Basics$True = {$: 'True'};
+var elm$core$Result$isOk = function (result) {
+	if (result.$ === 'Ok') {
+		return true;
+	} else {
+		return false;
+	}
 };
 var elm$core$Basics$EQ = {$: 'EQ'};
-var elm$core$Basics$LT = {$: 'LT'};
-var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var elm$core$Array$foldr = F3(
-	function (func, baseCase, _n0) {
-		var tree = _n0.c;
-		var tail = _n0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3(elm$core$Elm$JsArray$foldr, func, acc, values);
-				}
-			});
-		return A3(
-			elm$core$Elm$JsArray$foldr,
-			helper,
-			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
-	});
-var elm$core$List$cons = _List_cons;
-var elm$core$Array$toList = function (array) {
-	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
-};
 var elm$core$Basics$GT = {$: 'GT'};
+var elm$core$Basics$LT = {$: 'LT'};
 var elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -4461,6 +4442,7 @@ var elm$core$Dict$foldr = F3(
 			}
 		}
 	});
+var elm$core$List$cons = _List_cons;
 var elm$core$Dict$toList = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,
@@ -4488,16 +4470,29 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
-var author$project$Main$buildDefault = _List_fromArray(
-	[-1, 0, 0, -1, -1, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1]);
-var elm$core$Basics$True = {$: 'True'};
-var elm$core$Basics$False = {$: 'False'};
-var elm$core$Result$isOk = function (result) {
-	if (result.$ === 'Ok') {
-		return true;
-	} else {
-		return false;
-	}
+var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var elm$core$Array$foldr = F3(
+	function (func, baseCase, _n0) {
+		var tree = _n0.c;
+		var tail = _n0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3(elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			elm$core$Elm$JsArray$foldr,
+			helper,
+			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
+var elm$core$Array$toList = function (array) {
+	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
@@ -4889,7 +4884,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		A7(author$project$Main$Model, 'board not really implemented', author$project$Main$buildDefault, 3, 1, 0, 'agpgenpaiengapie', true),
+		A9(author$project$Main$Model, 'board not really implemented', 3, false, 0, 'agpgenpaiengapie', true, 1, 1, false),
 		elm$core$Platform$Cmd$none);
 };
 var author$project$Main$GetJSON = function (a) {
@@ -5439,19 +5434,6 @@ var author$project$Main$decodeJSON = A3(
 	A2(elm$json$Json$Decode$field, 'content', elm$json$Json$Decode$value));
 var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Main$outputPort = _Platform_outgoingPort('outputPort', elm$json$Json$Encode$string);
-var author$project$Main$updateBoard = F4(
-	function (current, target, value, board) {
-		if (board.b) {
-			var x = board.a;
-			var xs = board.b;
-			return _Utils_eq(current, target) ? A2(elm$core$List$cons, value, xs) : A2(
-				elm$core$List$cons,
-				x,
-				A4(author$project$Main$updateBoard, current + 1, target, value, xs));
-		} else {
-			return _List_Nil;
-		}
-	});
 var elm$core$Basics$not = _Basics_not;
 var elm$core$Debug$log = _Debug_log;
 var elm$json$Json$Decode$decodeValue = _Json_run;
@@ -5484,6 +5466,12 @@ var author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{toggleSidebar: !model.toggleSidebar}),
+					elm$core$Platform$Cmd$none);
+			case 'PassTurn':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{turn: !model.turn}),
 					elm$core$Platform$Cmd$none);
 			case 'NewGame':
 				return _Utils_Tuple2(
@@ -5543,7 +5531,7 @@ var author$project$Main$update = F2(
 							}),
 						elm$core$Platform$Cmd$none);
 				}
-			case 'ConnectToServer':
+			default:
 				var json = _n0.a;
 				return _Utils_Tuple2(
 					model,
@@ -5561,38 +5549,10 @@ var author$project$Main$update = F2(
 										'content',
 										elm$json$Json$Encode$string(''))
 									])))));
-			default:
-				var n = _n0.a;
-				var newTurn = ((-1) * model.turn) + 3;
-				var newBoard = A4(author$project$Main$updateBoard, 0, n, newTurn, model.board);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							board: newBoard,
-							debugString: elm$core$String$fromInt(n),
-							turn: newTurn
-						}),
-					author$project$Main$outputPort(
-						A2(
-							elm$json$Json$Encode$encode,
-							0,
-							elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'action',
-										elm$json$Json$Encode$string('submit_movelist')),
-										_Utils_Tuple2(
-										'content',
-										elm$json$Json$Encode$string('todo'))
-									])))));
 		}
 	});
+var author$project$Main$PassTurn = {$: 'PassTurn'};
 var author$project$Main$ToggleSidebar = {$: 'ToggleSidebar'};
-var author$project$Main$AddMove = function (a) {
-	return {$: 'AddMove', a: a};
-};
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
@@ -5607,7 +5567,12 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$main_ = _VirtualDom_node('main');
+var elm$html$Html$span = _VirtualDom_node('span');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5616,6 +5581,7 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5633,100 +5599,7 @@ var elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		elm$json$Json$Decode$succeed(msg));
 };
-var author$project$Main$drawCells = F2(
-	function (index, remainingCells) {
-		if (!remainingCells.b) {
-			return _List_Nil;
-		} else {
-			var v = remainingCells.a;
-			var vs = remainingCells.b;
-			switch (v) {
-				case 0:
-					return A2(
-						elm$core$List$cons,
-						A2(
-							elm$html$Html$div,
-							_List_fromArray(
-								[
-									elm$html$Html$Attributes$class('c')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									elm$html$Html$div,
-									_List_fromArray(
-										[
-											elm$html$Html$Attributes$class('s'),
-											elm$html$Html$Events$onClick(
-											author$project$Main$AddMove(index))
-										]),
-									_List_Nil)
-								])),
-						A2(author$project$Main$drawCells, index + 1, vs));
-				case 1:
-					return A2(
-						elm$core$List$cons,
-						A2(
-							elm$html$Html$div,
-							_List_fromArray(
-								[
-									elm$html$Html$Attributes$class('c')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									elm$html$Html$div,
-									_List_fromArray(
-										[
-											elm$html$Html$Attributes$class('s red')
-										]),
-									_List_Nil)
-								])),
-						A2(author$project$Main$drawCells, index + 1, vs));
-				case 2:
-					return A2(
-						elm$core$List$cons,
-						A2(
-							elm$html$Html$div,
-							_List_fromArray(
-								[
-									elm$html$Html$Attributes$class('c')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									elm$html$Html$div,
-									_List_fromArray(
-										[
-											elm$html$Html$Attributes$class('s blue')
-										]),
-									_List_Nil)
-								])),
-						A2(author$project$Main$drawCells, index + 1, vs));
-				default:
-					return A2(
-						elm$core$List$cons,
-						A2(
-							elm$html$Html$div,
-							_List_fromArray(
-								[
-									elm$html$Html$Attributes$class('c')
-								]),
-							_List_Nil),
-						A2(author$project$Main$drawCells, index + 1, vs));
-			}
-		}
-	});
-var elm$html$Html$a = _VirtualDom_node('a');
-var elm$html$Html$main_ = _VirtualDom_node('main');
-var elm$html$Html$span = _VirtualDom_node('span');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var author$project$Main$view = function (model) {
-	var drawBoard = function (board) {
-		return A2(author$project$Main$drawCells, 0, board);
-	};
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
@@ -5752,14 +5625,7 @@ var author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text(' yo '),
-						A2(
-						elm$html$Html$a,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$class('sidebar_tab')
-							]),
-						_List_Nil)
+						elm$html$Html$text(' yo ')
 					])),
 				A2(
 				elm$html$Html$div,
@@ -5803,7 +5669,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -5861,7 +5728,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -5919,7 +5787,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -5977,7 +5846,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6035,7 +5905,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6093,7 +5964,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6151,7 +6023,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6209,7 +6082,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6267,7 +6141,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6325,7 +6200,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6383,7 +6259,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6441,7 +6318,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6499,7 +6377,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6557,7 +6436,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6615,7 +6495,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6673,7 +6554,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6731,7 +6613,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6789,7 +6672,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6847,7 +6731,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6905,7 +6790,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -6963,7 +6849,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -7021,7 +6908,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -7079,7 +6967,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -7137,7 +7026,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -7195,7 +7085,8 @@ var author$project$Main$view = function (model) {
 														elm$html$Html$div,
 														_List_fromArray(
 															[
-																elm$html$Html$Attributes$class('spy')
+																elm$html$Html$Attributes$class(
+																'spy' + (model.hideSpies ? ' hidden' : ''))
 															]),
 														_List_Nil),
 														A2(
@@ -7237,7 +7128,7 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$div,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$class('bottom_left cards_remaining')
+										elm$html$Html$Attributes$class('bottom_left bottom_no_stretch')
 									]),
 								_List_fromArray(
 									[
@@ -7245,22 +7136,10 @@ var author$project$Main$view = function (model) {
 										elm$html$Html$span,
 										_List_fromArray(
 											[
-												elm$html$Html$Attributes$class('red_remaining')
+												elm$html$Html$Attributes$class('settings_button'),
+												elm$html$Html$Events$onClick(author$project$Main$ToggleSidebar)
 											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('0 remaining')
-											])),
-										A2(
-										elm$html$Html$span,
-										_List_fromArray(
-											[
-												elm$html$Html$Attributes$class('blue_remaining')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('10 remaining')
-											]))
+										_List_Nil)
 									])),
 								A2(
 								elm$html$Html$div,
@@ -7274,11 +7153,13 @@ var author$project$Main$view = function (model) {
 										elm$html$Html$span,
 										_List_fromArray(
 											[
-												elm$html$Html$Attributes$class('turn_text')
+												elm$html$Html$Attributes$class('turn_text button'),
+												elm$html$Html$Events$onClick(author$project$Main$PassTurn)
 											]),
 										_List_fromArray(
 											[
-												elm$html$Html$text('Red team\'s turn!'),
+												elm$html$Html$text(
+												(model.turn ? 'Red' : 'Blue') + ' team\'s turn!'),
 												A2(
 												elm$html$Html$span,
 												_List_fromArray(
@@ -7295,25 +7176,65 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$div,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$class('bottom_center')
+										elm$html$Html$Attributes$class('bottom_left cards_remaining')
 									]),
 								_List_fromArray(
 									[
 										A2(
-										elm$html$Html$a,
+										elm$html$Html$div,
 										_List_fromArray(
 											[
-												elm$html$Html$Attributes$class('pass')
+												elm$html$Html$Attributes$class('red_remaining')
 											]),
 										_List_fromArray(
 											[
-												elm$html$Html$text('Pass Turn'),
+												elm$html$Html$text(
+												elm$core$String$fromInt(model.redRemaining) + ' remaining')
+											])),
+										A2(
+										elm$html$Html$div,
+										_List_fromArray(
+											[
+												elm$html$Html$Attributes$class('blue_remaining')
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text(
+												elm$core$String$fromInt(model.blueRemaining) + ' remaining')
+											]))
+									])),
+								A2(
+								elm$html$Html$div,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('bottom_right')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										elm$html$Html$div,
+										_List_fromArray(
+											[
+												elm$html$Html$Attributes$class('button')
+											]),
+										_List_fromArray(
+											[
 												A2(
-												elm$html$Html$span,
+												elm$html$Html$a,
 												_List_Nil,
 												_List_fromArray(
 													[
-														elm$html$Html$text('Spacebar')
+														elm$html$Html$text(model.debugString),
+														A2(
+														elm$html$Html$span,
+														_List_fromArray(
+															[
+																elm$html$Html$Attributes$class('bottom_span')
+															]),
+														_List_fromArray(
+															[
+																elm$html$Html$text('Click for QR code')
+															]))
 													]))
 											]))
 									])),
@@ -7321,53 +7242,17 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$div,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$class('bottom_right')
+										elm$html$Html$Attributes$class('bottom_right bottom_no_stretch')
 									]),
 								_List_fromArray(
 									[
 										A2(
-										elm$html$Html$a,
-										_List_Nil,
+										elm$html$Html$span,
 										_List_fromArray(
 											[
-												elm$html$Html$text('New game'),
-												A2(
-												elm$html$Html$span,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$class('bottom_span')
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text('Click here')
-													]))
-											]))
-									])),
-								A2(
-								elm$html$Html$div,
-								_List_fromArray(
-									[
-										elm$html$Html$Attributes$class('bottom_right')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												elm$html$Html$text(model.debugString),
-												A2(
-												elm$html$Html$span,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$class('bottom_span')
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text('Click for QR code')
-													]))
-											]))
+												elm$html$Html$Attributes$class('info_button')
+											]),
+										_List_Nil)
 									]))
 							]))
 					]))
