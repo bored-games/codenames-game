@@ -37,6 +37,7 @@ main {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  transition: .1s linear all;
 }
 
 .sidebar {
@@ -50,16 +51,13 @@ main {
   border-left: 1px solid #b5bdc7;
   border-right: 1px solid rgba(255, 255, 255, .3);
   box-shadow: 0 0 5px rgba(0, 0, 0, .7);
-  transition: .15s ease-in-out all;
+  transition: .25s ease-in-out all;
   z-index: 100;
 }
 
 .sidebar.hidden {
-  left: -25%;
-}
-
-.sidebar.hidden:hover {
-  left: -24.5%;
+  left: -26%;
+  display: block;
 }
 
 .sidebar ul {
@@ -198,7 +196,7 @@ main {
   display: flex;
   align-items: center;
   line-height: 2.8rem;
-  font-family:Josefin Sans;
+  font-family: Candara;
   position: relative;
   width: 100%;
   z-index: 5;
@@ -395,4 +393,67 @@ em {
 
 .hidden {
   display: none;
+}
+
+.icon {
+  display: inline-block;
+  height: 1.0rem;
+  width: 1.0rem;
+  background: #fff;
+  mask: url('../static/checked.svg') no-repeat center center;
+  mask-size: contain;
+  margin-right: 0.75rem;
+  vertical-align: baseline;
+}
+
+.icon.edit {
+  mask-image: url('../static/edit.svg');
+}
+
+.icon.unchecked {
+  mask-image: url('../static/unchecked.svg');
+}
+
+.icon.close {
+  mask-image: url('../static/close.svg');
+}
+
+.lightbox {
+  background: rgba(0, 0, 0, .8);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  transition: .1s linear all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation-fill-mode: forwards;
+}
+
+.lightbox div {
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+  width: 40%;
+  height: 0%;
+  padding-top: 40%;
+  animation-name: fadeIn;
+  animation-duration: 0.25s;
+}
+
+.lightbox.hidden {
+  animation-name: fadeOut;
+  animation-duration: 0.25s;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; visibility: visible; }
 }

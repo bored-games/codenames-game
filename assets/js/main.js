@@ -4360,12 +4360,14 @@ var author$project$Main$Model = function (nameInProgress) {
 		return function (turn) {
 			return function (currentTimer) {
 				return function (debugString) {
-					return function (toggleSidebar) {
-						return function (toggleSpies) {
-							return function (redRemaining) {
-								return function (blueRemaining) {
-									return function (password) {
-										return {blueRemaining: blueRemaining, currentTimer: currentTimer, debugString: debugString, lastCell: lastCell, nameInProgress: nameInProgress, password: password, redRemaining: redRemaining, toggleSidebar: toggleSidebar, toggleSpies: toggleSpies, turn: turn};
+					return function (toggleLightbox) {
+						return function (toggleSidebar) {
+							return function (toggleSpies) {
+								return function (redRemaining) {
+									return function (blueRemaining) {
+										return function (password) {
+											return {blueRemaining: blueRemaining, currentTimer: currentTimer, debugString: debugString, lastCell: lastCell, nameInProgress: nameInProgress, password: password, redRemaining: redRemaining, toggleLightbox: toggleLightbox, toggleSidebar: toggleSidebar, toggleSpies: toggleSpies, turn: turn};
+										};
 									};
 								};
 							};
@@ -4378,7 +4380,7 @@ var author$project$Main$Model = function (nameInProgress) {
 };
 var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$True = {$: 'True'};
-var author$project$Main$init = author$project$Main$Model('board not really implemented')(3)(false)(0)('debug')(true)(false)(1)(1)('1w6mvdnr6vj');
+var author$project$Main$init = author$project$Main$Model('board not really implemented')(3)(false)(0)('debug')(true)(true)(true)(1)(1)('1w6mvdnr6vj');
 var elm$core$Basics$EQ = {$: 'EQ'};
 var elm$core$Basics$GT = {$: 'GT'};
 var elm$core$Basics$LT = {$: 'LT'};
@@ -4470,6 +4472,10 @@ var author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{nameInProgress: name});
+			case 'ToggleLightbox':
+				return _Utils_update(
+					model,
+					{toggleLightbox: !model.toggleLightbox});
 			case 'ToggleSidebar':
 				return _Utils_update(
 					model,
@@ -4489,6 +4495,7 @@ var author$project$Main$update = F2(
 		}
 	});
 var author$project$Main$PassTurn = {$: 'PassTurn'};
+var author$project$Main$ToggleLightbox = {$: 'ToggleLightbox'};
 var author$project$Main$ToggleSidebar = {$: 'ToggleSidebar'};
 var author$project$Main$ToggleSpies = {$: 'ToggleSpies'};
 var elm$core$Basics$append = _Utils_append;
@@ -4950,6 +4957,18 @@ var author$project$Main$view = function (model) {
 				elm$html$Html$div,
 				_List_fromArray(
 					[
+						elm$html$Html$Attributes$class(
+						'lightbox' + (model.toggleLightbox ? '' : ' hidden')),
+						elm$html$Html$Events$onClick(author$project$Main$ToggleLightbox)
+					]),
+				_List_fromArray(
+					[
+						A2(elm$html$Html$div, _List_Nil, _List_Nil)
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
 						elm$html$Html$Attributes$class('debug')
 					]),
 				_List_Nil),
@@ -4981,6 +5000,14 @@ var author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class(
+														'icon ' + (model.toggleSpies ? 'checked' : 'unchecked'))
+													]),
+												_List_Nil),
 												elm$html$Html$text('Show spies')
 											]))
 									]))
@@ -5003,6 +5030,13 @@ var author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class('icon checked')
+													]),
+												_List_Nil),
 												elm$html$Html$text('Use default words')
 											]))
 									])),
@@ -5019,6 +5053,13 @@ var author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class('icon checked')
+													]),
+												_List_Nil),
 												elm$html$Html$text('Use adult words')
 											]))
 									])),
@@ -5035,6 +5076,13 @@ var author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class('icon checked')
+													]),
+												_List_Nil),
 												elm$html$Html$text('Use custom words')
 											]))
 									]))
@@ -5057,6 +5105,13 @@ var author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class('icon edit')
+													]),
+												_List_Nil),
 												elm$html$Html$text('Edit custom wordlist (not implemented)')
 											]))
 									])),
@@ -5074,6 +5129,13 @@ var author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class('icon close')
+													]),
+												_List_Nil),
 												elm$html$Html$text('Close settings')
 											]))
 									]))
@@ -5126,7 +5188,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5185,7 +5247,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5244,7 +5306,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5303,7 +5365,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5362,7 +5424,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5421,7 +5483,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5480,7 +5542,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5539,7 +5601,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5598,7 +5660,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5657,7 +5719,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5716,7 +5778,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5775,7 +5837,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5834,7 +5896,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5893,7 +5955,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -5952,7 +6014,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6011,7 +6073,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6070,7 +6132,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6129,7 +6191,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6188,7 +6250,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6247,7 +6309,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6306,7 +6368,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6365,7 +6427,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6424,7 +6486,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6483,7 +6545,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
@@ -6542,7 +6604,7 @@ var author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																elm$html$Html$Attributes$class(
-																'spy' + (model.toggleSpies ? ' hidden' : ''))
+																'spy' + (model.toggleSpies ? '' : ' hidden'))
 															]),
 														_List_Nil),
 														A2(
