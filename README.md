@@ -11,6 +11,11 @@ Her job each turn is to provide one word and one number that connects as many wo
 
 Each guess is completed by selecting a card to learn which "team" it belongs to. If the *Assassin* is selected, the team loses immediately.
 
+## Preview
+
+<p align="center"><img src="docs/preview.png" width="1000px" alt="" /></p>
+
+
 ## Compile
 ```elm make src/Spymaster.elm --output=assets/js/main.js && elm reactor```
 
