@@ -1,37 +1,25 @@
-port module Main exposing (Model, Msg(..), init, inputPort, main, outputPort, subscriptions, update, view)
+module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, for, id, name, placeholder, style, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
-import Json.Decode
-import Json.Encode
+import Html.Events exposing (onClick)
 import Time
 
 
 
 -- MAIN
 
-
-main : Program () Model Msg
 main =
-    Browser.element
+    Browser.sandbox
         { init = init
-        , view = view
         , update = update
-        , subscriptions = subscriptions
+        , view = view
         }
 
 
 
 -- MODEL
-
-
-type alias JSONMessage =
-    { action : String
-    , content : Json.Encode.Value
-    }
-
 
 type alias Model =
     { nameInProgress : String
@@ -46,9 +34,9 @@ type alias Model =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Model
+init : Model
+init =
+    Model
         "board not really implemented"
         3
         False
@@ -58,8 +46,6 @@ init _ =
         1
         1
         False
-    , Cmd.none
-    )
 
 
 
@@ -70,81 +56,26 @@ type Msg
     = SetName String
       --| SetColor String
       --| UpdateSettings
-      --| SetMessage String
-      --| SendMessage
     | ToggleSidebar
     | PassTurn
     | NewGame
-      --| SetScore Int Int
-      --| ToggleEmoticons
-      --| InsertEmoticon String
-    | Tick Time.Posix
-    | Ping Time.Posix
-    | GetJSON Json.Encode.Value -- Parse incoming JSON
 
 
-
---| GetBoard Json.Encode.Value             -- 100
---| GetPegs Json.Encode.Value         -- 101
---| GetScore Json.Encode.Value         -- 200
---| GetChat Json.Encode.Value              -- 202
---| SetActiveColor (Maybe Color)
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case Debug.log "MESSAGE: " msg of
         SetName name ->
-            ( { model | nameInProgress = name }, Cmd.none )
+            { model | nameInProgress = name }
 
         ToggleSidebar ->
-            ( { model | toggleSidebar = not model.toggleSidebar }
-            , Cmd.none
-            )
+            { model | toggleSidebar = not model.toggleSidebar }
 
         PassTurn ->
-            ( { model | turn = not model.turn }
-            , Cmd.none
-            )
+            { model | turn = not model.turn }
 
         NewGame ->
-            -- TODO!
-            ( { model | nameInProgress = "New game" }, Cmd.none )
-
-        Tick newTime ->
-            let
-                currentTimerDisplay =
-                    model.currentTimer + 1
-            in
-            ( { model | currentTimer = currentTimerDisplay }, Cmd.none )
-
-        Ping newTime ->
-            ( { model | currentTimer = model.currentTimer + 1 }
-            , outputPort
-                (Json.Encode.encode
-                    0
-                    (Json.Encode.object
-                        [ ( "action", Json.Encode.string "ping" )
-                        , ( "content", Json.Encode.string "ping" )
-                        ]
-                    )
-                )
-            )
-
-        GetJSON json ->
-            case Json.Decode.decodeValue decodeJSON json of
-                Ok { action, content } ->
-                    case action of
-                        "update_chat" ->
-                            ( Debug.log "Error: unknown code in JSON message" model, Cmd.none )
-
-                        -- Error: missing code
-                        _ ->
-                            ( Debug.log "Error: unknown code in JSON message" model, Cmd.none )
-
-                -- Error: missing code
-                Err _ ->
-                    ( { model | debugString = "Bad JSON: " ++ Json.Encode.encode 0 json }, Cmd.none )
+            -- TO DO!
+            { model | nameInProgress = "New game" }
 
 
 updateBoard : Int -> Int -> Int -> List Int -> List Int
@@ -159,34 +90,6 @@ updateBoard current target value board =
 
         _ ->
             []
-
-
-decodeJSON : Json.Decode.Decoder JSONMessage
-decodeJSON =
-    Json.Decode.map2
-        JSONMessage
-        (Json.Decode.field "action" Json.Decode.string)
-        (Json.Decode.field "content" Json.Decode.value)
-
-
-
--- SUBSCRIPTIONS
-
-
-port outputPort : String -> Cmd msg
-
-
-port inputPort : (Json.Encode.Value -> msg) -> Sub msg
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch
-        [ Time.every 50000 Ping
-        , Time.every 1000 Tick
-        , inputPort GetJSON
-        ]
-
 
 
 
