@@ -63,6 +63,29 @@ main {
   left: -24.5%;
 }
 
+.sidebar ul {
+  list-style: none;
+  margin: 1.0rem 0;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 0;
+}
+
+.sidebar li a {
+  display: block;
+  color: #ccc;
+  font-size: 1.2rem;
+  padding: 0.5rem 1.25rem;
+  transition: .1s linear all;
+}
+
+.sidebar li a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .1);
+}
+
 .sidebar_tab {
   position: absolute;
   bottom: 2%;
@@ -87,7 +110,8 @@ main {
   cursor: default;
   transition: .1s linear all;
   display: flex;
- /* overflow: hidden; rem/ */
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .card_border:hover {
@@ -217,17 +241,11 @@ main {
 	cursor: pointer;
 }
 
-.red_hover .clickable:hover {
-	box-shadow: 0px 0px 15px #ff3c61;
+.red-turn .card_border:hover {
+	box-shadow: 0px 0px 15px 5px #cf314e;
 }
-.red_hover  .clickable:hover .wordbox {
-	color: #ab2d2d;
-}
-.blue_hover .clickable:hover {
-	box-shadow: 0px 0px 15px #3eaeff; /* red: ff3c61 */
-}
-.blue_hover  .clickable:hover .wordbox {
-	color: #2d76ab; /* red: ab2d2d */
+.blue-turn .card_border:hover {
+	box-shadow: 0px 0px 15px 5px #2b7bb4; 
 }
 
 .pass {
@@ -369,4 +387,12 @@ em {
   font-weight: 200;
   opacity: 0.5;
   font-size: 1.2rem;
+}
+
+.password {
+  text-transform: uppercase;
+}
+
+.hidden {
+  display: none;
 }
