@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Spymaster</title>
+
+	<meta name="description" content="">
+	<meta name="keywords" content="codeblocks">
+	<link rel="icon" type="image/png" href="assets/static/favicon.png" />
+
+	<!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/style.css">
+		
+	<!-- Fonts -->
+	<link href='http://fonts.googleapis.com/css?family=Oswald:300,400,700' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Gloria+Hallelujah' rel='stylesheet' type='text/css'>
+    
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+	<script src="assets/js/BigInteger.min.js"></script>
+  <script src="assets/js/qrcode.min.js"></script>
+  
+  <script src="assets/js/main.js"></script>
+
+</head>
+<body>
+  <main id="elm-node"></main>
+
+  <script type="text/javascript">
+    // prevent backspace from redirecting browser
+    window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+0008'||e.keyIdentifier=='Backspace'||e.keyCode==8){if(e.target==document.body){e.preventDefault();return false;}}},true);
+    var app = Elm.Main.init({node:document.getElementById('elm-node')});
+  </script>
+
+</body>
+</html>

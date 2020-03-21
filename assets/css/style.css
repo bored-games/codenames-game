@@ -1,0 +1,307 @@
+body {
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  height: 100vh;
+	background: linear-gradient(to bottom, #827265 0, #4b4037 100%);
+	font-family: "Segoe UI", Helvetica, "Open Sans", Arial;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+}
+
+.center {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  align-items: space-around;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+
+.bottom {
+  height: 10%;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.sidebar {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 25%;
+  z-index: 2;
+  background: rgba(10, 10, 10, .9);
+  border-left: 1px solid #b5bdc7;
+  border-right: 1px solid rgba(255, 255, 255, .3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, .7);
+  transition: .15s ease-in-out all;
+  cursor: pointer;
+}
+
+.sidebar.hidden {
+  left: -25%;
+}
+
+.sidebar.hidden:hover {
+  left: -24.5%;
+}
+
+.sidebar_tab {
+  position: absolute;
+  bottom: 2%;
+  top: 92%;
+  width: 12%;
+  right: -12%;
+  display: block;
+  background: rgba(10, 10, 10, .9);
+  box-shadow: 0 0 5px rgba(0, 0, 0, .7);
+  border-top: 1px solid rgba(255, 255, 255, .3);
+  border-right: 1px solid rgba(255, 255, 255, .3);
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+}
+
+.card_border {
+  flex: 0 0 18%;
+  background: #fbce97;
+  height: 17%;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid #f7cd93;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, .2);
+  cursor: default;
+  transition: .15s linear all;
+  display: flex;
+}
+
+.card_border:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, .8);
+}
+
+.card {
+  width: 100%;
+  border: 1px solid white;
+	border-radius: 8px;
+	padding: 5px;
+	border: 3px solid #945f3f;
+  background: #fec693;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.card_top {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  align-self: stretch;
+}
+
+.decor_line {
+  flex: 1 1 auto;
+  border-bottom: 2px solid #b47e5a;
+  margin-right: 0.5rem;
+}
+
+.spy {
+  flex: 0 0 20%;
+  box-sizing: border-box;
+	border: 3px solid #eaeaea;
+	height: 100%;
+	width: 20%;
+	display: inline-block;
+  background: #555;
+  background-position: center center;
+	background-size: cover;
+	box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+#c00 .spy { background-image: url('../static/spies/anthony-blunt.png'); }
+#c01 .spy { background-image: url('../static/spies/oleg-penkovsky.png'); }
+#c02 .spy { background-image: url('../static/spies/elizabeth-van-lew.png'); }
+#c03 .spy { background-image: url('../static/spies/grima-wormtongue.png'); }
+#c04 .spy { background-image: url('../static/spies/sydney-reilly.png'); }
+#c05 .spy { background-image: url('../static/spies/mati-hari.png'); }
+#c06 .spy { background-image: url('../static/spies/nancy-wake.png'); }
+#c07 .spy { background-image: url('../static/spies/elyesa-bazna.png'); }
+#c08 .spy { background-image: url('../static/spies/the-prisoner.png'); }
+#c09 .spy { background-image: url('../static/spies/ray-mawby.png'); }
+#c10 .spy { background-image: url('../static/spies/belle-boyd.png'); }
+#c11 .spy { background-image: url('../static/spies/the-somerton-man.png'); }
+#c12 .spy { background-image: url('../static/spies/virginia-hall.png'); }
+#c13 .spy { background-image: url('../static/spies/guy-burgess.png'); }
+#c14 .spy { background-image: url('../static/spies/ethel-rosenberg.png'); }
+#c15 .spy { background-image: url('../static/spies/julius-rosenberg.png'); }
+#c16 .spy { background-image: url('../static/spies/richard-sorge.png'); }
+#c17 .spy { background-image: url('../static/spies/christiaan-hurgronje.png'); }
+#c18 .spy { background-image: url('../static/spies/kim-philby.png'); }
+#c19 .spy { background-image: url('../static/spies/fritz-duquesne.png'); }
+#c20 .spy { background-image: url('../static/spies/robert-hanssen.png'); }
+#c21 .spy { background-image: url('../static/spies/thomas-miller-beach.png'); }
+#c22 .spy { background-image: url('../static/spies/george-koval.png'); }
+#c23 .spy { background-image: url('../static/spies/donald-maclean.png'); }
+#c24 .spy { background-image: url('../static/spies/klaus-fuchs.png'); }
+
+.wordbox {
+  flex: 0 0 auto;
+  color: #351e11;
+  background: #ffefce;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  line-height: 2.5rem;
+}
+
+.wordbox span {
+  width: 100%;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.red_hover .clickable:hover {
+	box-shadow: 0px 0px 15px #ff3c61;
+}
+.red_hover  .clickable:hover .wordbox {
+	color: #ab2d2d;
+}
+.blue_hover .clickable:hover {
+	box-shadow: 0px 0px 15px #3eaeff; /* red: ff3c61 */
+}
+.blue_hover  .clickable:hover .wordbox {
+	color: #2d76ab; /* red: ab2d2d */
+}
+
+.pass {
+  background-color: #C63702;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #C63702 inset, 0 0 0 2px rgba(255, 255, 255, 0.15) inset, 0 8px 0 0 #AD3002, 0 8px 0 1px rgba(0, 0, 0, 0.4), 0 8px 8px 1px rgba(0, 0, 0, 0.5);
+  color: #FFF;
+  display: block;
+  font-size: 22px;
+  font-weight: 600;
+  height: 90%;
+  position: relative;
+  text-align: center;
+  text-shadow: 0 1px 1px black;
+  text-decoration: none !important;
+  transition: 0.05s linear all;
+  width: 100%;
+  cursor: pointer;
+  line-height: 2.5rem;
+  top: 0px;
+  vertical-align: middle;
+}
+
+.pass span {
+  opacity: 0.4;
+  display: block;
+  line-height: 1.0rem;
+  font-weight: 400;
+  font-size: 80%;
+}
+
+.pass:hover, .pass:focus {
+  background-color: #D13902;
+  box-shadow: 
+    0 0 0 1px #C63702 inset,
+    0 0 0 2px rgba(255, 255, 255, 0.15) inset,
+    0 10px 0 0 #AD3002,
+    0 10px 0 1px rgba(0, 0, 0, 0.4),
+    0 10px 8px 1px rgba(0, 0, 0, 0.6);
+    top: -2px;
+}
+
+.pass:active {
+  box-shadow: 
+    0 0 0 1px #AD3002 inset,
+    0 0 0 2px rgba(255, 255, 255, 0.15) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.4); 
+  transform: translateY(10px);
+}
+
+
+.bottom > div {
+  flex: 0 0 auto;
+  padding: 10px;
+  text-shadow: -2px -3px 4px rgba(0, 0, 0, .4);
+}
+
+
+.bottom_center {
+  flex: 2 2 auto;
+  min-width: 25%;
+  align-self: stretch;
+}
+
+.bottom_left, .bottom_right {
+  flex: 1 1 auto;
+  font-family: "Oswald";
+  font-size: 2.0rem;
+  line-height: 2.25rem;
+	cursor: default;
+  color: #ccc;
+  text-align: center;
+}
+
+.settings_button {
+  background: rgba(0, 0, 0, .3);
+  padding: 10px;
+  height: 100%;
+}
+
+.red_remaining {
+	display: block;
+	color: #ffbbc8;
+}
+
+.blue_remaining {
+	display: block;
+	color: #aeddff;
+}
+
+em {
+	font-style: normal;
+}
+
+.turn_text {
+  display: block;
+}
+
+.passphrase {
+	cursor: default;
+	display: block;
+	text-transform: uppercase;
+}
+
+.new_game {
+	cursor: pointer;
+	color: rgba(255, 255, 255, .5);
+}
+
+.bottom_span {
+  display: block;
+  font-weight: 200;
+  opacity: 0.5;
+  font-size: 1.2rem;
+}
