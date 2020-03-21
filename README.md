@@ -1,4 +1,4 @@
-# :canoe: Canoe :canoe: Work in progress!
+# 🕵️ Spymaster 🕵️
 An offline browser-based game similar to "Codenames" written in Elm.
 
 ## Objective
