@@ -74,7 +74,7 @@ main {
   display: block;
   color: #ccc;
   font-size: 1.2rem;
-  padding: 0.5rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   transition: .1s linear all;
   cursor: pointer;
 }
@@ -430,7 +430,7 @@ em {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation-fill-mode: forwards;
+  animation-fill-mode: both;
 }
 
 .lightbox div {
@@ -439,21 +439,15 @@ em {
   width: 40%;
   height: 0%;
   padding-top: 40%;
-  animation-name: fadeIn;
-  animation-duration: 0.25s;
+  transition: .25s linear all;
+}
+
+.lightbox.show {
+  opacity: 1;
+  visibility: visible;
 }
 
 .lightbox.hidden {
-  animation-name: fadeOut;
-  animation-duration: 0.25s;
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; visibility: hidden; }
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; visibility: visible; }
+  opacity: 0;
+  visibility: hidden;
 }
