@@ -104,7 +104,7 @@ main {
   height: 17%;
   box-sizing: border-box;
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, .2);
+  box-shadow: 0 0 15px 4px rgba(0, 0, 0, .2);
   cursor: default;
   transition: .1s linear all;
   display: flex;
@@ -120,8 +120,6 @@ main {
 
 .card {
   width: 100%;
-	border-radius: 8px;
-  background: #ccc9c0;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -157,16 +155,16 @@ main {
   margin-top: 5px;
 }
 
-#c00 .spy { background-image: url('../static/spies/anthony-blunt.png'); }
-#c01 .spy { background-image: url('../static/spies/oleg-penkovsky.png'); }
-#c02 .spy { background-image: url('../static/spies/elizabeth-van-lew.png'); }
-#c03 .spy { background-image: url('../static/spies/grima-wormtongue.png'); }
-#c04 .spy { background-image: url('../static/spies/sydney-reilly.png'); }
-#c05 .spy { background-image: url('../static/spies/mati-hari.png'); }
-#c06 .spy { background-image: url('../static/spies/nancy-wake.png'); }
-#c07 .spy { background-image: url('../static/spies/elyesa-bazna.png'); }
-#c08 .spy { background-image: url('../static/spies/the-prisoner.png'); }
-#c09 .spy { background-image: url('../static/spies/ray-mawby.png'); }
+#c0 .spy { background-image: url('../static/spies/anthony-blunt.png'); }
+#c1 .spy { background-image: url('../static/spies/oleg-penkovsky.png'); }
+#c2 .spy { background-image: url('../static/spies/elizabeth-van-lew.png'); }
+#c3 .spy { background-image: url('../static/spies/grima-wormtongue.png'); }
+#c4 .spy { background-image: url('../static/spies/sydney-reilly.png'); }
+#c5 .spy { background-image: url('../static/spies/mati-hari.png'); }
+#c6 .spy { background-image: url('../static/spies/nancy-wake.png'); }
+#c7 .spy { background-image: url('../static/spies/elyesa-bazna.png'); }
+#c8 .spy { background-image: url('../static/spies/the-prisoner.png'); }
+#c9 .spy { background-image: url('../static/spies/ray-mawby.png'); }
 #c10 .spy { background-image: url('../static/spies/belle-boyd.png'); }
 #c11 .spy { background-image: url('../static/spies/the-somerton-man.png'); }
 #c12 .spy { background-image: url('../static/spies/virginia-hall.png'); }
@@ -451,3 +449,131 @@ em {
   opacity: 0;
   visibility: hidden;
 }
+
+/******** Uncovered ********/
+.uncovered:hover {
+  box-shadow: none !important;
+  cursor: default !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  box-shadow: 0 0 15px 4px rgba(0, 0, 0, .2) !important;
+}
+
+/** Neutral **/
+.team-0.uncovered {
+  opacity: 0.3;
+}
+
+/** Red **/
+.team-1.uncovered .card {
+  background: linear-gradient(to bottom, #ecb6c1 0, #dbc7cb 100%) !important;
+}
+.team-1.uncovered .wordbox {
+  color: #680c17 !important;
+}
+.team-1.uncovered .wordbox:before {
+  background: #db6161 !important;
+  animation: flip1 .5s ease-in-out;
+  animation-fill-mode: forwards;  
+  -webkit-backface-visibility: hidden;
+  outline: 1px solid transparent;
+}
+.team-1.uncovered .wordbox:after {
+  background: #664c4f !important;
+  animation: flip2 .5s ease-in-out;
+  animation-fill-mode: forwards;  
+  -webkit-backface-visibility: hidden;
+  outline: 1px solid transparent;
+}
+
+/** Blue **/
+.team-2.uncovered {
+  background: #ccc !important;
+  color: #2b7bb4 !important;
+}
+
+.team-2.uncovered {
+  background: linear-gradient(to bottom, #b7d6ed 0, #c8d3db 100%) !important;
+}
+
+.team-2.uncovered .wordbox:before {
+  background: #6094db !important;
+  animation: flip1 .5s ease-in-out;
+  animation-fill-mode: forwards;  
+  -webkit-backface-visibility: hidden;
+  outline: 1px solid transparent;
+}
+.team-2.uncovered .wordbox:after {
+  color: #0d3e69 !important;
+  animation: flip2 .5s ease-in-out;
+  animation-fill-mode: forwards;  
+  -webkit-backface-visibility: hidden;
+  outline: 1px solid transparent;
+}
+.team-2.uncovered .wordbox:after {
+  background: #4c5b66 !important;
+}
+
+/** Assassin **/
+.team--1.uncovered {
+  background: linear-gradient(to bottom, #433e44 0, #aaa 100%) !important;
+}
+.team--1.uncovered .wordbox {
+  color: #bfaac5 !important;
+}
+.team--1.uncovered .wordbox:before {
+  background: #1f1a1f !important;
+  animation: flip1 .5s ease-in-out;
+  animation-fill-mode: forwards;  
+  -webkit-backface-visibility: hidden;
+  outline: 1px solid transparent;
+}
+.team--1.uncovered .wordbox:after {
+  background: #361e3b !important;
+  animation: flip2 .5s ease-in-out;
+  animation-fill-mode: forwards;  
+  -webkit-backface-visibility: hidden;
+  outline: 1px solid transparent;
+}
+
+@keyframes flip1 {
+  from {
+    transform: rotate(9deg) translate(-0, 10%);
+  }
+  to {
+    transform: rotate(-9deg) translate(-0, 10%);
+  }
+}
+
+@keyframes flip2 {
+  from {
+    transform: rotate(4deg) translate(0px, 0px);
+  }
+  to {
+    transform: rotate(-4deg) translate(0px, 0px);
+  }
+}
+
+/*
+
+top:-30px;
+bottom:-50px;
+left:-50%;
+right:-50%;
+background:#c0a78a;
+transform: rotate(9deg) translate(-0, 10%);
+z-index: -1;
+opacity: 0.7;
+}
+
+.wordbox:after{
+content:"";
+position:absolute;
+top:-20px;
+bottom:-50%;
+left:-50%;
+right:-50%;
+background:#7f7869;
+transform: rotate(4deg) translate(0px, 0px);
+
+*/
