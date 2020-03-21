@@ -54,7 +54,7 @@ init =
         1
         1
         "1w6mvdnr6vj"
-        []
+        [ Card "test" 1 False, Card "east" 2 False, Card "cow" 0 False, Card "weasel" -1 False, Card "hotdog" 2 False ]
 
 
 
