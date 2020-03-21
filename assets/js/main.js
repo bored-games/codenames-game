@@ -4369,8 +4369,8 @@ var author$project$Main$Model = function (turn) {
 							return function (redRemaining) {
 								return function (blueRemaining) {
 									return function (password) {
-										return function (words) {
-											return {blueRemaining: blueRemaining, currentTimer: currentTimer, debugString: debugString, password: password, redRemaining: redRemaining, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSpies: toggleSpies, turn: turn, words: words};
+										return function (cards) {
+											return {blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, debugString: debugString, password: password, redRemaining: redRemaining, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSpies: toggleSpies, turn: turn};
 										};
 									};
 								};
@@ -4470,21 +4470,178 @@ var elm$core$Set$toList = function (_n0) {
 var author$project$Main$init = author$project$Main$Model(false)(0)('debug')(false)(false)(true)(true)(1)(1)('1w6mvdnr6vj')(
 	_List_fromArray(
 		[
-			A3(author$project$Main$Card, 'test', 1, false),
-			A3(author$project$Main$Card, 'east', 2, false),
-			A3(author$project$Main$Card, 'cow', 0, false),
-			A3(author$project$Main$Card, 'weasel', -1, false),
-			A3(author$project$Main$Card, 'hotdog', 2, false),
-			A3(author$project$Main$Card, 'test', 1, true),
-			A3(author$project$Main$Card, 'east', 2, true),
-			A3(author$project$Main$Card, 'cow', 0, true),
-			A3(author$project$Main$Card, 'weasel', -1, true),
-			A3(author$project$Main$Card, 'hotdog', 2, true)
+			A3(author$project$Main$Card, 'Gate', 2, false),
+			A3(author$project$Main$Card, 'Quilt', -1, false),
+			A3(author$project$Main$Card, 'Party', 0, false),
+			A3(author$project$Main$Card, 'Adjustment', 1, false),
+			A3(author$project$Main$Card, 'Cloth', 2, false),
+			A3(author$project$Main$Card, 'Orange', 0, false),
+			A3(author$project$Main$Card, 'Rod', 1, false),
+			A3(author$project$Main$Card, 'Tomatoes', 2, false),
+			A3(author$project$Main$Card, 'Flowers', 1, false),
+			A3(author$project$Main$Card, 'Rabbits', 2, false),
+			A3(author$project$Main$Card, 'Crook', 2, false),
+			A3(author$project$Main$Card, 'Toad', 2, false),
+			A3(author$project$Main$Card, 'Order', 0, false),
+			A3(author$project$Main$Card, 'Scissors', 1, false),
+			A3(author$project$Main$Card, 'Tank', 1, false),
+			A3(author$project$Main$Card, 'Hotdog', 1, false),
+			A3(author$project$Main$Card, 'Scent', 2, false),
+			A3(author$project$Main$Card, 'Distance', 0, false),
+			A3(author$project$Main$Card, 'Stitch', 2, false),
+			A3(author$project$Main$Card, 'Suit', 0, false),
+			A3(author$project$Main$Card, 'Squirrel', 0, false),
+			A3(author$project$Main$Card, 'Design', 0, false),
+			A3(author$project$Main$Card, 'Business', 1, false),
+			A3(author$project$Main$Card, 'Flesh', 1, false),
+			A3(author$project$Main$Card, 'Beef', 2, false)
 		]));
+var elm$core$Basics$and = _Basics_and;
+var elm$core$Basics$eq = _Utils_equal;
 var elm$core$Basics$not = _Basics_not;
+var author$project$Main$hiddenBlue = function (c) {
+	return (!function ($) {
+		return $.uncovered;
+	}(c)) && (function ($) {
+		return $.team;
+	}(c) === 2);
+};
+var author$project$Main$hiddenRed = function (c) {
+	return (!function ($) {
+		return $.uncovered;
+	}(c)) && (function ($) {
+		return $.team;
+	}(c) === 1);
+};
+var elm$core$Basics$add = _Basics_add;
+var author$project$Main$uncover = F3(
+	function (index, target, cards) {
+		if (cards.b) {
+			var c = cards.a;
+			var cs = cards.b;
+			var newCard = _Utils_eq(index, target) ? _Utils_update(
+				c,
+				{uncovered: true}) : c;
+			return A2(
+				elm$core$List$cons,
+				newCard,
+				A3(author$project$Main$uncover, index + 1, target, cs));
+		} else {
+			return _List_Nil;
+		}
+	});
+var elm$core$Basics$gt = _Utils_gt;
+var elm$core$List$foldl = F3(
+	function (func, acc, list) {
+		foldl:
+		while (true) {
+			if (!list.b) {
+				return acc;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				var $temp$func = func,
+					$temp$acc = A2(func, x, acc),
+					$temp$list = xs;
+				func = $temp$func;
+				acc = $temp$acc;
+				list = $temp$list;
+				continue foldl;
+			}
+		}
+	});
+var elm$core$List$reverse = function (list) {
+	return A3(elm$core$List$foldl, elm$core$List$cons, _List_Nil, list);
+};
+var elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							elm$core$List$foldl,
+							fn,
+							acc,
+							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var elm$core$List$length = function (xs) {
+	return A3(
+		elm$core$List$foldl,
+		F2(
+			function (_n0, i) {
+				return i + 1;
+			}),
+		0,
+		xs);
+};
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'UncoverCard':
+				var index = msg.a;
+				var newCards = A3(author$project$Main$uncover, 0, index, model.cards);
+				var redRemaining = elm$core$List$length(
+					A2(elm$core$List$filter, author$project$Main$hiddenRed, newCards));
+				var blueRemaining = elm$core$List$length(
+					A2(elm$core$List$filter, author$project$Main$hiddenBlue, newCards));
+				return _Utils_update(
+					model,
+					{blueRemaining: blueRemaining, cards: newCards, redRemaining: redRemaining});
 			case 'ToggleLightbox':
 				return _Utils_update(
 					model,
@@ -4516,7 +4673,9 @@ var author$project$Main$ToggleLightbox = {$: 'ToggleLightbox'};
 var author$project$Main$ToggleQR = {$: 'ToggleQR'};
 var author$project$Main$ToggleSidebar = {$: 'ToggleSidebar'};
 var author$project$Main$ToggleSpies = {$: 'ToggleSpies'};
-var elm$core$Basics$add = _Basics_add;
+var author$project$Main$UncoverCard = function (a) {
+	return {$: 'UncoverCard', a: a};
+};
 var elm$core$Basics$append = _Utils_append;
 var elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
@@ -4556,28 +4715,6 @@ var elm$core$Array$SubTree = function (a) {
 	return {$: 'SubTree', a: a};
 };
 var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
-var elm$core$List$foldl = F3(
-	function (func, acc, list) {
-		foldl:
-		while (true) {
-			if (!list.b) {
-				return acc;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				var $temp$func = func,
-					$temp$acc = A2(func, x, acc),
-					$temp$list = xs;
-				func = $temp$func;
-				acc = $temp$acc;
-				list = $temp$list;
-				continue foldl;
-			}
-		}
-	});
-var elm$core$List$reverse = function (list) {
-	return A3(elm$core$List$foldl, elm$core$List$cons, _List_Nil, list);
-};
 var elm$core$Array$compressNodes = F2(
 	function (nodes, acc) {
 		compressNodes:
@@ -4604,7 +4741,6 @@ var elm$core$Basics$apR = F2(
 	function (x, f) {
 		return f(x);
 	});
-var elm$core$Basics$eq = _Utils_equal;
 var elm$core$Tuple$first = function (_n0) {
 	var x = _n0.a;
 	return x;
@@ -4630,7 +4766,6 @@ var elm$core$Basics$apL = F2(
 		return f(x);
 	});
 var elm$core$Basics$floor = _Basics_floor;
-var elm$core$Basics$gt = _Utils_gt;
 var elm$core$Basics$max = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) > 0) ? x : y;
@@ -4724,7 +4859,6 @@ var elm$json$Json$Decode$Index = F2(
 var elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 'OneOf', a: a};
 };
-var elm$core$Basics$and = _Basics_and;
 var elm$core$Basics$or = _Basics_or;
 var elm$core$Char$toCode = _Char_toCode;
 var elm$core$Char$isLower = function (_char) {
@@ -4744,16 +4878,6 @@ var elm$core$Char$isDigit = function (_char) {
 };
 var elm$core$Char$isAlphaNum = function (_char) {
 	return elm$core$Char$isLower(_char) || (elm$core$Char$isUpper(_char) || elm$core$Char$isDigit(_char));
-};
-var elm$core$List$length = function (xs) {
-	return A3(
-		elm$core$List$foldl,
-		F2(
-			function (_n0, i) {
-				return i + 1;
-			}),
-		0,
-		xs);
 };
 var elm$core$List$map2 = _List_map2;
 var elm$core$List$rangeHelp = F3(
@@ -4941,6 +5065,23 @@ var elm$html$Html$Attributes$stringProperty = F2(
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
 var author$project$Main$drawCard = F2(
 	function (index, cards) {
 		if (cards.b) {
@@ -4960,7 +5101,9 @@ var author$project$Main$drawCard = F2(
 								return $.uncovered;
 							}(c) ? ' uncovered' : ' covered'))),
 							elm$html$Html$Attributes$id(
-							'c' + elm$core$String$fromInt(index))
+							'c' + elm$core$String$fromInt(index)),
+							elm$html$Html$Events$onClick(
+							author$project$Main$UncoverCard(index))
 						]),
 					_List_fromArray(
 						[
@@ -5018,23 +5161,6 @@ var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$li = _VirtualDom_node('li');
 var elm$html$Html$main_ = _VirtualDom_node('main');
 var elm$html$Html$ul = _VirtualDom_node('ul');
-var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		elm$html$Html$Events$on,
-		'click',
-		elm$json$Json$Decode$succeed(msg));
-};
 var author$project$Main$view = function (model) {
 	var addCards = function (cards) {
 		return A2(author$project$Main$drawCard, 0, cards);
@@ -5264,7 +5390,7 @@ var author$project$Main$view = function (model) {
 									model.turn ? 'red-turn' : 'blue-turn',
 									model.toggleSpies ? '' : ' hide_spies'))
 							]),
-						addCards(model.words)),
+						addCards(model.cards)),
 						A2(
 						elm$html$Html$div,
 						_List_fromArray(
@@ -5317,7 +5443,7 @@ var author$project$Main$view = function (model) {
 													]),
 												_List_fromArray(
 													[
-														elm$html$Html$text('Press space to pass')
+														elm$html$Html$text('Click here or press space to pass')
 													]))
 											]))
 									])),
@@ -5482,61 +5608,6 @@ var elm$core$Task$Perform = function (a) {
 };
 var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
-var elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							elm$core$List$foldl,
-							fn,
-							acc,
-							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(

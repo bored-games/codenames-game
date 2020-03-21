@@ -153,6 +153,7 @@ main {
   margin-right: 5px;
   z-index: 10;
   margin-top: 5px;
+  transition: .1s linear all;
 }
 
 #c0 .spy { background-image: url('../static/spies/anthony-blunt.png'); }
@@ -450,6 +451,10 @@ em {
   visibility: hidden;
 }
 
+.hide_spies .spy {
+  opacity: 0;
+}
+
 /******** Uncovered ********/
 .uncovered:hover {
   box-shadow: none !important;
@@ -461,7 +466,9 @@ em {
 
 /** Neutral **/
 .team-0.uncovered {
+  transition: .1s linear all;
   opacity: 0.3;
+  filter: saturate(0);
 }
 
 /** Red **/

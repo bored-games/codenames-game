@@ -37,7 +37,7 @@ type alias Model =
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
-    , words : List (Card)
+    , cards : List (Card)
     }
 
 
@@ -54,8 +54,11 @@ init =
         1
         1
         "1w6mvdnr6vj"
-        [ Card "test" 1 False, Card "east" 2 False, Card "cow" 0 False, Card "weasel" -1 False, Card "hotdog" 2 False,
-        Card "test" 1 True, Card "east" 2 True, Card "cow" 0 True, Card "weasel" -1 True, Card "hotdog" 2 True ]
+        [ Card "Gate" 2 False, Card "Quilt" -1 False, Card "Party" 0 False, Card "Adjustment" 1 False, Card "Cloth" 2 False,
+        Card "Orange" 0 False, Card "Rod" 1 False, Card "Tomatoes" 2 False, Card "Flowers" 1 False, Card "Rabbits" 2 False,
+        Card "Crook" 2 False, Card "Toad" 2 False, Card "Order" 0 False, Card "Scissors" 1 False, Card "Tank" 1 False,
+        Card "Hotdog" 1 False, Card "Scent" 2 False, Card "Distance" 0 False, Card "Stitch" 2 False, Card "Suit" 0 False,
+        Card "Squirrel" 0 False, Card "Design" 0 False, Card "Business" 1 False, Card "Flesh" 1 False, Card "Beef" 2 False ]
 
 
 
@@ -65,7 +68,8 @@ init =
 type Msg
       --| SetColor String
       --| UpdateSettings
-    = ToggleLightbox
+    = UncoverCard Int
+    | ToggleLightbox
     | ToggleQR
     | ToggleSidebar
     | ToggleSpies
@@ -76,6 +80,14 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        UncoverCard index ->
+          let
+              newCards = uncover 0 index model.cards
+              redRemaining = List.length (List.filter hiddenRed newCards)
+              blueRemaining = List.length (List.filter hiddenBlue newCards)
+          in
+            { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining }
+
         ToggleLightbox ->
             { model | toggleLightbox = not model.toggleLightbox }
             
@@ -95,24 +107,32 @@ update msg model =
             { model | turn = False }
 
 
-updateBoard : Int -> Int -> Int -> List Int -> List Int
-updateBoard current target value board =
-    case board of
-        x :: xs ->
-            if current == target then
-                value :: xs
+uncover index target cards =
+  case cards of
+    c :: cs ->
+      let
+          newCard = if index == target then { c | uncovered = True} else c
+      in
+        newCard :: (uncover (index + 1) target cs)
+    
+    _ ->
+      []
 
-            else
-                x :: updateBoard (current + 1) target value xs
+hiddenRed : Card -> Bool
+hiddenRed c =
+  not (.uncovered c) && (.team c == 1)
 
-        _ ->
-            []
+hiddenBlue : Card -> Bool
+hiddenBlue c =
+  not (.uncovered c) && (.team c == 2)
 
 drawCard : Int -> List (Card) -> List (Html Msg)
 drawCard index cards =
   case cards of
     c :: cs ->
-      div [ class ("card_border team-" ++ String.fromInt (.team c) ++ if .uncovered c then " uncovered" else " covered"), id ("c" ++ String.fromInt index) ]
+      div [ class ("card_border team-" ++ String.fromInt (.team c) ++ if .uncovered c then " uncovered" else " covered")
+          , id ("c" ++ String.fromInt index)
+          , onClick (UncoverCard index) ]
       [ div [ class "card" ]
         [ div [ class "card_top" ]
           [ div [ class "spy" ] [] ]
@@ -123,6 +143,7 @@ drawCard index cards =
 
     _ ->
       []
+
 
 countRemainingByTeam : List (Card) -> Int -> Int
 countRemainingByTeam cards team =
@@ -157,7 +178,7 @@ view model =
           ]
       , div [ class "center" ]
         [ main_ [ class ((if model.turn then "red-turn" else "blue-turn") ++ (if model.toggleSpies then "" else " hide_spies")) ]
-          (addCards model.words)
+          (addCards model.cards)
         {- [ div [ class "card_border", id "c00" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Four" ] ] ] ]
           , div [ class "card_border", id "c01" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Score" ] ] ] ]
           , div [ class "card_border", id "c02" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "And" ] ] ] ]
@@ -190,7 +211,7 @@ view model =
             , div [ class "bottom_left" ]
               [ span [ class "turn_text button", onClick PassTurn ]
                 [ text ((if model.turn then "Red" else "Blue") ++ " team's turn!")
-                , span [ class "bottom_span" ] [ text "Press space to pass" ]
+                , span [ class "bottom_span" ] [ text "Click here or press space to pass" ]
                 ]
               ]
             , div [ class "bottom_left cards_remaining" ]
