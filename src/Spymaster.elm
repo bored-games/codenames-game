@@ -4,6 +4,8 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, for, id, name, placeholder, style, type_, value)
 import Html.Events exposing (onClick)
+import Random exposing (Seed, generate, initialSeed, step)
+import Random.List exposing (shuffle)
 import Time
 
 
@@ -11,8 +13,9 @@ import Time
 -- MAIN
 
 main =
-    Browser.sandbox
+    Browser.element
         { init = init
+        , subscriptions = subscriptions
         , update = update
         , view = view
         }
@@ -27,7 +30,8 @@ type alias Card =
   }
 
 type alias Model =
-    { turn : Bool
+    { seed : Seed
+    , turn : Bool
     , currentTimer : Int
     , debugString : String
     , toggleLightbox : Bool
@@ -37,13 +41,15 @@ type alias Model =
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
+    , allWords : List (String)
     , cards : List (Card)
     }
 
 
-init : Model
-init =
-    Model
+init : () -> (Model, Cmd Msg)
+init _ =
+    (Model
+        (Random.initialSeed 0)
         False
         0
         "debug"
@@ -54,12 +60,13 @@ init =
         1
         1
         "1w6mvdnr6vj"
+        [ "Gate", "Quilt", "Party", "Adjustment", "Cloth", "Orange", "Rod", "Tomatoes", "Flowers", "Rabbits", "Crook", "Toad", "Order", "Scissors", "Tank", "Hotdog", "Scent", "Distance", "Stitch", "Suit", "Squirrel", "Design", "Business", "Flesh", "Beef"]
         [ Card "Gate" 2 False, Card "Quilt" -1 False, Card "Party" 0 False, Card "Adjustment" 1 False, Card "Cloth" 2 False,
         Card "Orange" 0 False, Card "Rod" 1 False, Card "Tomatoes" 2 False, Card "Flowers" 1 False, Card "Rabbits" 2 False,
         Card "Crook" 2 False, Card "Toad" 2 False, Card "Order" 0 False, Card "Scissors" 1 False, Card "Tank" 1 False,
         Card "Hotdog" 1 False, Card "Scent" 2 False, Card "Distance" 0 False, Card "Stitch" 2 False, Card "Suit" 0 False,
         Card "Squirrel" 0 False, Card "Design" 0 False, Card "Business" 1 False, Card "Flesh" 1 False, Card "Beef" 2 False ]
-
+      , Cmd.none)
 
 
 -- UPDATE
@@ -75,9 +82,10 @@ type Msg
     | ToggleSpies
     | PassTurn
     | NewGame
+    | Tick Time.Posix
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg)
 update msg model =
     case msg of
         UncoverCard index ->
@@ -86,26 +94,50 @@ update msg model =
               redRemaining = List.length (List.filter hiddenRed newCards)
               blueRemaining = List.length (List.filter hiddenBlue newCards)
           in
-            { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining }
+            ( { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining },
+            Cmd.none)
 
         ToggleLightbox ->
-            { model | toggleLightbox = not model.toggleLightbox }
+            ( { model | toggleLightbox = not model.toggleLightbox }
+            , Cmd.none)
             
         ToggleQR ->
-            { model | toggleQR = not model.toggleQR }
+            ( { model | toggleQR = not model.toggleQR }
+            , Cmd.none)
 
         ToggleSidebar ->
-            { model | toggleSidebar = not model.toggleSidebar }
+            ( { model | toggleSidebar = not model.toggleSidebar }
+            , Cmd.none)
 
         ToggleSpies ->
-            { model | toggleSpies = not model.toggleSpies }
+            ( { model | toggleSpies = not model.toggleSpies }
+            , Cmd.none)
 
         PassTurn ->
-            { model | turn = not model.turn }
+            ( { model | turn = not model.turn }
+            , Cmd.none)
 
         NewGame ->
-            { model | turn = False }
+          let
+              (newWords, newSeed) = Random.step (Random.List.shuffle model.allWords) (Random.initialSeed 0)
+              newCards = populateCards model.cards newWords
+          in
+            ( { model | cards = newCards, seed = newSeed, allWords = newWords }
+            , Cmd.none)
 
+        Tick newTime ->
+          ( model, Cmd.none )
+
+populateCards cards words =
+  case cards of
+    c :: cs ->
+      case words of
+        w :: ws ->
+          {c | word = w} :: populateCards cs ws
+        _ ->
+          {c | word = "Error"} :: populateCards cs []
+    
+    _ -> []
 
 uncover index target cards =
   case cards of
@@ -148,6 +180,19 @@ drawCard index cards =
 countRemainingByTeam : List (Card) -> Int -> Int
 countRemainingByTeam cards team =
   3
+
+
+
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.batch
+    [ Time.every 1000 Tick
+  {-  , Browser.Events.onKeyUp (Json.Decode.map (KeyChanged False) (Json.Decode.field "key" Json.Decode.string))
+    , Browser.Events.onKeyDown (Json.Decode.map (KeyChanged True) (Json.Decode.field "key" Json.Decode.string)) -}
+    ]
+
 
 -- VIEW
 
@@ -219,7 +264,7 @@ view model =
                 , div [ class "blue_remaining" ] [ text (String.fromInt model.blueRemaining ++ " remaining") ]
                 ]
             , div [ class "bottom_right" ] [ div [ class "button" ] [ a [ onClick ToggleQR ] [ span [ class "password" ] [ text model.password ], span [ class "bottom_span" ] [ text "Click for QR code" ] ] ] ]
-            , div [ class "bottom_right" ] [ div [ class "button" ] [ a [] [ text "New game", span [ class "bottom_span" ] [ text "Click here" ] ] ] ]
+            , div [ class "bottom_right" ] [ div [ class "button" ] [ a [ onClick NewGame ] [ text "New game", span [ class "bottom_span" ] [ text "Click here" ] ] ] ]
             , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "info_button", onClick ToggleLightbox ] [] ]
             ]
           ]
