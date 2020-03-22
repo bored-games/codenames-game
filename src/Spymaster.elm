@@ -130,12 +130,21 @@ update msg model =
         NewGame ->
           let
               (newWords, _) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
-              newCards = List.map cover (populateCards model.cards newWords)
+              newCards = populateCards model.cards newWords
               (newTurn, _) = Random.step Random.Extra.bool model.seed
-              (newIDs, newSeed) = Random.step (Random.List.shuffle [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]) model.seed
-              teamIDs = [-1, 1, 1, 1, 1, 1, 1, 1, 1, if newTurn then 1 else 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0]
+              (newIDs, newSeed) = Random.step (Random.Array.shuffle (Array.fromList [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24])) model.seed
+              assassinID = Array.get 0 newIDs
+              redIDs = Array.slice 1 (if newTurn then 10 else 9) newIDs
+              blueIDs = Array.slice (if newTurn then 11 else 10) 19 newIDs
+              newShuffledCards = List.indexedMap (colorCards assassinID (Array.toList redIDs) (Array.toList blueIDs)) newCards
           in
-            ( { model | cards = colorCards newIDs teamIDs newCards, seed = newSeed, allWords = newWords, turn = newTurn }
+            ( { model | cards = newShuffledCards
+                      , seed = newSeed
+                      , allWords = newWords
+                      , turn = newTurn
+                      , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
+                      , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
+                      }
             , Cmd.none)
 
         Tick newTime ->
@@ -143,14 +152,22 @@ update msg model =
 
 
 {- -}
-colorCards : List (Int) -> List (Int) -> List (Card) -> List (Card)
-colorCards ids teams cards =
-  case cards of
-    c :: cs ->
-      c :: colorCards ids teams cs
-
-    _ ->
-      []
+colorCards : Maybe Int -> List ( Int ) -> List ( Int ) -> Int -> Card -> Card
+colorCards assassinID redIDs blueIDs index card  =
+  case assassinID of
+    Just aid ->
+      if index == aid then
+        { card | team = -1, uncovered = False }
+        else
+          if List.member index redIDs then
+            { card | team = 1, uncovered = False }
+          else
+            if List.member index blueIDs then
+              { card | team = 2, uncovered = False }
+            else
+              { card | team = 0, uncovered = False }
+    Nothing ->
+      card
   
 
 
@@ -178,10 +195,6 @@ uncover index target cards =
     
     _ ->
       []
-
-cover : Card -> Card
-cover card =
-  { card | uncovered = False}
 
 hiddenRed : Card -> Bool
 hiddenRed c =
