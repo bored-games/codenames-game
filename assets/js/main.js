@@ -4449,13 +4449,15 @@ var author$project$Main$Model = function (seed) {
 				return function (toggleLightbox) {
 					return function (toggleQR) {
 						return function (toggleSidebar) {
-							return function (toggleSpies) {
-								return function (redRemaining) {
-									return function (blueRemaining) {
-										return function (password) {
-											return function (allWords) {
-												return function (cards) {
-													return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSpies: toggleSpies, turn: turn};
+							return function (toggleSoundEffects) {
+								return function (toggleSpies) {
+									return function (redRemaining) {
+										return function (blueRemaining) {
+											return function (password) {
+												return function (allWords) {
+													return function (cards) {
+														return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, toggleSpies: toggleSpies, turn: turn};
+													};
 												};
 											};
 										};
@@ -4971,9 +4973,9 @@ var elm$random$Random$initialSeed = function (x) {
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
 		author$project$Main$Model(
-			elm$random$Random$initialSeed(0))(false)(0)('debug')(false)(false)(true)(true)(1)(1)('1w6mvdnr6vj')(
+			elm$random$Random$initialSeed(0))(false)(0)('debug')(false)(false)(true)(false)(true)(1)(1)('1w6mvdnr6vj')(
 			_List_fromArray(
-				['Gate', 'Quilt', 'Party', 'Adjustment', 'Cloth', 'Orange', 'Rod', 'Tomatoes', 'Flowers', 'Rabbits', 'Crook', 'Toad', 'Order', 'Scissors', 'Tank', 'Hotdog', 'Scent', 'Distance', 'Stitch', 'Suit', 'Squirrel', 'Design', 'Business', 'Flesh']))(
+				['Gate', 'Quilt', 'Party', 'Adjustment', 'Cloth', 'Orange', 'Rod', 'Tomatoes', 'Flowers', 'Rabbits', 'Crook', 'Toad', 'Order', 'Scissors', 'Tank', 'Hotdog', 'Scent', 'Distance', 'Stitch', 'Suit', 'Squirrel', 'Design', 'Business', 'Flesh', 'Beef']))(
 			_List_fromArray(
 				[
 					A3(author$project$Main$Card, 'Gate', 2, false),
@@ -5527,6 +5529,24 @@ var author$project$Main$subscriptions = function (model) {
 				A2(elm$time$Time$every, 1000, author$project$Main$Tick)
 			]));
 };
+var author$project$Main$colorCards = F3(
+	function (ids, teams, cards) {
+		if (cards.b) {
+			var c = cards.a;
+			var cs = cards.b;
+			return A2(
+				elm$core$List$cons,
+				c,
+				A3(author$project$Main$colorCards, ids, teams, cs));
+		} else {
+			return _List_Nil;
+		}
+	});
+var author$project$Main$cover = function (card) {
+	return _Utils_update(
+		card,
+		{uncovered: false});
+};
 var elm$core$Basics$not = _Basics_not;
 var author$project$Main$hiddenBlue = function (c) {
 	return (!function ($) {
@@ -5600,6 +5620,107 @@ var elm$random$Random$step = F2(
 		var generator = _n0.a;
 		return generator(seed);
 	});
+var elm$random$Random$addOne = function (value) {
+	return _Utils_Tuple2(1, value);
+};
+var elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var elm$core$List$sum = function (numbers) {
+	return A3(elm$core$List$foldl, elm$core$Basics$add, 0, numbers);
+};
+var elm$core$Bitwise$and = _Bitwise_and;
+var elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var elm$core$Bitwise$xor = _Bitwise_xor;
+var elm$random$Random$peel = function (_n0) {
+	var state = _n0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var elm$random$Random$float = F2(
+	function (a, b) {
+		return elm$random$Random$Generator(
+			function (seed0) {
+				var seed1 = elm$random$Random$next(seed0);
+				var range = elm$core$Basics$abs(b - a);
+				var n1 = elm$random$Random$peel(seed1);
+				var n0 = elm$random$Random$peel(seed0);
+				var lo = (134217727 & n1) * 1.0;
+				var hi = (67108863 & n0) * 1.0;
+				var val = ((hi * 1.34217728e8) + lo) / 9.007199254740992e15;
+				var scaled = (val * range) + a;
+				return _Utils_Tuple2(
+					scaled,
+					elm$random$Random$next(seed1));
+			});
+	});
+var elm$random$Random$getByWeight = F3(
+	function (_n0, others, countdown) {
+		getByWeight:
+		while (true) {
+			var weight = _n0.a;
+			var value = _n0.b;
+			if (!others.b) {
+				return value;
+			} else {
+				var second = others.a;
+				var otherOthers = others.b;
+				if (_Utils_cmp(
+					countdown,
+					elm$core$Basics$abs(weight)) < 1) {
+					return value;
+				} else {
+					var $temp$_n0 = second,
+						$temp$others = otherOthers,
+						$temp$countdown = countdown - elm$core$Basics$abs(weight);
+					_n0 = $temp$_n0;
+					others = $temp$others;
+					countdown = $temp$countdown;
+					continue getByWeight;
+				}
+			}
+		}
+	});
+var elm$random$Random$map = F2(
+	function (func, _n0) {
+		var genA = _n0.a;
+		return elm$random$Random$Generator(
+			function (seed0) {
+				var _n1 = genA(seed0);
+				var a = _n1.a;
+				var seed1 = _n1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var elm$random$Random$weighted = F2(
+	function (first, others) {
+		var normalize = function (_n0) {
+			var weight = _n0.a;
+			return elm$core$Basics$abs(weight);
+		};
+		var total = normalize(first) + elm$core$List$sum(
+			A2(elm$core$List$map, normalize, others));
+		return A2(
+			elm$random$Random$map,
+			A2(elm$random$Random$getByWeight, first, others),
+			A2(elm$random$Random$float, 0, total));
+	});
+var elm$random$Random$uniform = F2(
+	function (value, valueList) {
+		return A2(
+			elm$random$Random$weighted,
+			elm$random$Random$addOne(value),
+			A2(elm$core$List$map, elm$random$Random$addOne, valueList));
+	});
+var elm_community$random_extra$Random$Extra$bool = A2(
+	elm$random$Random$uniform,
+	true,
+	_List_fromArray(
+		[false]));
 var elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5638,16 +5759,6 @@ var elm$core$Array$fromList = function (list) {
 var elm$core$Array$length = function (_n0) {
 	var len = _n0.a;
 	return len;
-};
-var elm$core$Bitwise$and = _Bitwise_and;
-var elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
-var elm$core$Bitwise$xor = _Bitwise_xor;
-var elm$random$Random$peel = function (_n0) {
-	var state = _n0.a;
-	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
-	return ((word >>> 22) ^ word) >>> 0;
 };
 var elm$random$Random$int = F2(
 	function (a, b) {
@@ -5709,19 +5820,6 @@ var elm$random$Random$list = F2(
 		return elm$random$Random$Generator(
 			function (seed) {
 				return A4(elm$random$Random$listHelp, _List_Nil, n, gen, seed);
-			});
-	});
-var elm$random$Random$map = F2(
-	function (func, _n0) {
-		var genA = _n0.a;
-		return elm$random$Random$Generator(
-			function (seed0) {
-				var _n1 = genA(seed0);
-				var a = _n1.a;
-				var seed1 = _n1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
 			});
 	});
 var elm$core$Array$bitMask = 4294967295 >>> (32 - elm$core$Array$shiftStep);
@@ -5913,6 +6011,12 @@ var author$project$Main$update = F2(
 						model,
 						{toggleSidebar: !model.toggleSidebar}),
 					elm$core$Platform$Cmd$none);
+			case 'ToggleSoundEffects':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{toggleSoundEffects: !model.toggleSoundEffects}),
+					elm$core$Platform$Cmd$none);
 			case 'ToggleSpies':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -5929,14 +6033,59 @@ var author$project$Main$update = F2(
 				var _n1 = A2(
 					elm$random$Random$step,
 					elm_community$random_extra$Random$List$shuffle(model.allWords),
-					elm$random$Random$initialSeed(0));
+					model.seed);
 				var newWords = _n1.a;
-				var newSeed = _n1.b;
-				var newCards = A2(author$project$Main$populateCards, model.cards, newWords);
+				var newCards = A2(
+					elm$core$List$map,
+					author$project$Main$cover,
+					A2(author$project$Main$populateCards, model.cards, newWords));
+				var _n2 = A2(elm$random$Random$step, elm_community$random_extra$Random$Extra$bool, model.seed);
+				var newTurn = _n2.a;
+				var teamIDs = _List_fromArray(
+					[
+						-1,
+						1,
+						1,
+						1,
+						1,
+						1,
+						1,
+						1,
+						1,
+						newTurn ? 1 : 2,
+						2,
+						2,
+						2,
+						2,
+						2,
+						2,
+						2,
+						2,
+						0,
+						0,
+						0,
+						0,
+						0,
+						0,
+						0
+					]);
+				var _n3 = A2(
+					elm$random$Random$step,
+					elm_community$random_extra$Random$List$shuffle(
+						_List_fromArray(
+							[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24])),
+					model.seed);
+				var newIDs = _n3.a;
+				var newSeed = _n3.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{allWords: newWords, cards: newCards, seed: newSeed}),
+						{
+							allWords: newWords,
+							cards: A3(author$project$Main$colorCards, newIDs, teamIDs, newCards),
+							seed: newSeed,
+							turn: newTurn
+						}),
 					elm$core$Platform$Cmd$none);
 			default:
 				var newTime = msg.a;
@@ -5948,6 +6097,7 @@ var author$project$Main$PassTurn = {$: 'PassTurn'};
 var author$project$Main$ToggleLightbox = {$: 'ToggleLightbox'};
 var author$project$Main$ToggleQR = {$: 'ToggleQR'};
 var author$project$Main$ToggleSidebar = {$: 'ToggleSidebar'};
+var author$project$Main$ToggleSoundEffects = {$: 'ToggleSoundEffects'};
 var author$project$Main$ToggleSpies = {$: 'ToggleSpies'};
 var author$project$Main$UncoverCard = function (a) {
 	return {$: 'UncoverCard', a: a};
@@ -6157,6 +6307,31 @@ var author$project$Main$view = function (model) {
 													]),
 												_List_Nil),
 												elm$html$Html$text('Show spies')
+											]))
+									])),
+								A2(
+								elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										elm$html$Html$a,
+										_List_fromArray(
+											[
+												elm$html$Html$Attributes$class(''),
+												elm$html$Html$Events$onClick(author$project$Main$ToggleSoundEffects)
+											]),
+										_List_fromArray(
+											[
+												A2(
+												elm$html$Html$span,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$class(
+														'icon ' + (model.toggleSoundEffects ? 'checked' : 'unchecked'))
+													]),
+												_List_Nil),
+												elm$html$Html$text('Enable sound effects')
 											]))
 									]))
 							])),

@@ -5,7 +5,10 @@ import Html exposing (..)
 import Html.Attributes exposing (attribute, class, for, id, name, placeholder, style, type_, value)
 import Html.Events exposing (onClick)
 import Random exposing (Seed, generate, initialSeed, step)
+import Array exposing (Array, fromList, get, slice)
+import Random.Array exposing (shuffle)
 import Random.List exposing (shuffle)
+import Random.Extra exposing (bool)
 import Time
 
 
@@ -37,6 +40,7 @@ type alias Model =
     , toggleLightbox : Bool
     , toggleQR : Bool
     , toggleSidebar : Bool
+    , toggleSoundEffects : Bool
     , toggleSpies : Bool
     , redRemaining : Int
     , blueRemaining : Int
@@ -56,6 +60,7 @@ init _ =
         False
         False
         True
+        False
         True
         1
         1
@@ -79,6 +84,7 @@ type Msg
     | ToggleLightbox
     | ToggleQR
     | ToggleSidebar
+    | ToggleSoundEffects
     | ToggleSpies
     | PassTurn
     | NewGame
@@ -109,6 +115,10 @@ update msg model =
             ( { model | toggleSidebar = not model.toggleSidebar }
             , Cmd.none)
 
+        ToggleSoundEffects ->
+            ( { model | toggleSoundEffects = not model.toggleSoundEffects }
+            , Cmd.none)
+
         ToggleSpies ->
             ( { model | toggleSpies = not model.toggleSpies }
             , Cmd.none)
@@ -119,15 +129,32 @@ update msg model =
 
         NewGame ->
           let
-              (newWords, newSeed) = Random.step (Random.List.shuffle model.allWords) (Random.initialSeed 0)
-              newCards = populateCards model.cards newWords
+              (newWords, _) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
+              newCards = List.map cover (populateCards model.cards newWords)
+              (newTurn, _) = Random.step Random.Extra.bool model.seed
+              (newIDs, newSeed) = Random.step (Random.List.shuffle [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]) model.seed
+              teamIDs = [-1, 1, 1, 1, 1, 1, 1, 1, 1, if newTurn then 1 else 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0]
           in
-            ( { model | cards = newCards, seed = newSeed, allWords = newWords }
+            ( { model | cards = colorCards newIDs teamIDs newCards, seed = newSeed, allWords = newWords, turn = newTurn }
             , Cmd.none)
 
         Tick newTime ->
           ( model, Cmd.none )
 
+
+{- -}
+colorCards : List (Int) -> List (Int) -> List (Card) -> List (Card)
+colorCards ids teams cards =
+  case cards of
+    c :: cs ->
+      c :: colorCards ids teams cs
+
+    _ ->
+      []
+  
+
+
+{- Add word from `words` to each card in `cards` -}
 populateCards cards words =
   case cards of
     c :: cs ->
@@ -139,16 +166,22 @@ populateCards cards words =
     
     _ -> []
 
+{- Uncover the 'target' card -}
+uncover : Int -> Int -> List (Card) -> List (Card)
 uncover index target cards =
   case cards of
     c :: cs ->
       let
           newCard = if index == target then { c | uncovered = True} else c
       in
-        newCard :: (uncover (index + 1) target cs)
+        newCard :: uncover (index + 1) target cs
     
     _ ->
       []
+
+cover : Card -> Card
+cover card =
+  { card | uncovered = False}
 
 hiddenRed : Card -> Bool
 hiddenRed c =
@@ -210,6 +243,7 @@ view model =
         [ class ("sidebar" ++ (if model.toggleSidebar then " hidden" else ""))]
           [ ul []
             [ li [] [ a [ class "", onClick ToggleSpies ] [ span [ class ("icon " ++ if model.toggleSpies then "checked" else "unchecked")] [], text "Show spies"] ]
+            , li [] [ a [ class "", onClick ToggleSoundEffects ] [ span [ class ("icon " ++ if model.toggleSoundEffects then "checked" else "unchecked")] [], text "Enable sound effects"] ]
             ]
           , ul []
             [ li [] [ a [ class "" ] [ span [ class "icon checked"] [], text "Use default words"] ]
