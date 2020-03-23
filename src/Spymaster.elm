@@ -11,6 +11,8 @@ import Random.List exposing (shuffle)
 import Random.Extra exposing (bool)
 import Time
 
+import Wordlist exposing (wordlistAdvanced)
+
 
 
 -- MAIN
@@ -53,7 +55,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
     (Model
-        (Random.initialSeed 0)
+        (Random.initialSeed 99999999)
         False
         0
         "debug"
@@ -65,7 +67,8 @@ init _ =
         1
         1
         "1w6mvdnr6vj"
-        [ "Gate", "Quilt", "Party", "Adjustment", "Cloth", "Orange", "Rod", "Tomatoes", "Flowers", "Rabbits", "Crook", "Toad", "Order", "Scissors", "Tank", "Hotdog", "Scent", "Distance", "Stitch", "Suit", "Squirrel", "Design", "Business", "Flesh", "Beef"]
+        {- [ "Gate", "Quilt", "Party", "Adjustment", "Cloth", "Orange", "Rod", "Tomatoes", "Flowers", "Rabbits", "Crook", "Toad", "Order", "Scissors", "Tank", "Hotdog", "Scent", "Distance", "Stitch", "Suit", "Squirrel", "Design", "Business", "Flesh", "Beef"]-}
+        wordlistAdvanced
         [ Card "Gate" 2 False, Card "Quilt" -1 False, Card "Party" 0 False, Card "Adjustment" 1 False, Card "Cloth" 2 False,
         Card "Orange" 0 False, Card "Rod" 1 False, Card "Tomatoes" 2 False, Card "Flowers" 1 False, Card "Rabbits" 2 False,
         Card "Crook" 2 False, Card "Toad" 2 False, Card "Order" 0 False, Card "Scissors" 1 False, Card "Tank" 1 False,
@@ -129,21 +132,20 @@ update msg model =
 
         NewGame ->
           let
-              (newWords, _) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
-              newCards = populateCards model.cards newWords
-              (newTurn, _) = Random.step Random.Extra.bool model.seed
-              (newIDs, newSeed) = Random.step (Random.Array.shuffle (Array.fromList [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24])) model.seed
+              (newWords, seed1) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
+              (newTurn, seed2) = Random.step Random.Extra.bool seed1
+              (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
               assassinID = Array.get 0 newIDs
               redIDs = Array.slice 1 (if newTurn then 10 else 9) newIDs
               blueIDs = Array.slice (if newTurn then 11 else 10) 19 newIDs
-              newShuffledCards = List.indexedMap (colorCards assassinID (Array.toList redIDs) (Array.toList blueIDs)) newCards
+              newShuffledCards = List.indexedMap (colorCards assassinID (Array.toList redIDs) (Array.toList blueIDs)) (populateCards model.cards newWords)
           in
             ( { model | cards = newShuffledCards
-                      , seed = newSeed
-                      , allWords = newWords
+                      , seed = seed3
                       , turn = newTurn
                       , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
                       , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
+                      , debugString = String.concat newWords
                       }
             , Cmd.none)
 
@@ -251,7 +253,7 @@ view model =
     div [ class "container" ]
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] [] ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [] [] ]
-      , div [ class "debug" ] []
+      , div [ class "debug" ] [ {- text model.debugString -} ]
       , div
         [ class ("sidebar" ++ (if model.toggleSidebar then " hidden" else ""))]
           [ ul []
