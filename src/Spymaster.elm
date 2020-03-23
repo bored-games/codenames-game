@@ -2,7 +2,7 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, for, id, name, placeholder, style, type_, value)
+import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Random exposing (Seed, generate, initialSeed, step)
 import Array exposing (Array, fromList, get, slice)
@@ -10,10 +10,9 @@ import Random.Array exposing (shuffle)
 import Random.List exposing (shuffle)
 import Random.Extra exposing (bool)
 import Time
-import Bitwise exposing (shiftLeftBy, or)
 
 import Wordlist exposing (wordlistAdvanced)
-import BigInt exposing (BigInt, toString, divmod, fromHexString, fromIntString)
+import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
 
 -- MAIN
@@ -57,24 +56,20 @@ init : () -> (Model, Cmd Msg)
 init _ =
     update NewGame 
       (Model
-        (Random.initialSeed 99999999)
-        False
-        0
-        "debug"
-        False
-        False
-        True
-        False
-        True
-        1
-        1
-        "PASSWORD"
-        wordlistAdvanced
-        [ Card "Gate" 2 False, Card "Quilt" -1 False, Card "Party" 0 False, Card "Adjustment" 1 False, Card "Cloth" 2 False,
-        Card "Orange" 0 False, Card "Rod" 1 False, Card "Tomatoes" 2 False, Card "Flowers" 1 False, Card "Rabbits" 2 False,
-        Card "Crook" 2 False, Card "Toad" 2 False, Card "Order" 0 False, Card "Scissors" 1 False, Card "Tank" 1 False,
-        Card "Hotdog" 1 False, Card "Scent" 2 False, Card "Distance" 0 False, Card "Stitch" 2 False, Card "Suit" 0 False,
-        Card "Squirrel" 0 False, Card "Design" 0 False, Card "Business" 1 False, Card "Flesh" 1 False, Card "Beef" 2 False ]
+        (Random.initialSeed 99999999)      -- seed: to do: randomize
+        False                              -- turn: True = red, False = blue
+        0                                  -- currentTimer: to do: enable
+        ""                                 -- debugString
+        False                              -- toggleLightbox: for info, true = open
+        False                              -- toggleQR: toggle QR display, true = open
+        True                               -- toggleSidebar: toggle sidebar, true = open
+        False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
+        True                               -- toggleSpies: toggle spy images, true = open
+        0                                  -- remainingRed: remaining red cards
+        0                                  -- remainingBlue: remaining blue cards
+        "PASSWORD"                         -- password: the encoded game board string
+        wordlistAdvanced                   -- allWords: list of all possible card words
+        (List.repeat 25 (Card "" 0 False)) -- cards: list of 25 cards, initially blank
       )
 
 
@@ -82,8 +77,6 @@ init _ =
 
 
 type Msg
-      --| SetColor String
-      --| UpdateSettings
     = UncoverCard Int
     | ToggleLightbox
     | ToggleQR
@@ -133,24 +126,19 @@ update msg model =
 
       NewGame ->
         let
-            (newWords, seed1) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
+            (newWords, seed1) = Random.step (Random.List.shuffle model.allWords) model.seed
             (newTurn, seed2) = Random.step Random.Extra.bool seed1
             (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
-            assassinID = case Array.get 0 newIDs of
-                           Just a -> a
-                           Nothing -> 0
+            assassinID = Maybe.withDefault 0 (Array.get 0 newIDs)
             redIDs = Array.toList <| Array.slice 1 (if newTurn then 10 else 9) newIDs
             blueIDs = Array.toList <| Array.slice (if newTurn then 10 else 9) 18 newIDs
             newShuffledCards = List.indexedMap (colorCards assassinID redIDs blueIDs) (populateCards model.cards newWords)
-            benum = Array.repeat 53 False
-            benum2 = Array.set 0 True benum       -- set to initial team
-            benum3 = Array.set (51-(2*assassinID)) True (Array.set (50-(2*assassinID)) True benum2)
-            benum4 = ammendArray redIDs benum3 True False
-            benum5 = ammendArray blueIDs benum4 False True
+            boolList1 = Array.set 0 newTurn (Array.repeat 53 False)       -- set to initial team
+            boolList2 = Array.set (51-(2*assassinID)) True (Array.set (50-(2*assassinID)) True boolList1)
+            boolList3 = ammendArray blueIDs (ammendArray redIDs boolList2 True False) False True
             myPrime = [True, False, True, False, True, True, False, False, True, True, True, True, False, True, False, False, False, False, True, True, False, False, False, True, True, True, True, False, True, False, False, False, False, True, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, False, True, True]
-            myPrimeX = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
-            myWhatever = List.map2 xor myPrime (Array.toList benum5)
-            bigint1 = listBoolToBigInt myWhatever
+         {- myPrime = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False] -}
+            bigint1 = listBoolToBigInt <| List.map2 xor myPrime (Array.toList boolList3)
         in
           ( { model | cards = newShuffledCards
                     , seed = seed3
@@ -176,12 +164,11 @@ getHexString digits =
     a :: b :: c :: d :: es -> Hex.toString ((if a then 8 else 0)+(if b then 4 else 0)+(if c then 2 else 0)+(if d then 1 else 0)) ++ getHexString es
     _ -> ""
 
-debuga : List (Bool) -> String
-debuga bools =
+debugBoolList : List (Bool) -> String
+debugBoolList bools =
   case bools of
     b :: bs ->
-      (if b then "1" else "0") ++ debuga bs
-    
+      (if b then "1" else "0") ++ debugBoolList bs
     _ ->
       ""
 
@@ -194,14 +181,8 @@ ammendArray ids digits msb lsb =
     _ ->
       digits
 
-cShiftLeft : Int -> Int -> Int
-cShiftLeft num bits = 
-  shiftLeftBy bits (2 * num)
 
-
-{- Encode a list of booleans representing a binary number into the string representing the number in base32 -}
-
-
+{- Encode a large BigInt representing a binary board encoding into the string representing the number in base32 -}
 base32Encode : BigInt -> String
 base32Encode input =
   if BigInt.gt input (BigInt.fromInt 0) then
@@ -209,16 +190,14 @@ base32Encode input =
       chars = Array.fromList ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
       (d, m) = case BigInt.divmod input (BigInt.fromInt 36) of
                  Just (dd, mm) -> (dd, mm)
-                 _ -> (BigInt.fromInt 0, BigInt.fromInt 0)
+                 _ -> (BigInt.fromInt 0, BigInt.fromInt 100)
       mAsInt = Maybe.withDefault 100 (String.toInt (BigInt.toString m))
-      -- integer = input // 36
-      -- remainder = get (modBy 36 input) chars
     in
       base32Encode d ++ Maybe.withDefault "" (Array.get mAsInt chars)
   else
     ""
 
-{- -}
+{- If current card index is in the list of Reds, Blues, Spectators, or Assassin, set its color accordingly -}
 colorCards : Int -> List ( Int ) -> List ( Int ) -> Int -> Card -> Card
 colorCards assassinID redIDs blueIDs index card  =
     if index == assassinID then
@@ -235,6 +214,7 @@ colorCards assassinID redIDs blueIDs index card  =
 
 
 {- Add word from `words` to each card in `cards` -}
+populateCards : List (Card) -> List (String) -> List (Card)
 populateCards cards words =
   case cards of
     c :: cs ->
@@ -242,7 +222,7 @@ populateCards cards words =
         w :: ws ->
           {c | word = w} :: populateCards cs ws
         _ ->
-          {c | word = "Error"} :: populateCards cs []
+          {c | word = "Not Enough Words!"} :: populateCards cs []
     
     _ -> []
 
@@ -284,12 +264,6 @@ drawCard index cards =
 
     _ ->
       []
-
-
-countRemainingByTeam : List (Card) -> Int -> Int
-countRemainingByTeam cards team =
-  3
-
 
 
 -- SUBSCRIPTIONS
@@ -334,32 +308,6 @@ view model =
       , div [ class "center" ]
         [ main_ [ class ((if model.turn then "red-turn" else "blue-turn") ++ (if model.toggleSpies then "" else " hide_spies")) ]
           (addCards model.cards)
-        {- [ div [ class "card_border", id "c00" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Four" ] ] ] ]
-          , div [ class "card_border", id "c01" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Score" ] ] ] ]
-          , div [ class "card_border", id "c02" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "And" ] ] ] ]
-          , div [ class "card_border", id "c03" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Seven" ] ] ] ]
-          , div [ class "card_border", id "c04" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Years" ] ] ] ]
-          , div [ class "card_border", id "c05" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Ago" ] ] ] ]
-          , div [ class "card_border", id "c06" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Our" ] ] ] ]
-          , div [ class "card_border", id "c07" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Fathers" ] ] ] ]
-          , div [ class "card_border", id "c08" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Brought" ] ] ] ]
-          , div [ class "card_border", id "c09" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Forth" ] ] ] ]
-          , div [ class "card_border", id "c10" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "On" ] ] ] ]
-          , div [ class "card_border", id "c11" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "This" ] ] ] ]
-          , div [ class "card_border", id "c12" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Continent" ] ] ] ]
-          , div [ class "card_border", id "c13" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "A" ] ] ] ]
-          , div [ class "card_border", id "c14" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "New" ] ] ] ]
-          , div [ class "card_border", id "c15" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Nation" ] ] ] ]
-          , div [ class "card_border", id "c16" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Conceived" ] ] ] ]
-          , div [ class "card_border", id "c17" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "In" ] ] ] ]
-          , div [ class "card_border", id "c18" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Liberty" ] ] ] ]
-          , div [ class "card_border", id "c19" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "And" ] ] ] ]
-          , div [ class "card_border", id "c20" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Dedicated" ] ] ] ]
-          , div [ class "card_border", id "c21" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "To" ] ] ] ]
-          , div [ class "card_border", id "c22" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "The" ] ] ] ]
-          , div [ class "card_border", id "c23" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "Proposition" ] ] ] ]
-          , div [ class "card_border", id "c24" ] [ div [ class "card" ] [ div [ class "card_top" ] [ div [ class ("spy" ++ if model.toggleSpies then "" else " hidden") ] [], div [ class "decor_line" ] [] ], span [ class "wordbox" ] [ span [] [ text "That" ] ] ] ]
-          ] -}
         , div [ class "bottom" ]
             [ div [ class "bottom_left bottom_no_stretch" ]
               [ span [ class "settings_button", onClick ToggleSidebar ] [] ]

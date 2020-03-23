@@ -5774,7 +5774,7 @@ var author$project$Main$base32Encode = function (input) {
 			} else {
 				return _Utils_Tuple2(
 					cmditch$elm_bigint$BigInt$fromInt(0),
-					cmditch$elm_bigint$BigInt$fromInt(0));
+					cmditch$elm_bigint$BigInt$fromInt(100));
 			}
 		}();
 		var d = _n0.a;
@@ -6528,7 +6528,7 @@ var author$project$Main$populateCards = F2(
 					elm$core$List$cons,
 					_Utils_update(
 						c,
-						{word: 'Error'}),
+						{word: 'Not Enough Words!'}),
 					A2(author$project$Main$populateCards, cs, _List_Nil));
 			}
 		} else {
@@ -7482,12 +7482,8 @@ var author$project$Main$update = F2(
 						{turn: !model.turn}),
 					elm$core$Platform$Cmd$none);
 			case 'NewGame':
-				var myPrimeX = _List_fromArray(
-					[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]);
 				var myPrime = _List_fromArray(
 					[true, false, true, false, true, true, false, false, true, true, true, true, false, true, false, false, false, false, true, true, false, false, false, true, true, true, true, false, true, false, false, false, false, true, false, true, true, false, false, false, false, true, false, false, false, false, true, false, true, false, true, true]);
-				var benum = A2(elm$core$Array$repeat, 53, false);
-				var benum2 = A3(elm$core$Array$set, 0, true, benum);
 				var _n1 = A2(
 					elm$random$Random$step,
 					elm_community$random_extra$Random$List$shuffle(model.allWords),
@@ -7497,6 +7493,11 @@ var author$project$Main$update = F2(
 				var _n2 = A2(elm$random$Random$step, elm_community$random_extra$Random$Extra$bool, seed1);
 				var newTurn = _n2.a;
 				var seed2 = _n2.b;
+				var boolList1 = A3(
+					elm$core$Array$set,
+					0,
+					newTurn,
+					A2(elm$core$Array$repeat, 53, false));
 				var _n3 = A2(
 					elm$random$Random$step,
 					elm_community$random_extra$Random$Array$shuffle(
@@ -7505,20 +7506,15 @@ var author$project$Main$update = F2(
 					seed2);
 				var newIDs = _n3.a;
 				var seed3 = _n3.b;
-				var assassinID = function () {
-					var _n4 = A2(elm$core$Array$get, 0, newIDs);
-					if (_n4.$ === 'Just') {
-						var a = _n4.a;
-						return a;
-					} else {
-						return 0;
-					}
-				}();
-				var benum3 = A3(
+				var assassinID = A2(
+					elm$core$Maybe$withDefault,
+					0,
+					A2(elm$core$Array$get, 0, newIDs));
+				var boolList2 = A3(
 					elm$core$Array$set,
 					51 - (2 * assassinID),
 					true,
-					A3(elm$core$Array$set, 50 - (2 * assassinID), true, benum2));
+					A3(elm$core$Array$set, 50 - (2 * assassinID), true, boolList1));
 				var blueIDs = elm$core$Array$toList(
 					A3(
 						elm$core$Array$slice,
@@ -7531,14 +7527,18 @@ var author$project$Main$update = F2(
 						1,
 						newTurn ? 10 : 9,
 						newIDs));
-				var benum4 = A4(author$project$Main$ammendArray, redIDs, benum3, true, false);
-				var benum5 = A4(author$project$Main$ammendArray, blueIDs, benum4, false, true);
-				var myWhatever = A3(
-					elm$core$List$map2,
-					elm$core$Basics$xor,
-					myPrime,
-					elm$core$Array$toList(benum5));
-				var bigint1 = author$project$Main$listBoolToBigInt(myWhatever);
+				var boolList3 = A4(
+					author$project$Main$ammendArray,
+					blueIDs,
+					A4(author$project$Main$ammendArray, redIDs, boolList2, true, false),
+					false,
+					true);
+				var bigint1 = author$project$Main$listBoolToBigInt(
+					A3(
+						elm$core$List$map2,
+						elm$core$Basics$xor,
+						myPrime,
+						elm$core$Array$toList(boolList3)));
 				var newShuffledCards = A2(
 					elm$core$List$indexedMap,
 					A3(author$project$Main$colorCards, assassinID, redIDs, blueIDs),
@@ -7564,6 +7564,27 @@ var author$project$Main$update = F2(
 	});
 var author$project$Wordlist$wordlistAdvanced = _List_fromArray(
 	['hotdog', 'dance', 'cross', 'cotton', 'match', 'france', 'ball', 'bow', 'mercury', 'net', 'spider', 'cat', 'whip', 'stock', 'princess', 'check', 'bed', 'thief', 'park', 'bar', 'czech', 'thumb', 'plastic', 'leprechaun', 'bell', 'triangle', 'light', 'calf', 'straw', 'cloak', 'mexico', 'ship', 'wind', 'lion', 'london', 'fair', 'force', 'phoenix', 'buck', 'ice cream', 'van', 'drill', 'tube', 'link', 'seal', 'fish', 'iron', 'block', 'doctor', 'degree', 'roulette', 'moon', 'angel', 'shot', 'octopus', 'death', 'time', 'queen', 'circle', 'bark', 'figure', 'file', 'back', 'antarctica', 'dwarf', 'nurse', 'lemon', 'cap', 'belt', 'air', 'switch', 'board', 'eye', 'dice', 'kid', 'police', 'rock', 'screen', 'trap', 'drop', 'agent', 'rabbit', 'vet', 'date', 'chocolate', 'bridge', 'beach', 'cold', 'horn', 'bank', 'stick', 'paste', 'bugle', 'ruler', 'rome', 'battery', 'pound', 'spine', 'mount', 'jupiter', 'boulder', 'glove', 'buffalo', 'parachute', 'gas', 'key', 'casino', 'torch', 'pit', 'king', 'revolution', 'palm', 'ice', 'piano', 'code', 'crane', 'grass', 'pool', 'helicopter', 'mug', 'fan', 'saturn', 'canada', 'skyscraper', 'opera', 'nut', 'heart', 'theater', 'turkey', 'route', 'court', 'alps', 'round', 'orange', 'diamond', 'scale', 'well', 'band', 'train', 'poison', 'fighter', 'shop', 'shadow', 'rose', 'arm', 'ground', 'slip', 'duck', 'pirate', 'jet', 'comic', 'soul', 'strike', 'forest', 'capital', 'table', 'litter', 'car', 'grace', 'pumpkin', 'copper', 'egypt', 'suit', 'robin', 'charge', 'cricket', 'card', 'boom', 'platypus', 'missile', 'part', 'bomb', 'plane', 'hawk', 'sub', 'press', 'box', 'shark', 'stream', 'deck', 'hotel', 'cast', 'alien', 'pilot', 'state', 'fly', 'pitch', 'cook', 'moscow', 'tag', 'spot', 'kiwi', 'trip', 'spell', 'star', 'snowman', 'concert', 'web', 'hospital', 'scorpion', 'laser', 'pyramid', 'sock', 'hood', 'mine', 'penguin', 'spring', 'worm', 'india', 'temple', 'whale', 'fall', 'hollywood', 'fire', 'field', 'tower', 'wake', 'needle', 'centaur', 'change', 'bermuda', 'note', 'tablet', 'ring', 'horse', 'microscope', 'mammoth', 'europe', 'kangaroo', 'bottle', 'fence', 'wave', 'head', 'tie', 'olive', 'teacher', 'jack', 'satellite', 'limousine', 'knight', 'contract', 'scuba diver', 'plate', 'mouse', 'pistol', 'engine', 'string', 'knife', 'cell', 'organ', 'pass', 'stadium', 'sueprhero', 'foot', 'horseshoe', 'log', 'ketchup', 'scientist', 'lab', 'slug', 'himalayas', 'dinosaur', 'lawyer', 'australia', 'pie', 'march', 'africa', 'line', 'war', 'row', 'shakespeare', 'night', 'church', 'cover', 'jam', 'green', 'dragon', 'oil', 'new york', 'honey', 'loch ness', 'witch', 'spike', 'cliff', 'compound', 'crown', 'bill', 'cycle', 'berry', 'america', 'boot', 'chick', 'face', 'school', 'wall', 'atlantis', 'water', 'pin', 'lead', 'port', 'tooth', 'lock', 'pan', 'dog', 'post', 'fork', 'novel', 'club', 'aztec', 'yard', 'ambulance', 'ham', 'undertaker', 'flute', 'china', 'nail', 'day', 'model', 'crash', 'film', 'bug', 'smuggler', 'swing', 'sound', 'gold', 'olympus', 'mass', 'staff', 'greece', 'tap', 'shoe', 'pupil', 'hook', 'snow', 'glass', 'hole', 'eagle', 'unicorn', 'amazon', 'lap', 'washer', 'robot', 'pole', 'beijing', 'telescope', 'soldier', 'ivory', 'ghost', 'center', 'berlin', 'server', 'pants', 'vacuum', 'chair', 'washington', 'watch', 'disease', 'play', 'brush', 'bond', 'conductor', 'ray', 'germany', 'pipe', 'sink', 'maple', 'chest', 'dress', 'draft', 'mail', 'carrot', 'bolt', 'giant', 'millionaire', 'tail', 'tokyo', 'button', 'mint', 'england', 'hand', 'paper', 'tick', 'ninja', 'bat', 'marble', 'square', 'mouth', 'mole', 'plot', 'space', 'trunk', 'bear', 'beat', 'genius', 'spy', 'luck', 'life', 'game', 'embassy', 'apple', 'racket']);
+var elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2(elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3(elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
 var elm$random$Random$initialSeed = function (x) {
 	var _n0 = elm$random$Random$next(
 		A2(elm$random$Random$Seed, 0, 1013904223));
@@ -7578,35 +7599,11 @@ var author$project$Main$init = function (_n0) {
 		author$project$Main$update,
 		author$project$Main$NewGame,
 		author$project$Main$Model(
-			elm$random$Random$initialSeed(99999999))(false)(0)('debug')(false)(false)(true)(false)(true)(1)(1)('PASSWORD')(author$project$Wordlist$wordlistAdvanced)(
-			_List_fromArray(
-				[
-					A3(author$project$Main$Card, 'Gate', 2, false),
-					A3(author$project$Main$Card, 'Quilt', -1, false),
-					A3(author$project$Main$Card, 'Party', 0, false),
-					A3(author$project$Main$Card, 'Adjustment', 1, false),
-					A3(author$project$Main$Card, 'Cloth', 2, false),
-					A3(author$project$Main$Card, 'Orange', 0, false),
-					A3(author$project$Main$Card, 'Rod', 1, false),
-					A3(author$project$Main$Card, 'Tomatoes', 2, false),
-					A3(author$project$Main$Card, 'Flowers', 1, false),
-					A3(author$project$Main$Card, 'Rabbits', 2, false),
-					A3(author$project$Main$Card, 'Crook', 2, false),
-					A3(author$project$Main$Card, 'Toad', 2, false),
-					A3(author$project$Main$Card, 'Order', 0, false),
-					A3(author$project$Main$Card, 'Scissors', 1, false),
-					A3(author$project$Main$Card, 'Tank', 1, false),
-					A3(author$project$Main$Card, 'Hotdog', 1, false),
-					A3(author$project$Main$Card, 'Scent', 2, false),
-					A3(author$project$Main$Card, 'Distance', 0, false),
-					A3(author$project$Main$Card, 'Stitch', 2, false),
-					A3(author$project$Main$Card, 'Suit', 0, false),
-					A3(author$project$Main$Card, 'Squirrel', 0, false),
-					A3(author$project$Main$Card, 'Design', 0, false),
-					A3(author$project$Main$Card, 'Business', 1, false),
-					A3(author$project$Main$Card, 'Flesh', 1, false),
-					A3(author$project$Main$Card, 'Beef', 2, false)
-				])));
+			elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(true)(false)(true)(0)(0)('PASSWORD')(author$project$Wordlist$wordlistAdvanced)(
+			A2(
+				elm$core$List$repeat,
+				25,
+				A3(author$project$Main$Card, '', 0, false))));
 };
 var author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
