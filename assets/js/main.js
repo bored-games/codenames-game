@@ -890,53 +890,6 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 
 
 
-function _Char_toCode(char)
-{
-	var code = char.charCodeAt(0);
-	if (0xD800 <= code && code <= 0xDBFF)
-	{
-		return (code - 0xD800) * 0x400 + char.charCodeAt(1) - 0xDC00 + 0x10000
-	}
-	return code;
-}
-
-function _Char_fromCode(code)
-{
-	return _Utils_chr(
-		(code < 0 || 0x10FFFF < code)
-			? '\uFFFD'
-			:
-		(code <= 0xFFFF)
-			? String.fromCharCode(code)
-			:
-		(code -= 0x10000,
-			String.fromCharCode(Math.floor(code / 0x400) + 0xD800, code % 0x400 + 0xDC00)
-		)
-	);
-}
-
-function _Char_toUpper(char)
-{
-	return _Utils_chr(char.toUpperCase());
-}
-
-function _Char_toLower(char)
-{
-	return _Utils_chr(char.toLowerCase());
-}
-
-function _Char_toLocaleUpper(char)
-{
-	return _Utils_chr(char.toLocaleUpperCase());
-}
-
-function _Char_toLocaleLower(char)
-{
-	return _Utils_chr(char.toLocaleLowerCase());
-}
-
-
-
 var _String_cons = F2(function(chr, str)
 {
 	return chr + str;
@@ -1246,6 +1199,154 @@ function _String_fromList(chars)
 	return _List_toArray(chars).join('');
 }
 
+
+
+// CREATE
+
+var _Regex_never = /.^/;
+
+var _Regex_fromStringWith = F2(function(options, string)
+{
+	var flags = 'g';
+	if (options.multiline) { flags += 'm'; }
+	if (options.caseInsensitive) { flags += 'i'; }
+
+	try
+	{
+		return elm$core$Maybe$Just(new RegExp(string, flags));
+	}
+	catch(error)
+	{
+		return elm$core$Maybe$Nothing;
+	}
+});
+
+
+// USE
+
+var _Regex_contains = F2(function(re, string)
+{
+	return string.match(re) !== null;
+});
+
+
+var _Regex_findAtMost = F3(function(n, re, str)
+{
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex == re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch
+				? elm$core$Maybe$Just(submatch)
+				: elm$core$Maybe$Nothing;
+		}
+		out.push(A4(elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _List_fromArray(out);
+});
+
+
+var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
+{
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch
+				? elm$core$Maybe$Just(submatch)
+				: elm$core$Maybe$Nothing;
+		}
+		return replacer(A4(elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
+	}
+	return string.replace(re, jsReplacer);
+});
+
+var _Regex_splitAtMost = F3(function(n, re, str)
+{
+	var string = str;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		var result = re.exec(string);
+		if (!result) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _List_fromArray(out);
+});
+
+var _Regex_infinity = Infinity;
+
+
+
+function _Char_toCode(char)
+{
+	var code = char.charCodeAt(0);
+	if (0xD800 <= code && code <= 0xDBFF)
+	{
+		return (code - 0xD800) * 0x400 + char.charCodeAt(1) - 0xDC00 + 0x10000
+	}
+	return code;
+}
+
+function _Char_fromCode(code)
+{
+	return _Utils_chr(
+		(code < 0 || 0x10FFFF < code)
+			? '\uFFFD'
+			:
+		(code <= 0xFFFF)
+			? String.fromCharCode(code)
+			:
+		(code -= 0x10000,
+			String.fromCharCode(Math.floor(code / 0x400) + 0xD800, code % 0x400 + 0xDC00)
+		)
+	);
+}
+
+function _Char_toUpper(char)
+{
+	return _Utils_chr(char.toUpperCase());
+}
+
+function _Char_toLower(char)
+{
+	return _Utils_chr(char.toLowerCase());
+}
+
+function _Char_toLocaleUpper(char)
+{
+	return _Utils_chr(char.toLocaleUpperCase());
+}
+
+function _Char_toLocaleLower(char)
+{
+	return _Utils_chr(char.toLocaleLowerCase());
+}
 
 
 
@@ -4654,9 +4755,106 @@ var author$project$Main$ammendArray = F4(
 			return digits;
 		}
 	});
-var elm$core$Elm$JsArray$empty = _JsArray_empty;
-var elm$core$Array$empty = A4(elm$core$Array$Array_elm_builtin, 0, elm$core$Array$shiftStep, elm$core$Elm$JsArray$empty, elm$core$Elm$JsArray$empty);
-var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
+var cmditch$elm_bigint$BigInt$Pos = function (a) {
+	return {$: 'Pos', a: a};
+};
+var cmditch$elm_bigint$BigInt$Zer = {$: 'Zer'};
+var cmditch$elm_bigint$BigInt$abs = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return cmditch$elm_bigint$BigInt$Zer;
+		case 'Neg':
+			var mag = bigInt.a;
+			return cmditch$elm_bigint$BigInt$Pos(mag);
+		default:
+			var i = bigInt;
+			return i;
+	}
+};
+var cmditch$elm_bigint$BigInt$BigIntNotNormalised = F2(
+	function (a, b) {
+		return {$: 'BigIntNotNormalised', a: a, b: b};
+	});
+var cmditch$elm_bigint$BigInt$MagnitudeNotNormalised = function (a) {
+	return {$: 'MagnitudeNotNormalised', a: a};
+};
+var cmditch$elm_bigint$BigInt$Positive = {$: 'Positive'};
+var cmditch$elm_bigint$BigInt$Magnitude = function (a) {
+	return {$: 'Magnitude', a: a};
+};
+var elm$core$Basics$False = {$: 'False'};
+var elm$core$Maybe$Just = function (a) {
+	return {$: 'Just', a: a};
+};
+var elm$core$Maybe$Nothing = {$: 'Nothing'};
+var elm_community$list_extra$List$Extra$last = function (items) {
+	last:
+	while (true) {
+		if (!items.b) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			if (!items.b.b) {
+				var x = items.a;
+				return elm$core$Maybe$Just(x);
+			} else {
+				var rest = items.b;
+				var $temp$items = rest;
+				items = $temp$items;
+				continue last;
+			}
+		}
+	}
+};
+var cmditch$elm_bigint$BigInt$isNegativeMagnitude = function (digits) {
+	var _n0 = elm_community$list_extra$List$Extra$last(digits);
+	if (_n0.$ === 'Nothing') {
+		return false;
+	} else {
+		var x = _n0.a;
+		return x < 0;
+	}
+};
+var cmditch$elm_bigint$BigInt$Neg = function (a) {
+	return {$: 'Neg', a: a};
+};
+var elm$core$Basics$True = {$: 'True'};
+var elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var cmditch$elm_bigint$BigInt$mkBigInt = F2(
+	function (s, mag) {
+		var digits = mag.a;
+		if (elm$core$List$isEmpty(digits)) {
+			return cmditch$elm_bigint$BigInt$Zer;
+		} else {
+			switch (s.$) {
+				case 'Zero':
+					return cmditch$elm_bigint$BigInt$Zer;
+				case 'Positive':
+					return cmditch$elm_bigint$BigInt$Pos(mag);
+				default:
+					return cmditch$elm_bigint$BigInt$Neg(mag);
+			}
+		}
+	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var cmditch$elm_bigint$BigInt$mkBigIntNotNormalised = F2(
+	function (s, digits) {
+		return A2(
+			cmditch$elm_bigint$BigInt$BigIntNotNormalised,
+			s,
+			cmditch$elm_bigint$BigInt$MagnitudeNotNormalised(digits));
+	});
+var elm$core$Basics$eq = _Utils_equal;
+var elm$core$Basics$and = _Basics_and;
+var elm$core$Basics$add = _Basics_add;
+var elm$core$Basics$gt = _Utils_gt;
 var elm$core$List$foldl = F3(
 	function (func, acc, list) {
 		foldl:
@@ -4679,6 +4877,737 @@ var elm$core$List$foldl = F3(
 var elm$core$List$reverse = function (list) {
 	return A3(elm$core$List$foldl, elm$core$List$cons, _List_Nil, list);
 };
+var elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							elm$core$List$foldl,
+							fn,
+							acc,
+							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var elm_community$list_extra$List$Extra$dropWhileRight = function (p) {
+	return A2(
+		elm$core$List$foldr,
+		F2(
+			function (x, xs) {
+				return (p(x) && elm$core$List$isEmpty(xs)) ? _List_Nil : A2(elm$core$List$cons, x, xs);
+			}),
+		_List_Nil);
+};
+var cmditch$elm_bigint$BigInt$dropZeroes = elm_community$list_extra$List$Extra$dropWhileRight(
+	elm$core$Basics$eq(0));
+var cmditch$elm_bigint$Constants$maxDigitMagnitude = 7;
+var elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var elm$core$Basics$pow = _Basics_pow;
+var cmditch$elm_bigint$Constants$maxDigitValue = (-1) + A2(elm$core$Basics$pow, 10, cmditch$elm_bigint$Constants$maxDigitMagnitude);
+var cmditch$elm_bigint$BigInt$baseDigit = cmditch$elm_bigint$Constants$maxDigitValue + 1;
+var elm$core$Basics$idiv = _Basics_idiv;
+var elm$core$Basics$remainderBy = _Basics_remainderBy;
+var elm$core$Tuple$mapFirst = F2(
+	function (func, _n0) {
+		var x = _n0.a;
+		var y = _n0.b;
+		return _Utils_Tuple2(
+			func(x),
+			y);
+	});
+var cmditch$elm_bigint$BigInt$normaliseDigit = function (x) {
+	return (x < 0) ? A2(
+		elm$core$Tuple$mapFirst,
+		elm$core$Basics$add(-1),
+		cmditch$elm_bigint$BigInt$normaliseDigit(x + cmditch$elm_bigint$BigInt$baseDigit)) : _Utils_Tuple2((x / cmditch$elm_bigint$BigInt$baseDigit) | 0, x % cmditch$elm_bigint$BigInt$baseDigit);
+};
+var cmditch$elm_bigint$BigInt$normaliseDigitList = F2(
+	function (carry, xs) {
+		normaliseDigitList:
+		while (true) {
+			if (!xs.b) {
+				if (_Utils_cmp(carry, cmditch$elm_bigint$BigInt$baseDigit) > 0) {
+					var $temp$carry = 0,
+						$temp$xs = _List_fromArray(
+						[carry]);
+					carry = $temp$carry;
+					xs = $temp$xs;
+					continue normaliseDigitList;
+				} else {
+					return _List_fromArray(
+						[carry]);
+				}
+			} else {
+				var x = xs.a;
+				var xs_ = xs.b;
+				var _n1 = cmditch$elm_bigint$BigInt$normaliseDigit(x + carry);
+				var newCarry = _n1.a;
+				var x_ = _n1.b;
+				return A2(
+					elm$core$List$cons,
+					x_,
+					A2(cmditch$elm_bigint$BigInt$normaliseDigitList, newCarry, xs_));
+			}
+		}
+	});
+var cmditch$elm_bigint$BigInt$normaliseMagnitude = function (_n0) {
+	var xs = _n0.a;
+	return cmditch$elm_bigint$BigInt$Magnitude(
+		cmditch$elm_bigint$BigInt$dropZeroes(
+			A2(cmditch$elm_bigint$BigInt$normaliseDigitList, 0, xs)));
+};
+var elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var cmditch$elm_bigint$BigInt$reverseMagnitude = elm$core$List$map(elm$core$Basics$negate);
+var cmditch$elm_bigint$BigInt$Negative = {$: 'Negative'};
+var cmditch$elm_bigint$BigInt$Zero = {$: 'Zero'};
+var cmditch$elm_bigint$BigInt$signNegate = function (sign_) {
+	switch (sign_.$) {
+		case 'Positive':
+			return cmditch$elm_bigint$BigInt$Negative;
+		case 'Negative':
+			return cmditch$elm_bigint$BigInt$Positive;
+		default:
+			return cmditch$elm_bigint$BigInt$Zero;
+	}
+};
+var cmditch$elm_bigint$BigInt$normalise = function (_n0) {
+	normalise:
+	while (true) {
+		var s = _n0.a;
+		var digits = _n0.b;
+		var _n1 = cmditch$elm_bigint$BigInt$normaliseMagnitude(digits);
+		var normalisedMag = _n1.a;
+		if (cmditch$elm_bigint$BigInt$isNegativeMagnitude(normalisedMag)) {
+			var $temp$_n0 = A2(
+				cmditch$elm_bigint$BigInt$mkBigIntNotNormalised,
+				cmditch$elm_bigint$BigInt$signNegate(s),
+				cmditch$elm_bigint$BigInt$reverseMagnitude(normalisedMag));
+			_n0 = $temp$_n0;
+			continue normalise;
+		} else {
+			return A2(
+				cmditch$elm_bigint$BigInt$mkBigInt,
+				s,
+				cmditch$elm_bigint$BigInt$Magnitude(normalisedMag));
+		}
+	}
+};
+var cmditch$elm_bigint$BigInt$MagnitudePair = function (a) {
+	return {$: 'MagnitudePair', a: a};
+};
+var cmditch$elm_bigint$BigInt$sameSizeRaw = F2(
+	function (xs, ys) {
+		var _n0 = _Utils_Tuple2(xs, ys);
+		if (!_n0.a.b) {
+			if (!_n0.b.b) {
+				return _List_Nil;
+			} else {
+				var _n2 = _n0.b;
+				var y = _n2.a;
+				var ys_ = _n2.b;
+				return A2(
+					elm$core$List$cons,
+					_Utils_Tuple2(0, y),
+					A2(cmditch$elm_bigint$BigInt$sameSizeRaw, _List_Nil, ys_));
+			}
+		} else {
+			if (!_n0.b.b) {
+				var _n1 = _n0.a;
+				var x = _n1.a;
+				var xs_ = _n1.b;
+				return A2(
+					elm$core$List$cons,
+					_Utils_Tuple2(x, 0),
+					A2(cmditch$elm_bigint$BigInt$sameSizeRaw, xs_, _List_Nil));
+			} else {
+				var _n3 = _n0.a;
+				var x = _n3.a;
+				var xs_ = _n3.b;
+				var _n4 = _n0.b;
+				var y = _n4.a;
+				var ys_ = _n4.b;
+				return A2(
+					elm$core$List$cons,
+					_Utils_Tuple2(x, y),
+					A2(cmditch$elm_bigint$BigInt$sameSizeRaw, xs_, ys_));
+			}
+		}
+	});
+var cmditch$elm_bigint$BigInt$sameSizeNotNormalized = F2(
+	function (_n0, _n1) {
+		var xs = _n0.a;
+		var ys = _n1.a;
+		return cmditch$elm_bigint$BigInt$MagnitudePair(
+			A2(cmditch$elm_bigint$BigInt$sameSizeRaw, xs, ys));
+	});
+var cmditch$elm_bigint$BigInt$toPositiveSign = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return A2(cmditch$elm_bigint$BigInt$mkBigIntNotNormalised, cmditch$elm_bigint$BigInt$Zero, _List_Nil);
+		case 'Neg':
+			var digits = bigInt.a.a;
+			return A2(
+				cmditch$elm_bigint$BigInt$mkBigIntNotNormalised,
+				cmditch$elm_bigint$BigInt$Positive,
+				cmditch$elm_bigint$BigInt$reverseMagnitude(digits));
+		default:
+			var digits = bigInt.a.a;
+			return A2(cmditch$elm_bigint$BigInt$mkBigIntNotNormalised, cmditch$elm_bigint$BigInt$Positive, digits);
+	}
+};
+var cmditch$elm_bigint$BigInt$add = F2(
+	function (a, b) {
+		var _n0 = cmditch$elm_bigint$BigInt$toPositiveSign(b);
+		var mb = _n0.b;
+		var _n1 = cmditch$elm_bigint$BigInt$toPositiveSign(a);
+		var ma = _n1.b;
+		var _n2 = A2(cmditch$elm_bigint$BigInt$sameSizeNotNormalized, ma, mb);
+		var pairs = _n2.a;
+		var added = A2(
+			elm$core$List$map,
+			function (_n3) {
+				var a_ = _n3.a;
+				var b_ = _n3.b;
+				return a_ + b_;
+			},
+			pairs);
+		return cmditch$elm_bigint$BigInt$normalise(
+			A2(
+				cmditch$elm_bigint$BigInt$BigIntNotNormalised,
+				cmditch$elm_bigint$BigInt$Positive,
+				cmditch$elm_bigint$BigInt$MagnitudeNotNormalised(added)));
+	});
+var elm$core$Basics$compare = _Utils_compare;
+var cmditch$elm_bigint$BigInt$signFromInt = function (x) {
+	var _n0 = A2(elm$core$Basics$compare, x, 0);
+	switch (_n0.$) {
+		case 'LT':
+			return cmditch$elm_bigint$BigInt$Negative;
+		case 'GT':
+			return cmditch$elm_bigint$BigInt$Positive;
+		default:
+			return cmditch$elm_bigint$BigInt$Zero;
+	}
+};
+var elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var cmditch$elm_bigint$BigInt$fromInt = function (x) {
+	return cmditch$elm_bigint$BigInt$normalise(
+		A2(
+			cmditch$elm_bigint$BigInt$BigIntNotNormalised,
+			cmditch$elm_bigint$BigInt$signFromInt(x),
+			cmditch$elm_bigint$BigInt$MagnitudeNotNormalised(
+				_List_fromArray(
+					[
+						elm$core$Basics$abs(x)
+					]))));
+};
+var cmditch$elm_bigint$BigInt$compareMagnitude = F4(
+	function (x, y, xs, ys) {
+		compareMagnitude:
+		while (true) {
+			var _n0 = _Utils_Tuple2(xs, ys);
+			if (!_n0.a.b) {
+				if (!_n0.b.b) {
+					return A2(elm$core$Basics$compare, x, y);
+				} else {
+					return elm$core$Basics$LT;
+				}
+			} else {
+				if (!_n0.b.b) {
+					return elm$core$Basics$GT;
+				} else {
+					var _n1 = _n0.a;
+					var x_ = _n1.a;
+					var xss = _n1.b;
+					var _n2 = _n0.b;
+					var y_ = _n2.a;
+					var yss = _n2.b;
+					if (_Utils_eq(x_, y_)) {
+						var $temp$x = x,
+							$temp$y = y,
+							$temp$xs = xss,
+							$temp$ys = yss;
+						x = $temp$x;
+						y = $temp$y;
+						xs = $temp$xs;
+						ys = $temp$ys;
+						continue compareMagnitude;
+					} else {
+						var $temp$x = x_,
+							$temp$y = y_,
+							$temp$xs = xss,
+							$temp$ys = yss;
+						x = $temp$x;
+						y = $temp$y;
+						xs = $temp$xs;
+						ys = $temp$ys;
+						continue compareMagnitude;
+					}
+				}
+			}
+		}
+	});
+var cmditch$elm_bigint$BigInt$orderNegate = function (x) {
+	switch (x.$) {
+		case 'LT':
+			return elm$core$Basics$GT;
+		case 'EQ':
+			return elm$core$Basics$EQ;
+		default:
+			return elm$core$Basics$LT;
+	}
+};
+var cmditch$elm_bigint$BigInt$compare = F2(
+	function (int1, int2) {
+		var _n0 = _Utils_Tuple2(int1, int2);
+		switch (_n0.a.$) {
+			case 'Pos':
+				if (_n0.b.$ === 'Pos') {
+					var mag1 = _n0.a.a.a;
+					var mag2 = _n0.b.a.a;
+					return A4(cmditch$elm_bigint$BigInt$compareMagnitude, 0, 0, mag1, mag2);
+				} else {
+					return elm$core$Basics$GT;
+				}
+			case 'Neg':
+				if (_n0.b.$ === 'Neg') {
+					var mag1 = _n0.a.a.a;
+					var mag2 = _n0.b.a.a;
+					return cmditch$elm_bigint$BigInt$orderNegate(
+						A4(cmditch$elm_bigint$BigInt$compareMagnitude, 0, 0, mag1, mag2));
+				} else {
+					return elm$core$Basics$LT;
+				}
+			default:
+				switch (_n0.b.$) {
+					case 'Pos':
+						var _n1 = _n0.a;
+						return elm$core$Basics$LT;
+					case 'Zer':
+						var _n2 = _n0.a;
+						var _n3 = _n0.b;
+						return elm$core$Basics$EQ;
+					default:
+						var _n4 = _n0.a;
+						return elm$core$Basics$GT;
+				}
+		}
+	});
+var cmditch$elm_bigint$BigInt$gt = F2(
+	function (x, y) {
+		return _Utils_eq(
+			A2(cmditch$elm_bigint$BigInt$compare, x, y),
+			elm$core$Basics$GT);
+	});
+var elm$core$Basics$not = _Basics_not;
+var cmditch$elm_bigint$BigInt$lte = F2(
+	function (x, y) {
+		return !A2(cmditch$elm_bigint$BigInt$gt, x, y);
+	});
+var cmditch$elm_bigint$BigInt$magnitude = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return cmditch$elm_bigint$BigInt$Magnitude(_List_Nil);
+		case 'Pos':
+			var mag = bigInt.a;
+			return mag;
+		default:
+			var mag = bigInt.a;
+			return mag;
+	}
+};
+var cmditch$elm_bigint$BigInt$mulSingleDigit = F2(
+	function (_n0, d) {
+		var xs = _n0.a;
+		return cmditch$elm_bigint$BigInt$normaliseMagnitude(
+			cmditch$elm_bigint$BigInt$MagnitudeNotNormalised(
+				A2(
+					elm$core$List$map,
+					elm$core$Basics$mul(d),
+					xs)));
+	});
+var cmditch$elm_bigint$BigInt$mulMagnitudes = F2(
+	function (_n0, _n1) {
+		var mag1 = _n0.a;
+		var mag2 = _n1.a;
+		if (!mag1.b) {
+			return cmditch$elm_bigint$BigInt$Magnitude(_List_Nil);
+		} else {
+			if (!mag1.b.b) {
+				var m = mag1.a;
+				return A2(
+					cmditch$elm_bigint$BigInt$mulSingleDigit,
+					cmditch$elm_bigint$BigInt$Magnitude(mag2),
+					m);
+			} else {
+				var m = mag1.a;
+				var mx = mag1.b;
+				var accum = A2(
+					cmditch$elm_bigint$BigInt$mulSingleDigit,
+					cmditch$elm_bigint$BigInt$Magnitude(mag2),
+					m);
+				var _n3 = A2(
+					cmditch$elm_bigint$BigInt$mulMagnitudes,
+					cmditch$elm_bigint$BigInt$Magnitude(mx),
+					cmditch$elm_bigint$BigInt$Magnitude(mag2));
+				var rest = _n3.a;
+				var bigInt = A2(
+					cmditch$elm_bigint$BigInt$add,
+					A2(cmditch$elm_bigint$BigInt$mkBigInt, cmditch$elm_bigint$BigInt$Positive, accum),
+					A2(
+						cmditch$elm_bigint$BigInt$mkBigInt,
+						cmditch$elm_bigint$BigInt$Positive,
+						cmditch$elm_bigint$BigInt$Magnitude(
+							A2(elm$core$List$cons, 0, rest))));
+				return cmditch$elm_bigint$BigInt$magnitude(bigInt);
+			}
+		}
+	});
+var cmditch$elm_bigint$BigInt$sign = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return cmditch$elm_bigint$BigInt$Zero;
+		case 'Pos':
+			return cmditch$elm_bigint$BigInt$Positive;
+		default:
+			return cmditch$elm_bigint$BigInt$Negative;
+	}
+};
+var cmditch$elm_bigint$BigInt$signProduct = F2(
+	function (x, y) {
+		return (_Utils_eq(x, cmditch$elm_bigint$BigInt$Zero) || _Utils_eq(y, cmditch$elm_bigint$BigInt$Zero)) ? cmditch$elm_bigint$BigInt$Zero : (_Utils_eq(x, y) ? cmditch$elm_bigint$BigInt$Positive : cmditch$elm_bigint$BigInt$Negative);
+	});
+var cmditch$elm_bigint$BigInt$mul = F2(
+	function (int1, int2) {
+		return A2(
+			cmditch$elm_bigint$BigInt$mkBigInt,
+			A2(
+				cmditch$elm_bigint$BigInt$signProduct,
+				cmditch$elm_bigint$BigInt$sign(int1),
+				cmditch$elm_bigint$BigInt$sign(int2)),
+			A2(
+				cmditch$elm_bigint$BigInt$mulMagnitudes,
+				cmditch$elm_bigint$BigInt$magnitude(int1),
+				cmditch$elm_bigint$BigInt$magnitude(int2)));
+	});
+var cmditch$elm_bigint$BigInt$negate = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return cmditch$elm_bigint$BigInt$Zer;
+		case 'Pos':
+			var mag = bigInt.a;
+			return cmditch$elm_bigint$BigInt$Neg(mag);
+		default:
+			var mag = bigInt.a;
+			return cmditch$elm_bigint$BigInt$Pos(mag);
+	}
+};
+var cmditch$elm_bigint$BigInt$sub = F2(
+	function (a, b) {
+		return A2(
+			cmditch$elm_bigint$BigInt$add,
+			a,
+			cmditch$elm_bigint$BigInt$negate(b));
+	});
+var cmditch$elm_bigint$BigInt$zero = cmditch$elm_bigint$BigInt$fromInt(0);
+var cmditch$elm_bigint$BigInt$divmodDigit_ = F4(
+	function (to_test, padding, num, den) {
+		if (!to_test) {
+			return _Utils_Tuple2(cmditch$elm_bigint$BigInt$zero, num);
+		} else {
+			var x = cmditch$elm_bigint$BigInt$fromInt(to_test);
+			var candidate = A2(
+				cmditch$elm_bigint$BigInt$mul,
+				A2(cmditch$elm_bigint$BigInt$mul, x, den),
+				padding);
+			var _n0 = A2(cmditch$elm_bigint$BigInt$lte, candidate, num) ? _Utils_Tuple2(
+				A2(cmditch$elm_bigint$BigInt$mul, x, padding),
+				A2(cmditch$elm_bigint$BigInt$sub, num, candidate)) : _Utils_Tuple2(cmditch$elm_bigint$BigInt$zero, num);
+			var newdiv = _n0.a;
+			var newmod = _n0.b;
+			var _n1 = A4(cmditch$elm_bigint$BigInt$divmodDigit_, (to_test / 2) | 0, padding, newmod, den);
+			var restdiv = _n1.a;
+			var restmod = _n1.b;
+			return _Utils_Tuple2(
+				A2(cmditch$elm_bigint$BigInt$add, newdiv, restdiv),
+				restmod);
+		}
+	});
+var cmditch$elm_bigint$BigInt$maxDigitBits = elm$core$Basics$ceiling(
+	A2(elm$core$Basics$logBase, 2, cmditch$elm_bigint$Constants$maxDigitValue));
+var cmditch$elm_bigint$BigInt$divmodDigit = F3(
+	function (padding, x, y) {
+		return A4(
+			cmditch$elm_bigint$BigInt$divmodDigit_,
+			A2(elm$core$Basics$pow, 2, cmditch$elm_bigint$BigInt$maxDigitBits),
+			padding,
+			x,
+			y);
+	});
+var cmditch$elm_bigint$BigInt$one = cmditch$elm_bigint$BigInt$fromInt(1);
+var elm$core$Basics$always = F2(
+	function (a, _n0) {
+		return a;
+	});
+var elm$core$Basics$le = _Utils_le;
+var elm$core$List$rangeHelp = F3(
+	function (lo, hi, list) {
+		rangeHelp:
+		while (true) {
+			if (_Utils_cmp(lo, hi) < 1) {
+				var $temp$lo = lo,
+					$temp$hi = hi - 1,
+					$temp$list = A2(elm$core$List$cons, hi, list);
+				lo = $temp$lo;
+				hi = $temp$hi;
+				list = $temp$list;
+				continue rangeHelp;
+			} else {
+				return list;
+			}
+		}
+	});
+var elm$core$List$range = F2(
+	function (lo, hi) {
+		return A3(elm$core$List$rangeHelp, lo, hi, _List_Nil);
+	});
+var cmditch$elm_bigint$BigInt$repeatedly = F3(
+	function (f, x, n) {
+		return A3(
+			elm$core$List$foldl,
+			elm$core$Basics$always(f),
+			x,
+			A2(elm$core$List$range, 1, n));
+	});
+var cmditch$elm_bigint$BigInt$padDigits = function (n) {
+	return A3(
+		cmditch$elm_bigint$BigInt$repeatedly,
+		cmditch$elm_bigint$BigInt$mul(
+			cmditch$elm_bigint$BigInt$fromInt(cmditch$elm_bigint$BigInt$baseDigit)),
+		cmditch$elm_bigint$BigInt$one,
+		n);
+};
+var cmditch$elm_bigint$BigInt$divMod_ = F3(
+	function (n, num, den) {
+		if (!n) {
+			return A3(
+				cmditch$elm_bigint$BigInt$divmodDigit,
+				cmditch$elm_bigint$BigInt$padDigits(n),
+				num,
+				den);
+		} else {
+			var _n0 = A3(
+				cmditch$elm_bigint$BigInt$divmodDigit,
+				cmditch$elm_bigint$BigInt$padDigits(n),
+				num,
+				den);
+			var cdiv = _n0.a;
+			var cmod = _n0.b;
+			var _n1 = A3(cmditch$elm_bigint$BigInt$divMod_, n - 1, cmod, den);
+			var rdiv = _n1.a;
+			var rmod = _n1.b;
+			return _Utils_Tuple2(
+				A2(cmditch$elm_bigint$BigInt$add, cdiv, rdiv),
+				rmod);
+		}
+	});
+var cmditch$elm_bigint$BigInt$toDigits = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return _List_Nil;
+		case 'Pos':
+			var ds = bigInt.a.a;
+			return ds;
+		default:
+			var ds = bigInt.a.a;
+			return ds;
+	}
+};
+var elm$core$Basics$max = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) > 0) ? x : y;
+	});
+var elm$core$List$length = function (xs) {
+	return A3(
+		elm$core$List$foldl,
+		F2(
+			function (_n0, i) {
+				return i + 1;
+			}),
+		0,
+		xs);
+};
+var cmditch$elm_bigint$BigInt$divmod = F2(
+	function (num, den) {
+		if (_Utils_eq(den, cmditch$elm_bigint$BigInt$zero)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var cand_l = (elm$core$List$length(
+				cmditch$elm_bigint$BigInt$toDigits(num)) - elm$core$List$length(
+				cmditch$elm_bigint$BigInt$toDigits(den))) + 1;
+			var _n0 = A3(
+				cmditch$elm_bigint$BigInt$divMod_,
+				A2(elm$core$Basics$max, 0, cand_l),
+				cmditch$elm_bigint$BigInt$abs(num),
+				cmditch$elm_bigint$BigInt$abs(den));
+			var d = _n0.a;
+			var m = _n0.b;
+			return elm$core$Maybe$Just(
+				_Utils_Tuple2(
+					A2(
+						cmditch$elm_bigint$BigInt$mkBigInt,
+						A2(
+							cmditch$elm_bigint$BigInt$signProduct,
+							cmditch$elm_bigint$BigInt$sign(num),
+							cmditch$elm_bigint$BigInt$sign(den)),
+						cmditch$elm_bigint$BigInt$magnitude(d)),
+					A2(
+						cmditch$elm_bigint$BigInt$mkBigInt,
+						cmditch$elm_bigint$BigInt$sign(num),
+						cmditch$elm_bigint$BigInt$magnitude(m))));
+		}
+	});
+var elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var elm$core$String$fromInt = _String_fromNumber;
+var elm$core$Basics$append = _Utils_append;
+var elm$core$String$cons = _String_cons;
+var elm$core$String$fromChar = function (_char) {
+	return A2(elm$core$String$cons, _char, '');
+};
+var elm$core$String$length = _String_length;
+var elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3(elm$core$String$repeatHelp, n, chunk, '');
+	});
+var elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				elm$core$String$repeat,
+				n - elm$core$String$length(string),
+				elm$core$String$fromChar(_char)),
+			string);
+	});
+var cmditch$elm_bigint$BigInt$fillZeroes = A2(
+	elm$core$Basics$composeL,
+	A2(
+		elm$core$String$padLeft,
+		cmditch$elm_bigint$Constants$maxDigitMagnitude,
+		_Utils_chr('0')),
+	elm$core$String$fromInt);
+var elm$core$String$join = F2(
+	function (sep, chunks) {
+		return A2(
+			_String_join,
+			sep,
+			_List_toArray(chunks));
+	});
+var elm$core$String$concat = function (strings) {
+	return A2(elm$core$String$join, '', strings);
+};
+var cmditch$elm_bigint$BigInt$revMagnitudeToString = function (_n0) {
+	var digits = _n0.a;
+	var _n1 = elm$core$List$reverse(digits);
+	if (!_n1.b) {
+		return '0';
+	} else {
+		var x = _n1.a;
+		var xs = _n1.b;
+		return elm$core$String$concat(
+			A2(
+				elm$core$List$cons,
+				elm$core$String$fromInt(x),
+				A2(elm$core$List$map, cmditch$elm_bigint$BigInt$fillZeroes, xs)));
+	}
+};
+var cmditch$elm_bigint$BigInt$toString = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return '0';
+		case 'Pos':
+			var mag = bigInt.a;
+			return cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
+		default:
+			var mag = bigInt.a;
+			return '-' + cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
+	}
+};
+var elm$core$Elm$JsArray$empty = _JsArray_empty;
+var elm$core$Array$empty = A4(elm$core$Array$Array_elm_builtin, 0, elm$core$Array$shiftStep, elm$core$Elm$JsArray$empty, elm$core$Elm$JsArray$empty);
+var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
 var elm$core$Array$compressNodes = F2(
 	function (nodes, acc) {
 		compressNodes:
@@ -4701,7 +5630,6 @@ var elm$core$Array$compressNodes = F2(
 			}
 		}
 	});
-var elm$core$Basics$eq = _Utils_equal;
 var elm$core$Tuple$first = function (_n0) {
 	var x = _n0.a;
 	return x;
@@ -4722,13 +5650,7 @@ var elm$core$Array$treeFromBuilder = F2(
 			}
 		}
 	});
-var elm$core$Basics$add = _Basics_add;
 var elm$core$Basics$floor = _Basics_floor;
-var elm$core$Basics$gt = _Utils_gt;
-var elm$core$Basics$max = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) > 0) ? x : y;
-	});
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
@@ -4753,7 +5675,6 @@ var elm$core$Array$builderToArray = F2(
 				builder.tail);
 		}
 	});
-var elm$core$Basics$True = {$: 'True'};
 var elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -4810,10 +5731,6 @@ var elm$core$Array$getHelp = F3(
 			}
 		}
 	});
-var elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
-};
-var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Array$get = F2(
 	function (index, _n0) {
 		var len = _n0.a;
@@ -4826,38 +5743,56 @@ var elm$core$Array$get = F2(
 			A2(elm$core$Elm$JsArray$unsafeGet, elm$core$Array$bitMask & index, tail)) : elm$core$Maybe$Just(
 			A3(elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var elm$core$Basics$append = _Utils_append;
-var elm$core$Basics$idiv = _Basics_idiv;
-var elm$core$Basics$modBy = _Basics_modBy;
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var elm$core$String$toInt = _String_toInt;
 var author$project$Main$base32Encode = function (input) {
-	if (input > 0) {
-		var integer = (input / 36) | 0;
+	if (A2(
+		cmditch$elm_bigint$BigInt$gt,
+		input,
+		cmditch$elm_bigint$BigInt$fromInt(0))) {
 		var chars = elm$core$Array$fromList(
 			_List_fromArray(
 				['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']));
-		var remainder = A2(
-			elm$core$Array$get,
-			A2(elm$core$Basics$modBy, 36, input),
-			chars);
-		if (remainder.$ === 'Just') {
-			var c = remainder.a;
-			return _Utils_ap(
-				author$project$Main$base32Encode(integer),
-				c);
-		} else {
-			return '';
-		}
+		var _n0 = function () {
+			var _n1 = A2(
+				cmditch$elm_bigint$BigInt$divmod,
+				input,
+				cmditch$elm_bigint$BigInt$fromInt(36));
+			if (_n1.$ === 'Just') {
+				var _n2 = _n1.a;
+				var dd = _n2.a;
+				var mm = _n2.b;
+				return _Utils_Tuple2(dd, mm);
+			} else {
+				return _Utils_Tuple2(
+					cmditch$elm_bigint$BigInt$fromInt(0),
+					cmditch$elm_bigint$BigInt$fromInt(0));
+			}
+		}();
+		var d = _n0.a;
+		var m = _n0.b;
+		var mAsInt = A2(
+			elm$core$Maybe$withDefault,
+			100,
+			elm$core$String$toInt(
+				cmditch$elm_bigint$BigInt$toString(m)));
+		return _Utils_ap(
+			author$project$Main$base32Encode(d),
+			A2(
+				elm$core$Maybe$withDefault,
+				'',
+				A2(elm$core$Array$get, mAsInt, chars)));
 	} else {
 		return '';
 	}
-};
-var author$project$Main$cShiftLeft = F2(
-	function (num, bits) {
-		return (2 * num) << bits;
-	});
-var elm$core$Basics$False = {$: 'False'};
-var elm$core$Basics$negate = function (n) {
-	return -n;
 };
 var elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -4901,19 +5836,6 @@ var author$project$Main$colorCards = F5(
 			card,
 			{team: 0, uncovered: false})));
 	});
-var author$project$Main$debuga = function (bools) {
-	if (bools.b) {
-		var b = bools.a;
-		var bs = bools.b;
-		return _Utils_ap(
-			b ? '1' : '0',
-			author$project$Main$debuga(bs));
-	} else {
-		return '';
-	}
-};
-var elm$core$Basics$and = _Basics_and;
-var elm$core$Basics$not = _Basics_not;
 var author$project$Main$hiddenBlue = function (c) {
 	return (!function ($) {
 		return $.uncovered;
@@ -4927,6 +5849,665 @@ var author$project$Main$hiddenRed = function (c) {
 	}(c)) && (function ($) {
 		return $.team;
 	}(c) === 1);
+};
+var elm$core$String$fromList = _String_fromList;
+var elm$core$Basics$modBy = _Basics_modBy;
+var rtfeldman$elm_hex$Hex$unsafeToDigit = function (num) {
+	unsafeToDigit:
+	while (true) {
+		switch (num) {
+			case 0:
+				return _Utils_chr('0');
+			case 1:
+				return _Utils_chr('1');
+			case 2:
+				return _Utils_chr('2');
+			case 3:
+				return _Utils_chr('3');
+			case 4:
+				return _Utils_chr('4');
+			case 5:
+				return _Utils_chr('5');
+			case 6:
+				return _Utils_chr('6');
+			case 7:
+				return _Utils_chr('7');
+			case 8:
+				return _Utils_chr('8');
+			case 9:
+				return _Utils_chr('9');
+			case 10:
+				return _Utils_chr('a');
+			case 11:
+				return _Utils_chr('b');
+			case 12:
+				return _Utils_chr('c');
+			case 13:
+				return _Utils_chr('d');
+			case 14:
+				return _Utils_chr('e');
+			case 15:
+				return _Utils_chr('f');
+			default:
+				var $temp$num = num;
+				num = $temp$num;
+				continue unsafeToDigit;
+		}
+	}
+};
+var rtfeldman$elm_hex$Hex$unsafePositiveToDigits = F2(
+	function (digits, num) {
+		unsafePositiveToDigits:
+		while (true) {
+			if (num < 16) {
+				return A2(
+					elm$core$List$cons,
+					rtfeldman$elm_hex$Hex$unsafeToDigit(num),
+					digits);
+			} else {
+				var $temp$digits = A2(
+					elm$core$List$cons,
+					rtfeldman$elm_hex$Hex$unsafeToDigit(
+						A2(elm$core$Basics$modBy, 16, num)),
+					digits),
+					$temp$num = (num / 16) | 0;
+				digits = $temp$digits;
+				num = $temp$num;
+				continue unsafePositiveToDigits;
+			}
+		}
+	});
+var rtfeldman$elm_hex$Hex$toString = function (num) {
+	return elm$core$String$fromList(
+		(num < 0) ? A2(
+			elm$core$List$cons,
+			_Utils_chr('-'),
+			A2(rtfeldman$elm_hex$Hex$unsafePositiveToDigits, _List_Nil, -num)) : A2(rtfeldman$elm_hex$Hex$unsafePositiveToDigits, _List_Nil, num));
+};
+var author$project$Main$getHexString = function (digits) {
+	if (((digits.b && digits.b.b) && digits.b.b.b) && digits.b.b.b.b) {
+		var a = digits.a;
+		var _n1 = digits.b;
+		var b = _n1.a;
+		var _n2 = _n1.b;
+		var c = _n2.a;
+		var _n3 = _n2.b;
+		var d = _n3.a;
+		var es = _n3.b;
+		return _Utils_ap(
+			rtfeldman$elm_hex$Hex$toString(
+				(((a ? 8 : 0) + (b ? 4 : 0)) + (c ? 2 : 0)) + (d ? 1 : 0)),
+			author$project$Main$getHexString(es));
+	} else {
+		return '';
+	}
+};
+var cmditch$elm_bigint$BigInt$eightHexDigits = A2(
+	cmditch$elm_bigint$BigInt$mul,
+	cmditch$elm_bigint$BigInt$fromInt(2),
+	cmditch$elm_bigint$BigInt$fromInt(2147483648));
+var cmditch$elm_bigint$Constants$hexDigitMagnitude = 8;
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Result$toMaybe = function (result) {
+	if (result.$ === 'Ok') {
+		var v = result.a;
+		return elm$core$Maybe$Just(v);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {index: index, match: match, number: number, submatches: submatches};
+	});
+var elm$regex$Regex$contains = _Regex_contains;
+var elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var elm$regex$Regex$fromString = function (string) {
+	return A2(
+		elm$regex$Regex$fromStringWith,
+		{caseInsensitive: false, multiline: false},
+		string);
+};
+var elm$regex$Regex$never = _Regex_never;
+var elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2(elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return elm$core$List$reverse(
+			A3(elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _n0 = _Utils_Tuple2(n, list);
+			_n0$1:
+			while (true) {
+				_n0$5:
+				while (true) {
+					if (!_n0.b.b) {
+						return list;
+					} else {
+						if (_n0.b.b.b) {
+							switch (_n0.a) {
+								case 1:
+									break _n0$1;
+								case 2:
+									var _n2 = _n0.b;
+									var x = _n2.a;
+									var _n3 = _n2.b;
+									var y = _n3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_n0.b.b.b.b) {
+										var _n4 = _n0.b;
+										var x = _n4.a;
+										var _n5 = _n4.b;
+										var y = _n5.a;
+										var _n6 = _n5.b;
+										var z = _n6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _n0$5;
+									}
+								default:
+									if (_n0.b.b.b.b && _n0.b.b.b.b.b) {
+										var _n7 = _n0.b;
+										var x = _n7.a;
+										var _n8 = _n7.b;
+										var y = _n8.a;
+										var _n9 = _n8.b;
+										var z = _n9.a;
+										var _n10 = _n9.b;
+										var w = _n10.a;
+										var tl = _n10.b;
+										return (ctr > 1000) ? A2(
+											elm$core$List$cons,
+											x,
+											A2(
+												elm$core$List$cons,
+												y,
+												A2(
+													elm$core$List$cons,
+													z,
+													A2(
+														elm$core$List$cons,
+														w,
+														A2(elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											elm$core$List$cons,
+											x,
+											A2(
+												elm$core$List$cons,
+												y,
+												A2(
+													elm$core$List$cons,
+													z,
+													A2(
+														elm$core$List$cons,
+														w,
+														A3(elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _n0$5;
+									}
+							}
+						} else {
+							if (_n0.a === 1) {
+								break _n0$1;
+							} else {
+								break _n0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _n1 = _n0.b;
+			var x = _n1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var elm$core$List$take = F2(
+	function (n, list) {
+		return A3(elm$core$List$takeFast, 0, n, list);
+	});
+var elm_community$list_extra$List$Extra$greedyGroupsOfWithStep = F3(
+	function (size, step, xs) {
+		var xs_ = A2(elm$core$List$drop, step, xs);
+		var okayXs = elm$core$List$length(xs) > 0;
+		var okayArgs = (size > 0) && (step > 0);
+		return (okayArgs && okayXs) ? A2(
+			elm$core$List$cons,
+			A2(elm$core$List$take, size, xs),
+			A3(elm_community$list_extra$List$Extra$greedyGroupsOfWithStep, size, step, xs_)) : _List_Nil;
+	});
+var elm_community$list_extra$List$Extra$greedyGroupsOf = F2(
+	function (size, xs) {
+		return A3(elm_community$list_extra$List$Extra$greedyGroupsOfWithStep, size, size, xs);
+	});
+var elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var elm_community$maybe_extra$Maybe$Extra$combine = A2(
+	elm$core$List$foldr,
+	elm$core$Maybe$map2(elm$core$List$cons),
+	elm$core$Maybe$Just(_List_Nil));
+var elm$core$List$tail = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(xs);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var elm$core$Result$Err = function (a) {
+	return {$: 'Err', a: a};
+};
+var elm$core$Result$Ok = function (a) {
+	return {$: 'Ok', a: a};
+};
+var elm$core$Result$map = F2(
+	function (func, ra) {
+		if (ra.$ === 'Ok') {
+			var a = ra.a;
+			return elm$core$Result$Ok(
+				func(a));
+		} else {
+			var e = ra.a;
+			return elm$core$Result$Err(e);
+		}
+	});
+var elm$core$Result$mapError = F2(
+	function (f, result) {
+		if (result.$ === 'Ok') {
+			var v = result.a;
+			return elm$core$Result$Ok(v);
+		} else {
+			var e = result.a;
+			return elm$core$Result$Err(
+				f(e));
+		}
+	});
+var elm$core$String$isEmpty = function (string) {
+	return string === '';
+};
+var elm$core$String$startsWith = _String_startsWith;
+var elm$core$String$foldr = _String_foldr;
+var elm$core$String$toList = function (string) {
+	return A3(elm$core$String$foldr, elm$core$List$cons, _List_Nil, string);
+};
+var rtfeldman$elm_hex$Hex$fromStringHelp = F3(
+	function (position, chars, accumulated) {
+		fromStringHelp:
+		while (true) {
+			if (!chars.b) {
+				return elm$core$Result$Ok(accumulated);
+			} else {
+				var _char = chars.a;
+				var rest = chars.b;
+				switch (_char.valueOf()) {
+					case '0':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated;
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '1':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + A2(elm$core$Basics$pow, 16, position);
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '2':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (2 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '3':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (3 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '4':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (4 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '5':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (5 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '6':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (6 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '7':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (7 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '8':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (8 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case '9':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (9 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case 'a':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (10 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case 'b':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (11 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case 'c':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (12 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case 'd':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (13 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case 'e':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (14 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					case 'f':
+						var $temp$position = position - 1,
+							$temp$chars = rest,
+							$temp$accumulated = accumulated + (15 * A2(elm$core$Basics$pow, 16, position));
+						position = $temp$position;
+						chars = $temp$chars;
+						accumulated = $temp$accumulated;
+						continue fromStringHelp;
+					default:
+						var nonHex = _char;
+						return elm$core$Result$Err(
+							elm$core$String$fromChar(nonHex) + ' is not a valid hexadecimal character.');
+				}
+			}
+		}
+	});
+var rtfeldman$elm_hex$Hex$fromString = function (str) {
+	if (elm$core$String$isEmpty(str)) {
+		return elm$core$Result$Err('Empty strings are not valid hexadecimal strings.');
+	} else {
+		var result = function () {
+			if (A2(elm$core$String$startsWith, '-', str)) {
+				var list = A2(
+					elm$core$Maybe$withDefault,
+					_List_Nil,
+					elm$core$List$tail(
+						elm$core$String$toList(str)));
+				return A2(
+					elm$core$Result$map,
+					elm$core$Basics$negate,
+					A3(
+						rtfeldman$elm_hex$Hex$fromStringHelp,
+						elm$core$List$length(list) - 1,
+						list,
+						0));
+			} else {
+				return A3(
+					rtfeldman$elm_hex$Hex$fromStringHelp,
+					elm$core$String$length(str) - 1,
+					elm$core$String$toList(str),
+					0);
+			}
+		}();
+		var formatError = function (err) {
+			return A2(
+				elm$core$String$join,
+				' ',
+				_List_fromArray(
+					['\"' + (str + '\"'), 'is not a valid hexadecimal string because', err]));
+		};
+		return A2(elm$core$Result$mapError, formatError, result);
+	}
+};
+var cmditch$elm_bigint$BigInt$fromHexString_ = function (x) {
+	var _n0 = A2(
+		elm$regex$Regex$contains,
+		A2(
+			elm$core$Maybe$withDefault,
+			elm$regex$Regex$never,
+			elm$regex$Regex$fromString('^[0-9A-Fa-f]')),
+		elm$core$String$fromList(x));
+	if (_n0) {
+		return A2(
+			elm$core$Maybe$map,
+			A2(
+				elm$core$Basics$composeR,
+				elm$core$List$reverse,
+				A2(
+					elm$core$List$foldl,
+					F2(
+						function (e, s) {
+							return A2(
+								cmditch$elm_bigint$BigInt$add,
+								cmditch$elm_bigint$BigInt$fromInt(e),
+								A2(cmditch$elm_bigint$BigInt$mul, s, cmditch$elm_bigint$BigInt$eightHexDigits));
+						}),
+					cmditch$elm_bigint$BigInt$zero)),
+			elm_community$maybe_extra$Maybe$Extra$combine(
+				A2(
+					elm$core$List$map,
+					A2(
+						elm$core$Basics$composeR,
+						elm$core$List$reverse,
+						A2(
+							elm$core$Basics$composeR,
+							elm$core$String$fromList,
+							A2(elm$core$Basics$composeR, rtfeldman$elm_hex$Hex$fromString, elm$core$Result$toMaybe))),
+					A2(
+						elm_community$list_extra$List$Extra$greedyGroupsOf,
+						cmditch$elm_bigint$Constants$hexDigitMagnitude,
+						elm$core$List$reverse(x)))));
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var elm$core$String$toLower = _String_toLower;
+var cmditch$elm_bigint$BigInt$fromHexString = function (x) {
+	var _n0 = elm$core$String$toList(
+		elm$core$String$toLower(x));
+	_n0$9:
+	while (true) {
+		if (!_n0.b) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			switch (_n0.a.valueOf()) {
+				case '-':
+					if (_n0.b.b) {
+						if ((('0' === _n0.b.a.valueOf()) && _n0.b.b.b) && ('x' === _n0.b.b.a.valueOf())) {
+							if (!_n0.b.b.b.b) {
+								var _n1 = _n0.b;
+								var _n2 = _n1.b;
+								return elm$core$Maybe$Nothing;
+							} else {
+								var _n3 = _n0.b;
+								var _n4 = _n3.b;
+								var xs = _n4.b;
+								return A2(
+									elm$core$Maybe$map,
+									cmditch$elm_bigint$BigInt$mul(
+										cmditch$elm_bigint$BigInt$fromInt(-1)),
+									cmditch$elm_bigint$BigInt$fromHexString_(xs));
+							}
+						} else {
+							var xs = _n0.b;
+							return A2(
+								elm$core$Maybe$map,
+								cmditch$elm_bigint$BigInt$mul(
+									cmditch$elm_bigint$BigInt$fromInt(-1)),
+								cmditch$elm_bigint$BigInt$fromHexString_(xs));
+						}
+					} else {
+						return elm$core$Maybe$Nothing;
+					}
+				case '+':
+					if (!_n0.b.b) {
+						return elm$core$Maybe$Nothing;
+					} else {
+						var xs = _n0.b;
+						return cmditch$elm_bigint$BigInt$fromHexString_(xs);
+					}
+				case '0':
+					if (_n0.b.b && ('x' === _n0.b.a.valueOf())) {
+						if (!_n0.b.b.b) {
+							var _n5 = _n0.b;
+							return elm$core$Maybe$Nothing;
+						} else {
+							var _n6 = _n0.b;
+							var xs = _n6.b;
+							return cmditch$elm_bigint$BigInt$fromHexString_(xs);
+						}
+					} else {
+						break _n0$9;
+					}
+				default:
+					break _n0$9;
+			}
+		}
+	}
+	var xs = _n0;
+	return cmditch$elm_bigint$BigInt$fromHexString_(xs);
+};
+var author$project$Main$listBoolToBigInt = function (digits) {
+	var _n0 = cmditch$elm_bigint$BigInt$fromHexString(
+		author$project$Main$getHexString(digits));
+	if (_n0.$ === 'Just') {
+		var bi = _n0.a;
+		return bi;
+	} else {
+		return cmditch$elm_bigint$BigInt$fromInt(0);
+	}
 };
 var author$project$Main$populateCards = F2(
 	function (cards, words) {
@@ -4970,52 +6551,6 @@ var author$project$Main$uncover = F3(
 			return _List_Nil;
 		}
 	});
-var elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var elm$core$Array$foldl = F3(
-	function (func, baseCase, _n0) {
-		var tree = _n0.c;
-		var tail = _n0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3(elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3(elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			elm$core$Elm$JsArray$foldl,
-			func,
-			A3(elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
-	});
-var elm$core$Elm$JsArray$map = _JsArray_map;
-var elm$core$Array$map = F2(
-	function (func, _n0) {
-		var len = _n0.a;
-		var startShift = _n0.b;
-		var tree = _n0.c;
-		var tail = _n0.d;
-		var helper = function (node) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return elm$core$Array$SubTree(
-					A2(elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return elm$core$Array$Leaf(
-					A2(elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2(elm$core$Elm$JsArray$map, helper, tree),
-			A2(elm$core$Elm$JsArray$map, func, tail));
-	});
 var elm$core$Elm$JsArray$initialize = _JsArray_initialize;
 var elm$core$Array$initializeHelp = F5(
 	function (fn, fromIndex, len, nodeList, tail) {
@@ -5043,8 +6578,6 @@ var elm$core$Array$initializeHelp = F5(
 			}
 		}
 	});
-var elm$core$Basics$le = _Utils_le;
-var elm$core$Basics$remainderBy = _Basics_remainderBy;
 var elm$core$Array$initialize = F2(
 	function (len, fn) {
 		if (len <= 0) {
@@ -5087,27 +6620,6 @@ var elm$core$Array$appendHelpBuilder = F2(
 			nodeListSize: builder.nodeListSize + 1,
 			tail: elm$core$Elm$JsArray$empty
 		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
-	});
-var elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
 	});
 var elm$core$Array$sliceLeft = F2(
 	function (from, array) {
@@ -5289,63 +6801,6 @@ var elm$core$Array$slice = F3(
 			A2(elm$core$Array$sliceRight, correctTo, array));
 	});
 var elm$core$Basics$xor = _Basics_xor;
-var elm$core$Bitwise$or = _Bitwise_or;
-var elm$core$Bitwise$xor = _Bitwise_xor;
-var elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							elm$core$List$foldl,
-							fn,
-							acc,
-							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
 var elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5357,38 +6812,7 @@ var elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var elm$core$List$length = function (xs) {
-	return A3(
-		elm$core$List$foldl,
-		F2(
-			function (_n0, i) {
-				return i + 1;
-			}),
-		0,
-		xs);
-};
 var elm$core$List$map2 = _List_map2;
-var elm$core$List$rangeHelp = F3(
-	function (lo, hi, list) {
-		rangeHelp:
-		while (true) {
-			if (_Utils_cmp(lo, hi) < 1) {
-				var $temp$lo = lo,
-					$temp$hi = hi - 1,
-					$temp$list = A2(elm$core$List$cons, hi, list);
-				lo = $temp$lo;
-				hi = $temp$hi;
-				list = $temp$list;
-				continue rangeHelp;
-			} else {
-				return list;
-			}
-		}
-	});
-var elm$core$List$range = F2(
-	function (lo, hi) {
-		return A3(elm$core$List$rangeHelp, lo, hi, _List_Nil);
-	});
 var elm$core$List$indexedMap = F2(
 	function (f, xs) {
 		return A3(
@@ -5406,12 +6830,6 @@ var elm$core$Result$isOk = function (result) {
 	} else {
 		return false;
 	}
-};
-var elm$core$Result$Err = function (a) {
-	return {$: 'Err', a: a};
-};
-var elm$core$Result$Ok = function (a) {
-	return {$: 'Ok', a: a};
 };
 var elm$json$Json$Decode$Failure = F2(
 	function (a, b) {
@@ -5448,14 +6866,6 @@ var elm$core$Char$isAlphaNum = function (_char) {
 	return elm$core$Char$isLower(_char) || (elm$core$Char$isUpper(_char) || elm$core$Char$isDigit(_char));
 };
 var elm$core$String$all = _String_all;
-var elm$core$String$fromInt = _String_fromNumber;
-var elm$core$String$join = F2(
-	function (sep, chunks) {
-		return A2(
-			_String_join,
-			sep,
-			_List_toArray(chunks));
-	});
 var elm$core$String$uncons = _String_uncons;
 var elm$core$String$split = F2(
 	function (sep, string) {
@@ -5583,14 +6993,6 @@ var elm$core$Array$length = function (_n0) {
 	var len = _n0.a;
 	return len;
 };
-var elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var elm$random$Random$Generator = function (a) {
 	return {$: 'Generator', a: a};
 };
@@ -5603,6 +7005,7 @@ var elm$random$Random$next = function (_n0) {
 	var incr = _n0.b;
 	return A2(elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
 };
+var elm$core$Bitwise$xor = _Bitwise_xor;
 var elm$random$Random$peel = function (_n0) {
 	var state = _n0.a;
 	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
@@ -5691,7 +7094,6 @@ var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
 	return y;
 };
-var elm$core$Basics$compare = _Utils_compare;
 var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -5942,25 +7344,8 @@ var elm_community$random_extra$Random$Array$shuffle = function (values) {
 			length,
 			A2(elm$random$Random$int, 0, length - 1)));
 };
-var elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
 var elm$random$Random$addOne = function (value) {
 	return _Utils_Tuple2(1, value);
-};
-var elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
 };
 var elm$core$List$sum = function (numbers) {
 	return A3(elm$core$List$foldl, elm$core$Basics$add, 0, numbers);
@@ -6153,21 +7538,7 @@ var author$project$Main$update = F2(
 					elm$core$Basics$xor,
 					myPrime,
 					elm$core$Array$toList(benum5));
-				var bnum = 3042636948931627 ^ ((1 << 52) | (A2(author$project$Main$cShiftLeft, 3, assassinID) | A3(
-					elm$core$Array$foldl,
-					elm$core$Bitwise$or,
-					A3(
-						elm$core$Array$foldl,
-						elm$core$Bitwise$or,
-						0,
-						A2(
-							elm$core$Array$map,
-							author$project$Main$cShiftLeft(1),
-							elm$core$Array$fromList(redIDs))),
-					A2(
-						elm$core$Array$map,
-						author$project$Main$cShiftLeft(2),
-						elm$core$Array$fromList(blueIDs)))));
+				var bigint1 = author$project$Main$listBoolToBigInt(myWhatever);
 				var newShuffledCards = A2(
 					elm$core$List$indexedMap,
 					A3(author$project$Main$colorCards, assassinID, redIDs, blueIDs),
@@ -6179,8 +7550,7 @@ var author$project$Main$update = F2(
 							blueRemaining: elm$core$List$length(
 								A2(elm$core$List$filter, author$project$Main$hiddenBlue, newShuffledCards)),
 							cards: newShuffledCards,
-							debugString: author$project$Main$debuga(myWhatever),
-							password: author$project$Main$base32Encode(bnum),
+							password: author$project$Main$base32Encode(bigint1),
 							redRemaining: elm$core$List$length(
 								A2(elm$core$List$filter, author$project$Main$hiddenRed, newShuffledCards)),
 							seed: seed3,
@@ -6519,11 +7889,6 @@ var elm$time$Time$onSelfMsg = F3(
 				A2(elm$core$Task$andThen, tellTaggers, elm$time$Time$now));
 		}
 	});
-var elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var elm$time$Time$subMap = F2(
 	function (f, _n0) {
 		var interval = _n0.a;
@@ -6723,10 +8088,7 @@ var author$project$Main$view = function (model) {
 					[
 						elm$html$Html$Attributes$class('debug')
 					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text(model.debugString)
-					])),
+				_List_Nil),
 				A2(
 				elm$html$Html$div,
 				_List_fromArray(
@@ -7204,7 +8566,6 @@ var elm$core$Task$perform = F2(
 			elm$core$Task$Perform(
 				A2(elm$core$Task$map, toMessage, task)));
 	});
-var elm$core$String$length = _String_length;
 var elm$core$String$slice = _String_slice;
 var elm$core$String$dropLeft = F2(
 	function (n, string) {
@@ -7214,19 +8575,14 @@ var elm$core$String$dropLeft = F2(
 			elm$core$String$length(string),
 			string);
 	});
-var elm$core$String$startsWith = _String_startsWith;
 var elm$url$Url$Http = {$: 'Http'};
 var elm$url$Url$Https = {$: 'Https'};
 var elm$core$String$indexes = _String_indexes;
-var elm$core$String$isEmpty = function (string) {
-	return string === '';
-};
 var elm$core$String$left = F2(
 	function (n, string) {
 		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
 	});
 var elm$core$String$contains = _String_contains;
-var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
 		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};

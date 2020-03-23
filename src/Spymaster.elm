@@ -13,8 +13,8 @@ import Time
 import Bitwise exposing (shiftLeftBy, or)
 
 import Wordlist exposing (wordlistAdvanced)
-
-
+import BigInt exposing (BigInt, toString, divmod, fromHexString, fromIntString)
+import Hex exposing (toString)
 
 -- MAIN
 
@@ -150,21 +150,31 @@ update msg model =
             myPrime = [True, False, True, False, True, True, False, False, True, True, True, True, False, True, False, False, False, False, True, True, False, False, False, True, True, True, True, False, True, False, False, False, False, True, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, False, True, True]
             myPrimeX = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
             myWhatever = List.map2 xor myPrime (Array.toList benum5)
-            
+            bigint1 = listBoolToBigInt myWhatever
         in
           ( { model | cards = newShuffledCards
                     , seed = seed3
                     , turn = newTurn
                     , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
                     , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
-                    , debugString = debuga myWhatever
-                    , password = base32Encode myWhatever
+                    , password = base32Encode bigint1
                     }
           , Cmd.none)
 
       Tick newTime ->
         ( model, Cmd.none )
 
+listBoolToBigInt : List (Bool) -> ( BigInt )
+listBoolToBigInt digits =
+  case BigInt.fromHexString (getHexString digits) of
+     Just bi -> bi
+     _ -> BigInt.fromInt 0
+
+getHexString : List (Bool) -> String
+getHexString digits =
+  case digits of
+    a :: b :: c :: d :: es -> Hex.toString ((if a then 8 else 0)+(if b then 4 else 0)+(if c then 2 else 0)+(if d then 1 else 0)) ++ getHexString es
+    _ -> ""
 
 debuga : List (Bool) -> String
 debuga bools =
@@ -189,34 +199,22 @@ cShiftLeft num bits =
   shiftLeftBy bits (2 * num)
 
 
-{- 
-			for (ii = 0; ii < reds.length; ii++) {
-				bnum = bnum.or(bigInt(0b01).shiftLeft(2*reds[ii]))
-			}
-			for (ii = 0; ii < blues.length; ii++) {
-				bnum = bnum.or(bigInt(0b10).shiftLeft(2*blues[ii]))
-			}
-			bnum = bnum.or(bigInt(0b11).shiftLeft(2*assassin))
-			bnum = bnum.or(bigInt(current_turn).shiftLeft(52))
+{- Encode a list of booleans representing a binary number into the string representing the number in base32 -}
 
-			var bigprime = bigInt("1010110011110100001100011110100001011000010000101011", 2);
 
-			bnum = bnum.xor(bigprime);
--}
-
-base32Encode : List(Bool) -> String
+base32Encode : BigInt -> String
 base32Encode input =
-  if input > 0 then
+  if BigInt.gt input (BigInt.fromInt 0) then
     let
       chars = Array.fromList ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-      integer = input // 36
-      remainder = get (modBy 36 input) chars
+      (d, m) = case BigInt.divmod input (BigInt.fromInt 36) of
+                 Just (dd, mm) -> (dd, mm)
+                 _ -> (BigInt.fromInt 0, BigInt.fromInt 0)
+      mAsInt = Maybe.withDefault 100 (String.toInt (BigInt.toString m))
+      -- integer = input // 36
+      -- remainder = get (modBy 36 input) chars
     in
-      case remainder of
-        Just c ->
-          base32Encode integer ++ c
-        Nothing ->
-           ""
+      base32Encode d ++ Maybe.withDefault "" (Array.get mAsInt chars)
   else
     ""
 
@@ -316,7 +314,7 @@ view model =
     div [ class "container" ]
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] [] ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [] [] ]
-      , div [ class "debug" ] [ text model.debugString ]
+      , div [ class "debug" ] [ {- text model.debugString -} ]
       , div
         [ class ("sidebar" ++ (if model.toggleSidebar then " hidden" else ""))]
           [ ul []
