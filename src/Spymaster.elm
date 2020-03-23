@@ -10,6 +10,7 @@ import Random.Array exposing (shuffle)
 import Random.List exposing (shuffle)
 import Random.Extra exposing (bool)
 import Time
+import Bitwise exposing (shiftLeftBy, or)
 
 import Wordlist exposing (wordlistAdvanced)
 
@@ -30,20 +31,20 @@ main =
 -- MODEL
 type alias Card =
   { word : String
-  , team : Int
+  , team : Int -- 0 = spectator, -1 = assassin, 1 = red, 2 = blue
   , uncovered : Bool
   }
 
 type alias Model =
     { seed : Seed
-    , turn : Bool
+    , turn : Bool -- True = red, False = blue
     , currentTimer : Int
     , debugString : String
-    , toggleLightbox : Bool
-    , toggleQR : Bool
-    , toggleSidebar : Bool
-    , toggleSoundEffects : Bool
-    , toggleSpies : Bool
+    , toggleLightbox : Bool     -- True = show
+    , toggleQR : Bool           -- True = show
+    , toggleSidebar : Bool      -- True = show
+    , toggleSoundEffects : Bool -- True = show
+    , toggleSpies : Bool        -- True = show
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
@@ -54,7 +55,8 @@ type alias Model =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    (Model
+    update NewGame 
+      (Model
         (Random.initialSeed 99999999)
         False
         0
@@ -66,15 +68,14 @@ init _ =
         True
         1
         1
-        "1w6mvdnr6vj"
-        {- [ "Gate", "Quilt", "Party", "Adjustment", "Cloth", "Orange", "Rod", "Tomatoes", "Flowers", "Rabbits", "Crook", "Toad", "Order", "Scissors", "Tank", "Hotdog", "Scent", "Distance", "Stitch", "Suit", "Squirrel", "Design", "Business", "Flesh", "Beef"]-}
+        "PASSWORD"
         wordlistAdvanced
         [ Card "Gate" 2 False, Card "Quilt" -1 False, Card "Party" 0 False, Card "Adjustment" 1 False, Card "Cloth" 2 False,
         Card "Orange" 0 False, Card "Rod" 1 False, Card "Tomatoes" 2 False, Card "Flowers" 1 False, Card "Rabbits" 2 False,
         Card "Crook" 2 False, Card "Toad" 2 False, Card "Order" 0 False, Card "Scissors" 1 False, Card "Tank" 1 False,
         Card "Hotdog" 1 False, Card "Scent" 2 False, Card "Distance" 0 False, Card "Stitch" 2 False, Card "Suit" 0 False,
         Card "Squirrel" 0 False, Card "Design" 0 False, Card "Business" 1 False, Card "Flesh" 1 False, Card "Beef" 2 False ]
-      , Cmd.none)
+      )
 
 
 -- UPDATE
@@ -97,80 +98,142 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg)
 update msg model =
     case msg of
-        UncoverCard index ->
-          let
-              newCards = uncover 0 index model.cards
-              redRemaining = List.length (List.filter hiddenRed newCards)
-              blueRemaining = List.length (List.filter hiddenBlue newCards)
-          in
-            ( { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining },
-            Cmd.none)
+      UncoverCard index ->
+        let
+          newCards = uncover 0 index model.cards
+          redRemaining = List.length (List.filter hiddenRed newCards)
+          blueRemaining = List.length (List.filter hiddenBlue newCards)
+        in
+          ( { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining },
+          Cmd.none)
 
-        ToggleLightbox ->
-            ( { model | toggleLightbox = not model.toggleLightbox }
-            , Cmd.none)
+      ToggleLightbox ->
+          ( { model | toggleLightbox = not model.toggleLightbox }
+          , Cmd.none)
+          
+      ToggleQR ->
+          ( { model | toggleQR = not model.toggleQR }
+          , Cmd.none)
+
+      ToggleSidebar ->
+          ( { model | toggleSidebar = not model.toggleSidebar }
+          , Cmd.none)
+
+      ToggleSoundEffects ->
+          ( { model | toggleSoundEffects = not model.toggleSoundEffects }
+          , Cmd.none)
+
+      ToggleSpies ->
+          ( { model | toggleSpies = not model.toggleSpies }
+          , Cmd.none)
+
+      PassTurn ->
+          ( { model | turn = not model.turn }
+          , Cmd.none)
+
+      NewGame ->
+        let
+            (newWords, seed1) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
+            (newTurn, seed2) = Random.step Random.Extra.bool seed1
+            (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
+            assassinID = case Array.get 0 newIDs of
+                           Just a -> a
+                           Nothing -> 0
+            redIDs = Array.toList <| Array.slice 1 (if newTurn then 10 else 9) newIDs
+            blueIDs = Array.toList <| Array.slice (if newTurn then 10 else 9) 18 newIDs
+            newShuffledCards = List.indexedMap (colorCards assassinID redIDs blueIDs) (populateCards model.cards newWords)
+            benum = Array.repeat 53 False
+            benum2 = Array.set 0 True benum       -- set to initial team
+            benum3 = Array.set (51-(2*assassinID)) True (Array.set (50-(2*assassinID)) True benum2)
+            benum4 = ammendArray redIDs benum3 True False
+            benum5 = ammendArray blueIDs benum4 False True
+            myPrime = [True, False, True, False, True, True, False, False, True, True, True, True, False, True, False, False, False, False, True, True, False, False, False, True, True, True, True, False, True, False, False, False, False, True, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, False, True, True]
+            myPrimeX = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
+            myWhatever = List.map2 xor myPrime (Array.toList benum5)
             
-        ToggleQR ->
-            ( { model | toggleQR = not model.toggleQR }
-            , Cmd.none)
+        in
+          ( { model | cards = newShuffledCards
+                    , seed = seed3
+                    , turn = newTurn
+                    , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
+                    , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
+                    , debugString = debuga myWhatever
+                    , password = base32Encode myWhatever
+                    }
+          , Cmd.none)
 
-        ToggleSidebar ->
-            ( { model | toggleSidebar = not model.toggleSidebar }
-            , Cmd.none)
+      Tick newTime ->
+        ( model, Cmd.none )
 
-        ToggleSoundEffects ->
-            ( { model | toggleSoundEffects = not model.toggleSoundEffects }
-            , Cmd.none)
 
-        ToggleSpies ->
-            ( { model | toggleSpies = not model.toggleSpies }
-            , Cmd.none)
+debuga : List (Bool) -> String
+debuga bools =
+  case bools of
+    b :: bs ->
+      (if b then "1" else "0") ++ debuga bs
+    
+    _ ->
+      ""
 
-        PassTurn ->
-            ( { model | turn = not model.turn }
-            , Cmd.none)
+ammendArray : List (Int) -> Array ( Bool ) -> Bool -> Bool -> Array ( Bool )
+ammendArray ids digits msb lsb =
+  case ids of
+    i :: is ->
+      Array.set (51-(2*i)) msb (Array.set (50-(2*i)) lsb (ammendArray is digits msb lsb))
 
-        NewGame ->
-          let
-              (newWords, seed1) = Random.step (Random.List.shuffle model.allWords) model.seed {- to do: use this seed below -}
-              (newTurn, seed2) = Random.step Random.Extra.bool seed1
-              (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
-              assassinID = Array.get 0 newIDs
-              redIDs = Array.slice 1 (if newTurn then 10 else 9) newIDs
-              blueIDs = Array.slice (if newTurn then 11 else 10) 19 newIDs
-              newShuffledCards = List.indexedMap (colorCards assassinID (Array.toList redIDs) (Array.toList blueIDs)) (populateCards model.cards newWords)
-          in
-            ( { model | cards = newShuffledCards
-                      , seed = seed3
-                      , turn = newTurn
-                      , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
-                      , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
-                      , debugString = String.concat newWords
-                      }
-            , Cmd.none)
+    _ ->
+      digits
 
-        Tick newTime ->
-          ( model, Cmd.none )
+cShiftLeft : Int -> Int -> Int
+cShiftLeft num bits = 
+  shiftLeftBy bits (2 * num)
 
+
+{- 
+			for (ii = 0; ii < reds.length; ii++) {
+				bnum = bnum.or(bigInt(0b01).shiftLeft(2*reds[ii]))
+			}
+			for (ii = 0; ii < blues.length; ii++) {
+				bnum = bnum.or(bigInt(0b10).shiftLeft(2*blues[ii]))
+			}
+			bnum = bnum.or(bigInt(0b11).shiftLeft(2*assassin))
+			bnum = bnum.or(bigInt(current_turn).shiftLeft(52))
+
+			var bigprime = bigInt("1010110011110100001100011110100001011000010000101011", 2);
+
+			bnum = bnum.xor(bigprime);
+-}
+
+base32Encode : List(Bool) -> String
+base32Encode input =
+  if input > 0 then
+    let
+      chars = Array.fromList ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+      integer = input // 36
+      remainder = get (modBy 36 input) chars
+    in
+      case remainder of
+        Just c ->
+          base32Encode integer ++ c
+        Nothing ->
+           ""
+  else
+    ""
 
 {- -}
-colorCards : Maybe Int -> List ( Int ) -> List ( Int ) -> Int -> Card -> Card
+colorCards : Int -> List ( Int ) -> List ( Int ) -> Int -> Card -> Card
 colorCards assassinID redIDs blueIDs index card  =
-  case assassinID of
-    Just aid ->
-      if index == aid then
-        { card | team = -1, uncovered = False }
+    if index == assassinID then
+      { card | team = -1, uncovered = False }
+      else
+        if List.member index redIDs then
+          { card | team = 1, uncovered = False }
         else
-          if List.member index redIDs then
-            { card | team = 1, uncovered = False }
+          if List.member index blueIDs then
+            { card | team = 2, uncovered = False }
           else
-            if List.member index blueIDs then
-              { card | team = 2, uncovered = False }
-            else
-              { card | team = 0, uncovered = False }
-    Nothing ->
-      card
-  
+            { card | team = 0, uncovered = False }
+
 
 
 {- Add word from `words` to each card in `cards` -}
@@ -253,7 +316,7 @@ view model =
     div [ class "container" ]
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] [] ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [] [] ]
-      , div [ class "debug" ] [ {- text model.debugString -} ]
+      , div [ class "debug" ] [ text model.debugString ]
       , div
         [ class ("sidebar" ++ (if model.toggleSidebar then " hidden" else ""))]
           [ ul []
