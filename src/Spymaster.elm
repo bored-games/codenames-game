@@ -60,7 +60,7 @@ init _ =
         False                              -- turn: True = red, False = blue
         0                                  -- currentTimer: to do: enable
         ""                                 -- debugString
-        True                              -- toggleLightbox: for info, true = open
+        False                              -- toggleLightbox: for info, true = open
         False                              -- toggleQR: toggle QR display, true = open
         True                               -- toggleSidebar: toggle sidebar, true = open
         False                              -- toggleSoundEffects: toggle sound effects, if that's ever added

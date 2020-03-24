@@ -7599,7 +7599,7 @@ var author$project$Main$init = function (_n0) {
 		author$project$Main$update,
 		author$project$Main$NewGame,
 		author$project$Main$Model(
-			elm$random$Random$initialSeed(99999999))(false)(0)('')(true)(false)(true)(false)(true)(0)(0)('PASSWORD')(author$project$Wordlist$wordlistAdvanced)(
+			elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(true)(false)(true)(0)(0)('PASSWORD')(author$project$Wordlist$wordlistAdvanced)(
 			A2(
 				elm$core$List$repeat,
 				25,
