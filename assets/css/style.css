@@ -432,13 +432,57 @@ em {
   animation-fill-mode: both;
 }
 
-.lightbox div {
-  background: #fff;
+.lightbox > div {
+  background: linear-gradient(-10deg, #b6a69c 0, rgb(212, 206, 202) 100%);
   box-shadow: 0 0 10px rgba(0, 0, 0, .4);
-  width: 40%;
-  height: 0%;
-  padding-top: 40%;
+  border: 1px solid #fff;
+  width: 80%;
   transition: .25s linear all;
+  color: #222;
+  border-radius: 6px;
+  padding: 18px;
+  display: flex;
+  line-height: 1.6rem;
+}
+
+.lightbox > div .leftside {
+  order: 2;
+  flex: 1 1 auto;
+  padding: 1.0rem;
+  width: 550px;
+}
+
+.lightbox > div .rightside {
+  order: 1;
+  flex: 1 1 auto;
+  text-align: justify;
+  padding: 1.0rem 4.0rem 1.0rem 1.0rem;
+}
+
+.lightbox h2 {
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: 1.0rem 0 1.0rem 0;
+  padding: 0;
+}
+
+.lightbox > div > div > div {
+  margin-bottom: 3.0rem;
+}
+
+.lightbox > div > div > div > div {
+  margin-bottom: 1.0rem;
+}
+
+blockquote {
+  font-style: italic;
+  color: #666;
+  margin-left: 1.0rem;
+  margin-right: 1.0rem;
+  border-left: 3px solid #aaa;
+  padding-left: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, .05);
 }
 
 .lightbox.show {

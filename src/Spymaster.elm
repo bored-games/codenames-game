@@ -60,7 +60,7 @@ init _ =
         False                              -- turn: True = red, False = blue
         0                                  -- currentTimer: to do: enable
         ""                                 -- debugString
-        False                              -- toggleLightbox: for info, true = open
+        True                              -- toggleLightbox: for info, true = open
         False                              -- toggleQR: toggle QR display, true = open
         True                               -- toggleSidebar: toggle sidebar, true = open
         False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
@@ -278,6 +278,26 @@ subscriptions model =
 
 
 -- VIEW
+lightboxInfo : List (Html Msg)
+lightboxInfo = [ div [ class "leftside"]
+                  [
+                    h2 [] [ text "Spymaster"] ]
+                , div [ class "rightside" ]
+                [
+                  h2 [] [ text "A Team Game for 4+ People"]
+                , div []
+                  [ div [] [ text "Divide into two teams and select one player from each team to be the Spymaster. She will have the decoded game board showing which words belong to her team. Copy the provided password or use the QR code to find the correct board with the Decryptor."]
+                  , div [] [ text "The Spymaster's job each turn is to provide one word that is not on any card, along with one number, to connect as many words as possible for her team to guess. The number (plus one) determines the maximum number of words that team may guess this turn. At any time, a team can pass, and the other team's Spymaster begins their turn."]
+                  , div [] [ text "Each guess is completed by selecting a card, revealing to which team it belongs. If a team selects a word that does not belong to their team, their turn is over. When all of one team's words are found, the team wins. If the *Assassin* is selected, the team loses immediately."]
+                  ]
+                , h2 [] [ text "Legal & copyright"]
+                , div []
+                  [ text "The US Government's Form Letter 108 emphasizes that "
+                  , blockquote [] [ text "Copyright does not protect the idea for a game, its name or title, or the method or methods for playing it. Nor does copyright protect any idea, system, method, device, or trademark ma­terial involved in developing, merchandising, or playing a game." ]
+                  , text "This program is free software: you can redistribute it or modify it under the GNU General Public License, version 3+. The source code is available on Github. Enjoy!"
+                  ]
+                ]
+              ]
 
 view : Model -> Html Msg
 view model =
@@ -286,7 +306,7 @@ view model =
      drawCard 0 cards
   in
     div [ class "container" ]
-      [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] [] ]
+      [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] lightboxInfo ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [] [] ]
       , div [ class "debug" ] [ {- text model.debugString -} ]
       , div

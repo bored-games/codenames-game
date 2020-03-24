@@ -7599,7 +7599,7 @@ var author$project$Main$init = function (_n0) {
 		author$project$Main$update,
 		author$project$Main$NewGame,
 		author$project$Main$Model(
-			elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(true)(false)(true)(0)(0)('PASSWORD')(author$project$Wordlist$wordlistAdvanced)(
+			elm$random$Random$initialSeed(99999999))(false)(0)('')(true)(false)(true)(false)(true)(0)(0)('PASSWORD')(author$project$Wordlist$wordlistAdvanced)(
 			A2(
 				elm$core$List$repeat,
 				25,
@@ -8039,6 +8039,92 @@ var author$project$Main$drawCard = F2(
 			return _List_Nil;
 		}
 	});
+var elm$html$Html$blockquote = _VirtualDom_node('blockquote');
+var elm$html$Html$h2 = _VirtualDom_node('h2');
+var author$project$Main$lightboxInfo = _List_fromArray(
+	[
+		A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('leftside')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Spymaster')
+					]))
+			])),
+		A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('rightside')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('A Team Game for 4+ People')
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text('Divide into two teams and select one player from each team to be the Spymaster. She will have the decoded game board showing which words belong to her team. Copy the provided password or use the QR code to find the correct board with the Decryptor.')
+							])),
+						A2(
+						elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text('The Spymaster\'s job each turn is to provide one word that is not on any card, along with one number, to connect as many words as possible for her team to guess. The number (plus one) determines the maximum number of words that team may guess this turn. At any time, a team can pass, and the other team\'s Spymaster begins their turn.')
+							])),
+						A2(
+						elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text('Each guess is completed by selecting a card, revealing to which team it belongs. If a team selects a word that does not belong to their team, their turn is over. When all of one team\'s words are found, the team wins. If the *Assassin* is selected, the team loses immediately.')
+							]))
+					])),
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Legal & copyright')
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('The US Government\'s Form Letter 108 emphasizes that '),
+						A2(
+						elm$html$Html$blockquote,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text('Copyright does not protect the idea for a game, its name or title, or the method or methods for playing it. Nor does copyright protect any idea, system, method, device, or trademark ma­terial involved in developing, merchandising, or playing a game.')
+							])),
+						elm$html$Html$text('This program is free software: you can redistribute it or modify it under the GNU General Public License, version 3+. The source code is available on Github. Enjoy!')
+					]))
+			]))
+	]);
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$li = _VirtualDom_node('li');
 var elm$html$Html$main_ = _VirtualDom_node('main');
@@ -8065,7 +8151,7 @@ var author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2(elm$html$Html$div, _List_Nil, _List_Nil)
+						A2(elm$html$Html$div, _List_Nil, author$project$Main$lightboxInfo)
 					])),
 				A2(
 				elm$html$Html$div,
