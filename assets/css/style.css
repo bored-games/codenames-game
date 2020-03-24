@@ -368,12 +368,6 @@ em {
   display: block;
 }
 
-.passphrase {
-	cursor: default;
-	display: block;
-	text-transform: uppercase;
-}
-
 .new_game {
 	cursor: pointer;
 	color: rgba(255, 255, 255, .5);
@@ -387,7 +381,7 @@ em {
 }
 
 .password {
-  text-transform: uppercase;
+  text-transform: lowercase;
 }
 
 .hidden {
