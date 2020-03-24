@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Spymaster Decryptor</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="icon" type="image/png" href="../assets/static/favicon.png" />
+		<link rel="stylesheet" href="./main.css" />
+
+		<script src="../assets/js/BigInteger.min.js"></script>
+		<script type="text/javascript">
+			function populate() {
+			// var password = "n6hvnnath7"; // some test passwords
+			// var password = "217kc4icxgz";
+				
+				var password = document.getElementById("passphrase").value;
+				console.log(password);
+				
+				if (password == "") {
+					return false;
+				}
+
+	   		const bigprime = bigInt("1010110011110100001100011110100001011000010000101011", 2);
+				var passphraseDecimal = bigInt(password, 36);
+				
+				passphraseDecimal = passphraseDecimal.xor(bigprime);
+
+				var imgs = []
+				imgs.push( document.getElementById("i0") );
+				imgs.push( document.getElementById("i1") );
+				imgs.push( document.getElementById("i2") );
+				imgs.push( document.getElementById("i3") );
+				imgs.push( document.getElementById("i4") );
+				imgs.push( document.getElementById("i5") );
+				imgs.push( document.getElementById("i6") );
+				imgs.push( document.getElementById("i7") );
+				imgs.push( document.getElementById("i8") );
+				imgs.push( document.getElementById("i9") );
+				imgs.push( document.getElementById("i10") );
+				imgs.push( document.getElementById("i11") );
+				imgs.push( document.getElementById("i12") );
+				imgs.push( document.getElementById("i13") );
+				imgs.push( document.getElementById("i14") );
+				imgs.push( document.getElementById("i15") );
+				imgs.push( document.getElementById("i16") );
+				imgs.push( document.getElementById("i17") );
+				imgs.push( document.getElementById("i18") );
+				imgs.push( document.getElementById("i19") );
+				imgs.push( document.getElementById("i20") );
+				imgs.push( document.getElementById("i21") );
+				imgs.push( document.getElementById("i22") );
+				imgs.push( document.getElementById("i23") );
+				imgs.push( document.getElementById("i24") );
+				
+        for (ii = 0; ii < 25; ii++) {
+						var decoded = ( bigInt(0b11).and(passphraseDecimal.shiftRight( (2 * ii)) ));
+						if (decoded == 0) { // spectator
+							imgs[ii].childNodes[1].className = "content spectator"
+            } else if (decoded == 1) { // red
+							imgs[ii].childNodes[1].className = "content red"
+            } else if (decoded == 2) { // blue
+							imgs[ii].childNodes[1].className = "content blue"
+            } else { // assassin
+							imgs[ii].childNodes[1].className = "content assassin"
+            }
+				}
+				
+				
+				var firstPlayer = ((bigInt(1).shiftLeft(49)).and(passphraseDecimal)).shiftRight(49);
+	
+				const turnElement = document.getElementById("turn-text");
+        if (firstPlayer == 0) {
+					turnElement.textContent = ("Red goes first!");
+					turnElement.className = "red-turn";
+        } else {
+					turnElement.textContent = ("Blue goes first!");
+					turnElement.className = "blue-turn";
+        }
+
+				return false;
+
+			}
+
+			// document.onReady(populate();
+		</script>
+	</head>
+	<body class="is-preload">
+
+		<header id="header">
+			<h1>Codenames: Spymaster Decryptor</h1>
+		</header>
+
+			<div id="wrapper">
+				<h2 id="turn-text" class="neutral">Enter a password below!</h2>
+
+				<!-- Main -->
+					<div id="main">
+						<div class="square-container">
+							<div class="square" id="i0">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i1">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i2">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i3">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i4">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i5">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i6">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i7">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i8">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i9">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i10">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i11">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i12">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i13">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i14">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i15">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i16">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i17">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i18">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i19">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i20">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i21">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i22">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i23">
+								<div class="content"></div>
+							</div>
+
+							<div class="square" id="i24">
+								<div class="content"></div>
+							</div>
+
+						</div>
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<form onsubmit="return populate();">
+							<div class="wide">
+								<input id='passphrase' oninput="populate()" type="text" placeholder="Password" />
+							</div>
+							<div class="narrow">
+								<button class='icon'><span class='icon--enter'></span></button>
+							</div>
+						</form>
+					</footer>
+			</div>
+	</body>
+</html>
