@@ -1,10 +1,10 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (..)
+import Html exposing (div)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
-import Random exposing (Seed, generate, initialSeed, step)
+import Random exposing (Seed, initialSeed, step)
 import Array exposing (Array, fromList, get, slice)
 import Random.Array exposing (shuffle)
 import Random.List exposing (shuffle)
@@ -17,6 +17,7 @@ import Hex exposing (toString)
 
 -- MAIN
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
@@ -149,8 +150,8 @@ update msg model =
                     }
           , Cmd.none)
 
-      Tick newTime ->
-        ( model, Cmd.none )
+      Tick _ ->
+        ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
 
 listBoolToBigInt : List (Bool) -> ( BigInt )
 listBoolToBigInt digits =
@@ -164,6 +165,7 @@ getHexString digits =
     a :: b :: c :: d :: es -> Hex.toString ((if a then 8 else 0)+(if b then 4 else 0)+(if c then 2 else 0)+(if d then 1 else 0)) ++ getHexString es
     _ -> ""
 
+{-
 debugBoolList : List (Bool) -> String
 debugBoolList bools =
   case bools of
@@ -171,6 +173,7 @@ debugBoolList bools =
       (if b then "1" else "0") ++ debugBoolList bs
     _ ->
       ""
+-}
 
 ammendArray : List (Int) -> Array ( Bool ) -> Bool -> Bool -> Array ( Bool )
 ammendArray ids digits msb lsb =
@@ -269,7 +272,7 @@ drawCard index cards =
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
   Sub.batch
     [ Time.every 1000 Tick
   {-  , Browser.Events.onKeyUp (Json.Decode.map (KeyChanged False) (Json.Decode.field "key" Json.Decode.string))
