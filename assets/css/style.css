@@ -152,6 +152,16 @@ button:hover {
   background: #298b6b;
 }
 
+.button--cancel {
+  border: 2px solid #7c1818;
+  background: #a03434;
+  text-shadow: 0px -1px 1px #5f1c1c;
+}
+
+.button--cancel:hover {
+  background: #8b2929;
+}
+
 .card_border {
   flex: 0 0 18%;
   background: #ccc5b3;
@@ -317,7 +327,6 @@ button:hover {
   cursor: pointer;
   line-height: 2.5rem;
   top: 0px;
-  vertical-align: middle;
 }
 
 .pass span {
@@ -574,6 +583,7 @@ blockquote {
   background: #db6161 !important;
   animation: flip1 .5s ease-in-out;
   animation-fill-mode: forwards;  
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   outline: 1px solid transparent;
 }
@@ -581,6 +591,7 @@ blockquote {
   background: #664c4f !important;
   animation: flip2 .5s ease-in-out;
   animation-fill-mode: forwards;  
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   outline: 1px solid transparent;
 }
@@ -599,13 +610,15 @@ blockquote {
   background: #6094db !important;
   animation: flip1 .5s ease-in-out;
   animation-fill-mode: forwards;  
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   outline: 1px solid transparent;
 }
 .team-2.uncovered .wordbox:after {
   color: #0d3e69 !important;
   animation: flip2 .5s ease-in-out;
-  animation-fill-mode: forwards;  
+  animation-fill-mode: forwards;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   outline: 1px solid transparent;
 }
@@ -623,14 +636,16 @@ blockquote {
 .team--1.uncovered .wordbox:before {
   background: #1f1a1f !important;
   animation: flip1 .5s ease-in-out;
-  animation-fill-mode: forwards;  
+  animation-fill-mode: forwards;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   outline: 1px solid transparent;
 }
 .team--1.uncovered .wordbox:after {
   background: #361e3b !important;
   animation: flip2 .5s ease-in-out;
-  animation-fill-mode: forwards;  
+  animation-fill-mode: forwards;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   outline: 1px solid transparent;
 }

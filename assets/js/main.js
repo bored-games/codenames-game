@@ -5347,9 +5347,11 @@ var $author$project$Spymaster$Model = function (seed) {
 												return function (password) {
 													return function (customWordsString) {
 														return function (customWords) {
-															return function (allWords) {
-																return function (cards) {
-																	return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, settings: settings, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, turn: turn};
+															return function (wordlists) {
+																return function (allWords) {
+																	return function (cards) {
+																		return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, settings: settings, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, turn: turn, wordlists: wordlists};
+																	};
 																};
 															};
 														};
@@ -6440,6 +6442,14 @@ var $author$project$Spymaster$colorCards = F5(
 			card,
 			{team: 0, uncovered: false})));
 	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -7240,6 +7250,12 @@ var $author$project$Spymaster$listBoolToBigInt = function (digits) {
 		return $cmditch$elm_bigint$BigInt$fromInt(0);
 	}
 };
+var $author$project$Spymaster$maybeToggle = F2(
+	function (key, wordlist) {
+		return _Utils_eq(key, wordlist.key) ? _Utils_update(
+			wordlist,
+			{include: !wordlist.include}) : wordlist;
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Spymaster$populateCards = F2(
@@ -7709,6 +7725,7 @@ var $elm$random$Random$step = F2(
 		var generator = _v0.a;
 		return generator(seed);
 	});
+var $elm$core$String$trim = _String_trim;
 var $author$project$Spymaster$uncover = F3(
 	function (index, target, cards) {
 		if (cards.b) {
@@ -7725,10 +7742,6 @@ var $author$project$Spymaster$uncover = F3(
 			return _List_Nil;
 		}
 	});
-var $author$project$Wordlist$wordlistAdvanced = _List_fromArray(
-	['red', 'orange', 'yellow', 'green', 'blue', 'black', 'white', 'cyan', 'pink', 'purple', 'grey', 'brown']);
-var $author$project$Wordlist$wordlistBasic = _List_fromArray(
-	['hotdog', 'dance', 'cross', 'cotton', 'match', 'france', 'ball', 'bow', 'mercury', 'net', 'spider', 'cat', 'whip', 'stock', 'princess', 'check', 'bed', 'thief', 'park', 'bar', 'czech', 'thumb', 'plastic', 'leprechaun', 'bell', 'triangle', 'light', 'calf', 'straw', 'cloak', 'mexico', 'ship', 'wind', 'lion', 'london', 'fair', 'force', 'phoenix', 'buck', 'ice cream', 'van', 'drill', 'tube', 'link', 'seal', 'fish', 'iron', 'block', 'doctor', 'degree', 'roulette', 'moon', 'angel', 'shot', 'octopus', 'death', 'time', 'queen', 'circle', 'bark', 'figure', 'file', 'back', 'antarctica', 'dwarf', 'nurse', 'lemon', 'cap', 'belt', 'air', 'switch', 'board', 'eye', 'dice', 'kid', 'police', 'rock', 'screen', 'trap', 'drop', 'agent', 'rabbit', 'vet', 'date', 'chocolate', 'bridge', 'beach', 'cold', 'horn', 'bank', 'stick', 'paste', 'bugle', 'ruler', 'rome', 'battery', 'pound', 'spine', 'mount', 'jupiter', 'boulder', 'glove', 'buffalo', 'parachute', 'gas', 'key', 'casino', 'torch', 'pit', 'king', 'revolution', 'palm', 'ice', 'piano', 'code', 'crane', 'grass', 'pool', 'helicopter', 'mug', 'fan', 'saturn', 'canada', 'skyscraper', 'opera', 'nut', 'heart', 'theater', 'turkey', 'route', 'court', 'alps', 'round', 'orange', 'diamond', 'scale', 'well', 'band', 'train', 'poison', 'fighter', 'shop', 'shadow', 'rose', 'arm', 'ground', 'slip', 'duck', 'pirate', 'jet', 'comic', 'soul', 'strike', 'forest', 'capital', 'table', 'litter', 'car', 'grace', 'pumpkin', 'copper', 'egypt', 'suit', 'robin', 'charge', 'cricket', 'card', 'boom', 'platypus', 'missile', 'part', 'bomb', 'plane', 'hawk', 'sub', 'press', 'box', 'shark', 'stream', 'deck', 'hotel', 'cast', 'alien', 'pilot', 'state', 'fly', 'pitch', 'cook', 'moscow', 'tag', 'spot', 'kiwi', 'trip', 'spell', 'star', 'snowman', 'concert', 'web', 'hospital', 'scorpion', 'laser', 'pyramid', 'sock', 'hood', 'mine', 'penguin', 'spring', 'worm', 'india', 'temple', 'whale', 'fall', 'hollywood', 'fire', 'field', 'tower', 'wake', 'needle', 'centaur', 'change', 'bermuda', 'note', 'tablet', 'ring', 'horse', 'microscope', 'mammoth', 'europe', 'kangaroo', 'bottle', 'fence', 'wave', 'head', 'tie', 'olive', 'teacher', 'jack', 'satellite', 'limousine', 'knight', 'contract', 'scuba diver', 'plate', 'mouse', 'pistol', 'engine', 'string', 'knife', 'cell', 'organ', 'pass', 'stadium', 'sueprhero', 'foot', 'horseshoe', 'log', 'ketchup', 'scientist', 'lab', 'slug', 'himalayas', 'dinosaur', 'lawyer', 'australia', 'pie', 'march', 'africa', 'line', 'war', 'row', 'shakespeare', 'night', 'church', 'cover', 'jam', 'green', 'dragon', 'oil', 'new york', 'honey', 'loch ness', 'witch', 'spike', 'cliff', 'compound', 'crown', 'bill', 'cycle', 'berry', 'america', 'boot', 'chick', 'face', 'school', 'wall', 'atlantis', 'water', 'pin', 'lead', 'port', 'tooth', 'lock', 'pan', 'dog', 'post', 'fork', 'novel', 'club', 'aztec', 'yard', 'ambulance', 'ham', 'undertaker', 'flute', 'china', 'nail', 'day', 'model', 'crash', 'film', 'bug', 'smuggler', 'swing', 'sound', 'gold', 'olympus', 'mass', 'staff', 'greece', 'tap', 'shoe', 'pupil', 'hook', 'snow', 'glass', 'hole', 'eagle', 'unicorn', 'amazon', 'lap', 'washer', 'robot', 'pole', 'beijing', 'telescope', 'soldier', 'ivory', 'ghost', 'center', 'berlin', 'server', 'pants', 'vacuum', 'chair', 'washington', 'watch', 'disease', 'play', 'brush', 'bond', 'conductor', 'ray', 'germany', 'pipe', 'sink', 'maple', 'chest', 'dress', 'draft', 'mail', 'carrot', 'bolt', 'giant', 'millionaire', 'tail', 'tokyo', 'button', 'mint', 'england', 'hand', 'paper', 'tick', 'ninja', 'bat', 'marble', 'square', 'mouth', 'mole', 'plot', 'space', 'trunk', 'bear', 'beat', 'genius', 'spy', 'luck', 'life', 'game', 'embassy', 'apple', 'racket']);
 var $elm$core$Basics$xor = _Basics_xor;
 var $author$project$Spymaster$update = F2(
 	function (msg, model) {
@@ -7785,25 +7798,16 @@ var $author$project$Spymaster$update = F2(
 						model,
 						{settings: newSettings}),
 					$elm$core$Platform$Cmd$none);
-			case 'ToggleBasicWords':
-				var oldSettings = model.settings;
-				var newSettings = _Utils_update(
-					oldSettings,
-					{basicWords: !oldSettings.basicWords});
+			case 'ToggleWordlist':
+				var key = msg.a;
+				var wordlists = A2(
+					$elm$core$List$map,
+					$author$project$Spymaster$maybeToggle(key),
+					model.wordlists);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{settings: newSettings}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleAdvancedWords':
-				var oldSettings = model.settings;
-				var newSettings = _Utils_update(
-					oldSettings,
-					{advancedWords: !oldSettings.advancedWords});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{settings: newSettings}),
+						{wordlists: wordlists}),
 					$elm$core$Platform$Cmd$none);
 			case 'ToggleCustomWords':
 				var oldSettings = model.settings;
@@ -7828,7 +7832,10 @@ var $author$project$Spymaster$update = F2(
 						A2(
 							$elm$core$List$filter,
 							$author$project$Spymaster$isNotEmpty,
-							A2($elm$core$String$split, '\n', model.customWordsString))));
+							A2(
+								$elm$core$List$map,
+								$elm$core$String$trim,
+								A2($elm$core$String$split, '\n', model.customWordsString)))));
 				var customWordsString = A2($elm$core$String$join, '\n', customWords);
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7852,9 +7859,16 @@ var $author$project$Spymaster$update = F2(
 				var wordlist = A2(
 					$elm$core$List$append,
 					A2(
-						$elm$core$List$append,
-						model.settings.basicWords ? $author$project$Wordlist$wordlistBasic : _List_Nil,
-						model.settings.advancedWords ? $author$project$Wordlist$wordlistAdvanced : _List_Nil),
+						$elm$core$List$concatMap,
+						function ($) {
+							return $.words;
+						},
+						A2(
+							$elm$core$List$filter,
+							function ($) {
+								return $.include;
+							},
+							model.wordlists)),
 					model.settings.customWords ? model.customWords : _List_Nil);
 				var myPrime = _List_fromArray(
 					[true, false, true, false, true, true, false, false, true, true, true, true, false, true, false, false, false, false, true, true, false, false, false, true, true, true, true, false, true, false, false, false, false, true, false, true, true, false, false, false, false, true, false, false, false, false, true, false, true, false, true, true]);
@@ -7940,15 +7954,36 @@ var $author$project$Spymaster$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Wordlist$wordlistAdvanced = _List_Nil;
+var $author$project$Wordlist$wordlistBasic = _List_fromArray(
+	['hotdog', 'dance', 'cross', 'cotton', 'match', 'france', 'ball', 'bow', 'mercury', 'net', 'spider', 'cat', 'whip', 'stock', 'princess', 'check', 'bed', 'thief', 'park', 'bar', 'czech', 'thumb', 'plastic', 'leprechaun', 'bell', 'triangle', 'light', 'calf', 'straw', 'cloak', 'mexico', 'ship', 'wind', 'lion', 'london', 'fair', 'force', 'phoenix', 'buck', 'ice cream', 'van', 'drill', 'tube', 'link', 'seal', 'fish', 'iron', 'block', 'doctor', 'degree', 'roulette', 'moon', 'angel', 'shot', 'octopus', 'death', 'time', 'queen', 'circle', 'bark', 'figure', 'file', 'back', 'antarctica', 'dwarf', 'nurse', 'lemon', 'cap', 'belt', 'air', 'switch', 'board', 'eye', 'dice', 'kid', 'police', 'rock', 'screen', 'trap', 'drop', 'agent', 'rabbit', 'vet', 'date', 'chocolate', 'bridge', 'beach', 'cold', 'horn', 'bank', 'stick', 'paste', 'bugle', 'ruler', 'rome', 'battery', 'pound', 'spine', 'mount', 'jupiter', 'boulder', 'glove', 'buffalo', 'parachute', 'gas', 'key', 'casino', 'torch', 'pit', 'king', 'revolution', 'palm', 'ice', 'piano', 'code', 'crane', 'grass', 'pool', 'helicopter', 'mug', 'fan', 'saturn', 'canada', 'skyscraper', 'opera', 'nut', 'heart', 'theater', 'turkey', 'route', 'court', 'alps', 'round', 'orange', 'diamond', 'scale', 'well', 'band', 'train', 'poison', 'fighter', 'shop', 'shadow', 'rose', 'arm', 'ground', 'slip', 'duck', 'pirate', 'jet', 'comic', 'soul', 'strike', 'forest', 'capital', 'table', 'litter', 'car', 'grace', 'pumpkin', 'copper', 'egypt', 'suit', 'robin', 'charge', 'cricket', 'card', 'boom', 'platypus', 'missile', 'part', 'bomb', 'plane', 'hawk', 'sub', 'press', 'box', 'shark', 'stream', 'deck', 'hotel', 'cast', 'alien', 'pilot', 'state', 'fly', 'pitch', 'cook', 'moscow', 'tag', 'spot', 'kiwi', 'trip', 'spell', 'star', 'snowman', 'concert', 'web', 'hospital', 'scorpion', 'laser', 'pyramid', 'sock', 'hood', 'mine', 'penguin', 'spring', 'worm', 'india', 'temple', 'whale', 'fall', 'hollywood', 'fire', 'field', 'tower', 'wake', 'needle', 'centaur', 'change', 'bermuda', 'note', 'tablet', 'ring', 'horse', 'microscope', 'mammoth', 'europe', 'kangaroo', 'bottle', 'fence', 'wave', 'head', 'tie', 'olive', 'teacher', 'jack', 'satellite', 'limousine', 'knight', 'contract', 'scuba diver', 'plate', 'mouse', 'pistol', 'engine', 'string', 'knife', 'cell', 'organ', 'pass', 'stadium', 'sueprhero', 'foot', 'horseshoe', 'log', 'ketchup', 'scientist', 'lab', 'slug', 'himalayas', 'dinosaur', 'lawyer', 'australia', 'pie', 'march', 'africa', 'line', 'war', 'row', 'shakespeare', 'night', 'church', 'cover', 'jam', 'green', 'dragon', 'oil', 'new york', 'honey', 'loch ness', 'witch', 'spike', 'cliff', 'compound', 'crown', 'bill', 'cycle', 'berry', 'america', 'boot', 'chick', 'face', 'school', 'wall', 'atlantis', 'water', 'pin', 'lead', 'port', 'tooth', 'lock', 'pan', 'dog', 'post', 'fork', 'novel', 'club', 'aztec', 'yard', 'ambulance', 'ham', 'undertaker', 'flute', 'china', 'nail', 'day', 'model', 'crash', 'film', 'bug', 'smuggler', 'swing', 'sound', 'gold', 'olympus', 'mass', 'staff', 'greece', 'tap', 'shoe', 'pupil', 'hook', 'snow', 'glass', 'hole', 'eagle', 'unicorn', 'amazon', 'lap', 'washer', 'robot', 'pole', 'beijing', 'telescope', 'soldier', 'ivory', 'ghost', 'center', 'berlin', 'server', 'pants', 'vacuum', 'chair', 'washington', 'watch', 'disease', 'play', 'brush', 'bond', 'conductor', 'ray', 'germany', 'pipe', 'sink', 'maple', 'chest', 'dress', 'draft', 'mail', 'carrot', 'bolt', 'giant', 'millionaire', 'tail', 'tokyo', 'button', 'mint', 'england', 'hand', 'paper', 'tick', 'ninja', 'bat', 'marble', 'square', 'mouth', 'mole', 'plot', 'space', 'trunk', 'bear', 'beat', 'genius', 'spy', 'luck', 'life', 'game', 'embassy', 'apple', 'racket']);
+var $author$project$Wordlist$wordlistColors = _List_fromArray(
+	['red', 'orange', 'yellow', 'green', 'blue', 'black', 'white', 'cyan', 'pink', 'purple', 'grey', 'brown', 'magenta', 'tan', 'cyan', 'olive', 'maroon', 'navy', 'aquamarine', 'silver', 'gold', 'turquoise', 'lime', 'teal', 'indigo', 'violet']);
+var $author$project$Wordlist$wordlistDeutsch = _List_fromArray(
+	['Roulette', 'Osten', 'Drache', 'Afrika', 'Krieg', 'Alpen', 'Honig', 'Frankreich', 'Bombe', 'Winnetou', 'Kasino', 'Mexiko', 'Wolkenkratzer', 'Verein', 'Saturn', 'Feder', 'Alien', 'Hamburger', 'Peitsche', 'Berlin', 'Antarktis', 'Adler', 'Schneemann', 'Europa', 'Konzert', 'Loch Ness', 'Schokolade', 'Peking', 'Jet', 'Inka', 'Millionär', 'Becken', 'Dinosaurier', 'Optik', 'Pirat', 'Strasse', 'Hupe', 'Essen', 'Pinguin', 'Siegel', 'Spinne', 'Bart', 'Geschoss', 'Blüte', 'Botschaft', 'Moos', 'Pistole', 'Abgabe', 'Krankheit', 'Bahn', 'Spion', 'Tafel', 'Prinzessin', 'Bart', 'Genie', 'Quartett', 'Dieb', 'Torte', 'Oper', 'Tau', 'Ritter', 'Chemie', 'Stadion', 'Arm', 'Limousine', 'Linse', 'Geist', 'Kippe', 'Laster', 'Melone', 'Lakritze', 'Fuchs', 'Laser', 'Boot', 'Tod', 'Korn', 'Krankenhaus', 'Bande', 'Skelett', 'Mal', 'Oktopus', 'Batterie', 'Hubschrauber', 'Dame', 'Känguru', 'Pflaster', 'Mikroskop', 'Erde', 'Zentaur', 'Messe', 'Superheld', 'Ton', 'Teleskop', 'Römer', 'Fallschirm', 'Stamm', 'Schnabeltier', 'Brand', 'Olymp', 'Schild', 'Satellit', 'Lippe', 'Engel', 'Miene', 'Roboter', 'Kokos', 'Einhorn', 'Läufer', 'Hexe', 'Bund', 'Bergsteiger', 'Elf', 'Taucher', 'Iris', 'Gift', 'Gang', 'Brücke', 'Pfeife', 'Feuer', 'Kiel', 'Tisch', 'Star', 'Wal', 'Leiter', 'Mond', 'Ladung', 'Fisch', 'Bauer', 'Doktor', 'Strudel', 'Kirche', 'Bremse', 'Gürtel', 'Hahn', 'Zitrone', 'Kapele', 'Wind', 'Strauss', 'Löwe', 'Satz', 'Auge', 'Grund', 'Luft', 'Kater', 'Hase', 'Matte', 'Bank', 'Kerze', 'Gras', 'Wirtschaft', 'Auflauf', 'Dichtung', 'Zwerg', 'Gehalt', 'Wald', 'Chor', 'Auto', 'Feige', 'Burg', 'Erika', 'Apfel', 'Mangel', 'Öl', 'Rolle', 'Koch', 'Stock', 'Bär', 'Dietrich', 'Katze', 'Schule', 'Leben', 'Ente', 'Glück', 'Schotten', 'Riese', 'Mark', 'Gesicht', 'Lager', 'Strand', 'Fall', 'Hotel', 'Jura', 'Wasser', 'Niete', 'Papier', 'Geschirr', 'Wurm', 'Knie', 'Anwalt', 'Drossel', 'Forscher', 'Hering', 'Tanz', 'Sekretär', 'Karotte', 'Drucker', 'Ketschup', 'Blinker', 'Nacht', 'Stift', 'Meer', 'Flügel', 'Fuss', 'Schein', 'Maus', 'Funken', 'Messer', 'Bock', 'Theater', 'Po', 'Polizei', 'Atlas', 'Schiff', 'Stempel', 'Pilot', 'Schelle', 'Daumen', 'Leuchte', 'Lehrer', 'Umzug', 'Flasche', 'Finger', 'Tag', 'Riegel', 'König', 'Mast', 'Glas', 'Käfer', 'Königin', 'Bogen', 'Zahn', 'Wanze', 'Hund', 'Scheibe', 'Pferd', 'Schalter', 'Schuh', 'Schimmel', 'Stuhl', 'Demo', 'Krone', 'Bein', 'Eis', 'Börse', 'Gold', 'Takt', 'Gabel', 'Fliege', 'Zeit', 'Jäger', 'Flöte', 'Kunde', 'Fackel', 'Nuss', 'Schnee', 'Schlange', 'Elfenbein', 'Tempo', 'Soldat', 'Bach', 'Pyramide', 'Vorsatz', 'Schnur', 'Gericht', 'Stern', 'Kamm', 'Ring', 'Busch', 'Horn', 'Platte', 'Herz', 'Decke', 'Ball', 'Rücken', 'Kanal', 'Maler', 'Nadel', 'Heide', 'Linie', 'Boxer', 'Korb', 'Reif', 'Blau', 'Ausdruck', 'Taste', 'Zug', 'Schirm', 'Kiefer', 'Spiel', 'Washington', 'Fleck', 'Mini', 'Knopf', 'Gut', 'Mund', 'Kohle', 'Akt', 'Grad', 'Himalaja', 'Brause', 'Bett', 'Viertel', 'Wand', 'Rute', 'Turm', 'Bulle', 'Karte', 'Figur', 'Tor', 'Fest', 'Raute', 'Zoll', 'Kreuz', 'Loge', 'Netz', 'Mutter', 'Punkt', 'Riemen', 'Pass', 'Verband', 'Fläche', 'Hut', 'Loch', 'Watt', 'Glocke', 'Horst', 'Kraft', 'Luxemburg', 'Schloss', 'Birne', 'Maschine', 'Note', 'Welle', 'Film', 'Storm', 'Absatz', 'Haupt', 'Blatt', 'Pol', 'Mandel', 'Mittel', 'Indien', 'Jahr', 'Fessel', 'Leim', 'Schale', 'Seite', 'Aufzug', 'Bau', 'Quelle', 'Kreis', 'Harz', 'Bindung', 'Wurf', 'Uhr', 'Golf', 'New', 'York', 'Rost', 'Australien', 'Rost', 'Bayern', 'Nagel', 'Tokio', 'Toast', 'Ägypten', 'Zylinder', 'London', 'Muschel', 'Morgenstern', 'Würfel', 'Moskau', 'Weide', 'China', 'Kapitän', 'Shakespeare', 'Lösung', 'Hollywood', 'Rasen', 'Griechenland', 'Rock', 'Rom', 'Krebs', 'Hand', 'Flur', 'Ninja', 'Steuer', 'Brötchen', 'Zelle', 'Kiwi', 'Barren', 'Deutschland', 'Löffel', 'Staat', 'Futter', 'Amerikaner', 'Schuppen', 'Atlantis', 'Orange', 'England', 'Pension']);
+var $author$project$Wordlist$wordlistEspanol = _List_fromArray(
+	['Hollywood', 'Pantalla', 'Juego', 'Canica', 'Dinosaurio', 'Gato', 'Tono', 'Lazo', 'Grecia', 'Cubierta', 'Pico', 'Centro', 'Vacío', 'Unicornio', 'Enterrador', 'Calcetín', 'Lago Ness', 'Caballo', 'Berlin', 'Ornitorrinco', 'Puerto', 'Cofre', 'Caja', 'Compuesto', 'Nave', 'Reloj', 'Espacio', 'Flauta', 'Torre', 'Muerte', 'Pozo', 'Justo', 'Diente', 'Staff', 'Cuenta', 'Disparo', 'Rey', 'Sartén', 'Cuadrado', 'Búfalo', 'Científico', 'Pollo', 'Atlantis', 'Espía', 'Correo', 'Nuez', 'Registro', 'Pirata', 'Cara', 'Pegar', 'Enfermedad', 'Patio', 'Montar', 'Babosa', 'Dados', 'Plomo', 'Gancho', 'Zanahoria', 'Veneno', 'Acción', 'Pie', 'Antorcha', 'Brazo', 'Figura', 'Mina', 'Traje', 'Grúa', 'Beijing', 'Masa', 'Microscopio', 'Motor', 'China', 'Paja', 'Pantalón', 'Europa', 'Bota', 'Princesa', 'Liga', 'Suerte', 'Aceituna', 'Palma', 'Maestro', 'Pulgar', 'Pulpo', 'Capucha', 'Empate', 'Doctor', 'Despertar', 'Grillo', 'Millonario', 'Nueva York', 'Estado', 'Bermudas', 'Parque', 'Pavo', 'Chocolate', 'Viaje', 'Raqueta', 'Bate', 'Chorro', 'Shakespearei', 'Tornillo', 'Interruptor', 'Pared', 'Alma', 'Fantasma', 'Tiempo', 'Danza', 'Amazonas', 'Gracia', 'Moscú', 'Calabaza', 'Antártida', 'Látigo', 'Corazón', 'Mesa', 'Bola', 'Luchador', 'Frío', 'Día', 'Primavera', 'Encuentro', 'Diamante', 'Centauro', 'Marzo', 'Ruleta', 'Perro', 'Cruz', 'Onda', 'Pato', 'Viento', 'Lugar', 'Rascacielos', 'Papel', 'Manzana', 'Aceite', 'Cocinar', 'Volar', 'Reparto', 'Oso', 'Broche', 'Ladrón', 'Trompa', 'América', 'Novela', 'Célula', 'Arco', 'Modelo', 'Cuchillo', 'Caballero', 'Corte', 'Hierro', 'Ballena', 'Sombra', 'Contrato', 'Mercurio', 'Conductor', 'Sello', 'Carro', 'Anillo', 'Niño', 'Piano', 'Láser', 'Sonido', 'Polo', 'Superhéroe', 'Revolución', 'Hoyo', 'Gas', 'Vidrio', 'Washington', 'Corteza', 'Nieve', 'Marfil', 'Pipa', 'Tapa', 'Grado', 'Tokio', 'Iglesia', 'Pay', 'Tubo', 'Bloque', 'Cómico', 'Pez', 'Puente', 'Luna', 'Parte', 'Azteca', 'Contrabandista', 'Tren', 'Embajada', 'Pupila', 'Buzo', 'Hielo', 'Trampa', 'Código', 'Zapato', 'Servidor', 'Club', 'Fila', 'Pirámide', 'Insecto', 'Pingüino', 'Libra', 'Himalaya', 'Checa', 'Roma', 'Ojo', 'Tablero', 'Cama', 'Punto', 'Francia', 'Mamut', 'Algodón', 'Robin', 'Red', 'Corneta', 'Maple', 'Inglaterra', 'Campo', 'Robot', 'Trama', 'África', 'Etiqueta', 'Boca', 'Kiwi', 'Lunar', 'Escuela', 'Hundir', 'Pistola', 'Ópera', 'Menta', 'Raíz', 'Submarino', 'Corona', 'Lomo', 'Avión', 'México', 'Capa', 'Círculo', 'Pastilla', 'Australia', 'Verde', 'Egipto', 'Línea', 'Abogado', 'Bruja', 'Paracaídas', 'Choque', 'Oro', 'Nota', 'León', 'Plástico', 'Telaraña', 'Ambulancia', 'Hospital', 'Hechizo', 'Seguro', 'Agua', 'Londres', 'Casino', 'Ciclo', 'Bar', 'Acantilado', 'Redondo', 'Bmba', 'Gigante', 'Mano', 'ninja', 'Rosa', 'Resbalar', 'Limosina', 'Pase', 'Teatro', 'Plato', 'Satélite', 'Catsup', 'Hotel', 'Cola', 'Garrapata', 'Suelo', 'Policía', 'Enano', 'Ventilador', 'Vestido', 'Saturno', 'Pasto', 'Cepillo', 'Silla', 'Roca', 'Piloto', 'Telescopio', 'Archivo', 'Laboratorio', 'India', 'Regla', 'Clavo', 'Columpio', 'Olimpia', 'Cambio', 'Frcha', 'Corriente', 'Misil', 'Escala', 'Banda', 'Ángel', 'Prensa', 'Baya', 'Carta', 'Comprobar', 'Borrador', 'Cabeza', 'Regazo', 'Naranja', 'Helado', 'Película', 'Lavadora', 'Piscina', 'Tiburón', 'Camioneta', 'Cuerda', 'Ternera', 'Halcón', 'Águila', 'Aguja', 'Bosque', 'Dragón', 'Clave', 'Cinturón', 'Gorra', 'Taladro', 'Guante', 'Pasta', 'Otoño', 'Fuego', 'Araña', 'Espina', 'Soldado', 'Cuerno', 'Reina', 'Jamón', 'Litro', 'Vida', 'Templo', 'Conejo', 'Botón', 'Juego', 'Estrella', 'Júpiter', 'Veterinaria', 'Nioche', 'aire', 'Batería', 'Genio', 'Tienda', 'Botella', 'Estadio', 'Alien', 'Luz', 'Triángulo', 'Limón', 'Enfermera', 'Gota', 'Pista', 'Banco', 'Alemania', 'Lombriz', 'Rayo', 'Capital', 'Paro', 'Guerra', 'Concierto', 'Miel', 'Canadá', 'Ciervo', 'Mono de Nieve', 'Vencer', 'Atasco', 'Cobre', 'Playa', 'Campana', 'Duende', 'Fénix', 'Fuerza', 'Explosión', 'Tenedor', 'Alpes', 'Poste', 'Cerca', 'Canguro', 'Ratón', 'Taza', 'Herradura', 'Escorpión', 'Agente', 'Helicóptero', 'Agujero', 'Órgano', 'Gato', 'Carga']);
+var $author$project$Wordlist$wordlistFrancais = _List_fromArray(
+	['Accident', 'Achat', 'Acné', 'Action', 'Adolescent', 'Afrique', 'Aiguille', 'Allumer', 'Alpes', 'Alphabet', 'Altitude', 'Amérique', 'Ami', 'Amour', 'Ampoule', 'Anniversaire', 'Appétit', 'Araignée', 'Arbre', 'Arc', 'Arc-en-ciel', 'Argent', 'Arme', 'Armée', 'Ascenseur', 'Asie', 'Assis', 'Astronaute', 'Atchoum', 'Athlète', 'Atlantide', 'Aube', 'Australie', 'Avec', 'Aventure', 'Avion', 'Avocat', 'Bac', 'Baguette', 'Bain', 'Baiser', 'Balai', 'Balle', 'Ballon', 'Bambou', 'Banane', 'Bannir', 'Barbe', 'Barrière', 'Bas', 'Basket', 'Bateau', 'Bâton', 'Batterie', 'Bébé', 'Beethoven', 'Bête', 'Biberon', 'Bière', 'Blanc', 'blé', 'Bleu', 'Bob', 'Boisson', 'Boîte', 'Bombe', 'Bonbon', 'Bonnet', 'Bord', 'Bordeaux', 'Botte', 'Boue', 'Bougie', 'Boule', 'Bouteille', 'Bouton', 'Branche', 'Bras', 'Bravo', 'Bretagne', 'Brise', 'Brosse', 'Bruit', 'Brume', 'Brun', 'Bûche', 'Bulle', 'Bureau', 'But', 'Cabane', 'Cabine', 'Cacher', 'Cadeau', 'Cafard', 'Café', 'Caisse', 'Calculer', 'Calme', 'Caméra', 'Camion', 'Camping', 'Canada', 'Canard', 'Canette', 'Canine', 'Cap', 'Capitalisme', 'Car', 'Carotte', 'Carré', 'Carte', 'Carton', 'Casque', 'Casser', 'Cassette', 'Cauchemar', 'Cause', 'Ceinture', 'Cellule', 'Cercle', 'Chaîne', 'Chair', 'Chaise', 'Champ', 'Champion', 'Chant', 'Chapeau', 'Charbon', 'Charge', 'Chasse', 'Chat', 'Château', 'Chaud', 'Chaussure', 'Chauve', 'Chef', 'Chemise', 'Chêne', 'Cher', 'Cheval', 'Chevalier', 'Cheveu', 'Chien', 'Chiffre', 'Chine', 'Chocolat', 'Chômage', 'Ciel', 'Cil', 'Cinéma', 'Cire', 'Cirque', 'Citron', 'Clé', 'Clou', 'Clown', 'Coach', 'Coccinelle', 'Code', 'Cœur', 'Col', 'Colle', 'Colline', 'Colonne', 'Cône', 'Confort', 'Continu', 'Contre', 'Conversation', 'Copain', 'Coq', 'Coquillage', 'Corbeau', 'Corde', 'Corps', 'Côte', 'Coude', 'Couloir', 'Coup', 'Cour', 'Courant', 'Courrier', 'Cours', 'Course', 'Court', 'Couteau', 'Couvert', 'Couverture', 'Cowboy', 'Crac', 'Crayon', 'Crème', 'Critique', 'Crochet', 'Croix', 'Croûte', 'Cuillère', 'Cuir', 'Cuisine', 'Culotte', 'Cycle', 'Dard', 'Dé', 'Debout', 'Défaut', 'Dehors', 'Démocratie', 'Dent', 'Dentiste', 'Dessin', 'Devoir', 'Diamant', 'Dictionnaire', 'Dieu', 'Dinosaure', 'Discours', 'Disque', 'Dix', 'Docteur', 'Doigt', 'Domino', 'Dormir', 'Droit', 'Eau', 'Échec', 'Échelle', 'Éclair', 'École', 'Écran', 'Écraser', 'Écrit', 'Église', 'Égout', 'Électricité', 'Éléphant', 'Élève', 'Elfe', 'Empreinte', 'Enceinte', 'Épice', 'Épine', 'Erreur', 'Espace', 'Espion', 'Essence', 'État', 'Été', 'Étoile', 'Étranger', 'Éventail', 'Évolution', 'Explosoin', 'Extension', 'Face', 'Fan', 'Farce', 'Fatigue', 'Fauteuil', 'Fayot', 'Fenêtre', 'Fer', 'Fête', 'Feu', 'Feuille', 'Fidèle', 'Fil', 'Fille', 'Flamme', 'Flèche', 'Fleur', 'Fleuve', 'Fond', 'Football', 'Forêt', 'Forger', 'Foudre', 'Fouet', 'Four', 'Fourmi', 'Froid', 'Fromage', 'Front', 'Fruit', 'Fuir', 'Futur', 'Garçon', 'Gâteau', 'Gauche', 'Gaz', 'Gazon', 'Gel', 'Genou', 'Glace', 'Gomme', 'Gorge', 'Goutte', 'Grand', 'Grèce', 'Grenouille', 'Grippe', 'Gris', 'Gros', 'Groupe', 'Guitare', 'Hasard', 'Haut', 'Hélicoptère', 'Herbe', 'Heureux', 'Histoire', 'Hiver', 'Hôtel', 'Hugo', 'Huile', 'Humide', 'Humour', 'Indice', 'Internet', 'Inviter', 'Italie', 'Jacques', 'Jambe', 'Jambon', 'Jardin', 'Jaune', 'Jean', 'Jeanne', 'Jet', 'Jeu', 'Jogging', 'Jour', 'Journal', 'Jupiter', 'Kilo', 'Kiwi', 'Laine', 'Lait', 'Langue', 'Lapin', 'Latin', 'Laver', 'Lecteur', 'Léger', 'Lent', 'Lettre', 'Lien', 'Ligne', 'Linge', 'Lion', 'Lit', 'Livre', 'Loi', 'Long', 'Louis', 'Loup', 'Lumière', 'Lundi', 'Lune', 'Lunette', 'Machine', 'Macho', 'main', 'Maison', 'Maîtresse', 'Mal', 'Maladie', 'Maman', 'Mammouth', 'Manger', 'Marais', 'Marc', 'Marche', 'Mariage', 'Marie', 'Mariée', 'Marque', 'Marseille', 'Masse', 'Mer', 'Messe', 'Mètre', 'Métro', 'Miaou', 'Micro', 'Mieux', 'Mille', 'Mine', 'Miroir', 'Moderne', 'Moitié', 'Monde', 'Monstre', 'Montagne', 'Montre', 'Mort', 'Moteur', 'Moto', 'Mou', 'Mouche', 'Moulin', 'Moustache', 'Mouton', 'Mur', 'Muscle', 'Musique', 'Mystère', 'Nage', 'Nature', 'Neige', 'Neutre', 'New York', 'Nez', 'Nid', 'Ninja', 'Niveau', 'Noël', 'Nœud', 'Noir', 'Nous', 'Nuage', 'Nuit', 'Numéro', 'Œil', 'Œuf', 'Oiseau', 'Olympique', 'Ombre', 'Ongle', 'Or', 'Oral', 'Orange', 'Ordinateur', 'Ordre', 'Ordure', 'Oreille', 'Organe', 'Orgueil', 'Ours', 'Outil', 'Ouvert', 'Ovale', 'Pain', 'Palais', 'Panneau', 'Pantalon', 'Pantin', 'Papa', 'Papier', 'Papillon', 'Paradis', 'Parc', 'Paris', 'Parole', 'Partie', 'Passe', 'Pâte', 'Patin', 'Patte', 'Paul', 'Payer', 'Pêche', 'Peinture', 'Pendule', 'Penser', 'Personne', 'Petit', 'Peur', 'Philosophe', 'Photo', 'Phrase', 'Piano', 'Pièce', 'Pied', 'Pierre', 'Pile', 'Pilote', 'Pince', 'Pioche', 'Pion', 'Pirate', 'Pire', 'Piscine', 'Place', 'Plafond', 'Plage', 'Plaie', 'Plan', 'Planche', 'Planète', 'Plante', 'Plastique', 'Plat', 'Plat', 'Plomb', 'Plonger', 'Pluie', 'Poche', 'Poète', 'Poids', 'Poing', 'Point', 'Poivre', 'Police', 'Politique', 'Pollen', 'Polo', 'Pomme', 'Pompe', 'Pont', 'Population', 'Port', 'Porte', 'Portefeuille', 'Positif', 'Poste', 'Poubelle', 'Poule', 'Poupée', 'Pousser', 'Poussière', 'Pouvoir', 'Préhistoire', 'Premier', 'Présent', 'Presse', 'Prier', 'Princesse', 'Prise', 'Privé', 'Professeur', 'Psychologie', 'Public', 'Pull', 'Punk', 'Puzzle', 'Pyjama', 'Quatre', 'Quinze', 'Race', 'Radio', 'Raisin', 'Rap', 'Rayé', 'Rayon', 'Réfléchir', 'Reine', 'Repas', 'Reptile', 'Requin', 'Rêve', 'Riche', 'Rideau', 'Rien', 'Rire', 'Robinet', 'Roche', 'Roi', 'Rond', 'Rose', 'Roue', 'Rouge', 'Rouille', 'Roux', 'Russie', 'Sable', 'Sabre', 'Sac', 'Sain', 'Saison', 'Sale', 'Salle', 'Salut', 'Samu', 'Sandwich', 'Sang', 'Sapin', 'Satellite', 'Saumon', 'Saut', 'Savoir', 'Schtroumpf', 'Science', 'Scout', 'Sec', 'Seine', 'Sel', 'Sept', 'Serpent', 'Serrer', 'Sexe', 'Shampooing', 'Siècle', 'Siège', 'Sieste', 'Silhouette', 'Sirène', 'Ski', 'Soleil', 'Sommeil', 'Son', 'Sonner', 'Sorcière', 'Sourd', 'Souris', 'Sport', 'Star', 'Station', 'Stylo', 'Sur', 'Surface', 'Sushi', 'Swing', 'Tableau', 'Tache', 'Taille', 'Tante', 'Tapis', 'Tard', 'Taxi', 'Téléphone', 'Télévision', 'Temple', 'Temps', 'Tennis', 'Tête', 'Thé', 'Tigre', 'Tintin', 'Tissu', 'Titre', 'Titre', 'Toast', 'Toilette', 'Tokyo', 'Tombe', 'Ton', 'Top', 'Touche', 'Toujours', 'Tour', 'Tournoi', 'Tout', 'Trace', 'Train', 'Traîner', 'Transport', 'Travail', 'Trésor', 'Triangle', 'Triste', 'Trône', 'Troupeau', 'Tsar', 'Tube', 'Tuer', 'Tuer', 'Tupperware', 'Tuyau', 'Twitter', 'Type', 'Université', 'Vache', 'Vache', 'Vague', 'Vaisselle', 'Valeur', 'Ver', 'Verdict', 'Verre', 'Vers', 'Vert', 'Veste', 'Viande', 'Vide', 'Vie', 'Vieux', 'Ville', 'Vin', 'Vingt', 'Violon', 'Vipère', 'Vision', 'Vite', 'Vive', 'Vœu', 'Voile', 'Voisin', 'Voiture', 'Vol', 'Volume', 'Vote', 'Vouloir', 'Voyage', 'Zen', 'Zéro', 'Zodiaque', 'Zone', 'Zoo']);
+var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
+	['abnormal', 'abominable', 'afraid', 'afterlife', 'agony ', 'alarming', 'alien', 'angel', 'apparition', 'autumn', 'axe ', 'banshee', 'basilisk', 'bat', 'beast', 'behemoth', 'black', 'blood ', 'bogeyman', 'bones', 'boo', 'broom', 'bury', 'cadaver', 'candy', 'carve', 'casket', 'cat', 'cauldron', 'cemetery', 'Cerberus', 'changeling', 'chill', 'cider', 'claws', 'clown', 'coffin', 'cold ', 'convulse ', 'corpse', 'costume', 'creak ', 'creepy', 'crone', 'crypt', 'dark', 'dead', 'demon ', 'devil ', 'dire', 'disease', 'disguise', 'disturbed ', 'donuts', 'Dracula', 'dragon', 'dread ', 'drown ', 'ecto-plasm', 'eerie', 'evil', 'eye', 'fangs', 'fatal ', 'fear ', 'fiend', 'fog', 'Frankenstein', 'freak', 'fright', 'gargoyle', 'ghastly', 'ghost ', 'ghoul', 'goblin', 'goo', 'gore ', 'grave', 'gruesome', 'Halloween', 'haunted', 'hayride', 'heart', 'Hell ', 'helpless', 'horror', 'howl', 'insane', 'jack-o\'-lantern', 'kill ', 'leaves', 'macabre', 'magic', 'mask', 'mausoleum', 'menace ', 'midnight', 'monster ', 'moon ', 'morbid', 'mummy', 'murder', 'mutant', 'mystery', 'mystical', 'night', 'occult', 'October', 'ogre', 'ominous', 'orange', 'owl', 'pagan', 'pain ', 'paranormal', 'party', 'phantasm', 'phantom', 'poltergeist', 'potion', 'pumpkin', 'putrid ', 'raven', 'reaper', 'rotten ', 'scare', 'scream ', 'shadow', 'shiver', 'silence', 'sinister ', 'skeleton ', 'skull', 'slime', 'specter', 'spell', 'spider', 'spirit', 'spooky', 'stab', 'stalk ', 'strange', 'strangle', 'suicide ', 'supernatural', 'superstition', 'sweets', 'tarantula', 'tense ', 'terrify ', 'thrill', 'tomb', 'torture ', 'treat', 'tremble', 'trick', 'troll', 'undead', 'unearth', 'vampire', 'villain', 'wand', 'warlock', 'web', 'weird', 'werewolf', 'wicked', 'witch', 'wizard', 'wraith', 'zombie ']);
 var $author$project$Spymaster$init = function (_v0) {
 	return A2(
 		$author$project$Spymaster$update,
 		$author$project$Spymaster$NewGame,
 		$author$project$Spymaster$Model(
-			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(true)(false)(
-			{advancedWords: false, basicWords: false, customWords: true, spies: true})(0)(0)('PASSWORD')('')(
+			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(false)(false)(
+			{customWords: true, spies: true})(0)(0)('')('')(_List_Nil)(
 			_List_fromArray(
-				['Noneeeeeeeeeee']))(_List_Nil)(
+				[
+					{include: false, key: 0, name: 'basic words', words: $author$project$Wordlist$wordlistBasic},
+					{include: false, key: 1, name: 'advanced words', words: $author$project$Wordlist$wordlistAdvanced},
+					{include: false, key: 2, name: 'color words', words: $author$project$Wordlist$wordlistColors},
+					{include: false, key: 3, name: 'Halloween words', words: $author$project$Wordlist$wordlistHalloween},
+					{include: false, key: 4, name: 'German words', words: $author$project$Wordlist$wordlistDeutsch},
+					{include: false, key: 5, name: 'French words', words: $author$project$Wordlist$wordlistFrancais},
+					{include: false, key: 6, name: 'Spanish words', words: $author$project$Wordlist$wordlistEspanol}
+				]))(_List_Nil)(
 			A2(
 				$elm$core$List$repeat,
 				25,
@@ -8239,8 +8274,6 @@ var $author$project$Spymaster$SaveCustomWords = {$: 'SaveCustomWords'};
 var $author$project$Spymaster$SetCustomWords = function (a) {
 	return {$: 'SetCustomWords', a: a};
 };
-var $author$project$Spymaster$ToggleAdvancedWords = {$: 'ToggleAdvancedWords'};
-var $author$project$Spymaster$ToggleBasicWords = {$: 'ToggleBasicWords'};
 var $author$project$Spymaster$ToggleCustomWords = {$: 'ToggleCustomWords'};
 var $author$project$Spymaster$ToggleCustomWordsEntry = {$: 'ToggleCustomWordsEntry'};
 var $author$project$Spymaster$ToggleLightbox = {$: 'ToggleLightbox'};
@@ -8359,7 +8392,38 @@ var $author$project$Spymaster$drawCard = F2(
 			return _List_Nil;
 		}
 	});
+var $author$project$Spymaster$ToggleWordlist = function (a) {
+	return {$: 'ToggleWordlist', a: a};
+};
 var $elm$html$Html$li = _VirtualDom_node('li');
+var $author$project$Spymaster$drawWordlistToggle = function (wordlist) {
+	return A2(
+		$elm$html$Html$li,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class(''),
+						$elm$html$Html$Events$onClick(
+						$author$project$Spymaster$ToggleWordlist(wordlist.key))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class(
+								'icon ' + (wordlist.include ? 'checked' : 'unchecked'))
+							]),
+						_List_Nil),
+						$elm$html$Html$text('Use ' + wordlist.name)
+					]))
+			]));
+};
 var $elm$html$Html$blockquote = _VirtualDom_node('blockquote');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $author$project$Spymaster$lightboxInfo = _List_fromArray(
@@ -8485,6 +8549,7 @@ var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Spymaster$view = function (model) {
+	var wordlistToggles = A2($elm$core$List$map, $author$project$Spymaster$drawWordlistToggle, model.wordlists);
 	var addCards = function (cards) {
 		return A2($author$project$Spymaster$drawCard, 0, cards);
 	};
@@ -8595,84 +8660,37 @@ var $author$project$Spymaster$view = function (model) {
 						A2(
 						$elm$html$Html$ul,
 						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleBasicWords)
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$span,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class(
-														'icon ' + (model.settings.basicWords ? 'checked' : 'unchecked'))
-													]),
-												_List_Nil),
-												$elm$html$Html$text('Use default words')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleAdvancedWords)
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$span,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class(
-														'icon ' + (model.settings.advancedWords ? 'checked' : 'unchecked'))
-													]),
-												_List_Nil),
-												$elm$html$Html$text('Use advanced words')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleCustomWords)
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$span,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class(
-														'icon ' + (model.settings.customWords ? 'checked' : 'unchecked'))
-													]),
-												_List_Nil),
-												$elm$html$Html$text('Use custom words')
-											]))
-									]))
-							])),
+						A2(
+							$elm$core$List$append,
+							wordlistToggles,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class(''),
+													$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleCustomWords)
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$span,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class(
+															'icon ' + (model.settings.customWords ? 'checked' : 'unchecked'))
+														]),
+													_List_Nil),
+													$elm$html$Html$text('Use custom words')
+												]))
+										]))
+								]))),
 						A2(
 						$elm$html$Html$ul,
 						_List_Nil,
@@ -8699,7 +8717,7 @@ var $author$project$Spymaster$view = function (model) {
 														$elm$html$Html$Attributes$class('icon edit')
 													]),
 												_List_Nil),
-												$elm$html$Html$text('Edit custom wordlist (to do)')
+												$elm$html$Html$text('Edit custom wordlist')
 											]))
 									])),
 								A2(
@@ -8777,7 +8795,8 @@ var $author$project$Spymaster$view = function (model) {
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Spymaster$CancelCustomWords)
+										$elm$html$Html$Events$onClick($author$project$Spymaster$CancelCustomWords),
+										$elm$html$Html$Attributes$class('button--cancel')
 									]),
 								_List_fromArray(
 									[

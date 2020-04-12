@@ -11,7 +11,7 @@ import Random.List exposing (shuffle)
 import Random.Extra exposing (bool)
 import Time
 import Set exposing (fromList, toList)
-import Wordlist exposing (wordlistBasic, wordlistAdvanced)
+import Wordlist exposing (wordlistBasic, wordlistAdvanced, wordlistColors, wordlistHalloween, wordlistDeutsch, wordlistFrancais, wordlistEspanol)
 import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
 
@@ -27,12 +27,18 @@ main =
         }
 
 
-
 -- MODEL
 type alias Card =
   { word : String
   , team : Int -- 0 = spectator, -1 = assassin, 1 = red, 2 = blue
   , uncovered : Bool
+  }
+
+type alias Wordlist =
+  { key: Int
+  , name: String
+  , include: Bool
+  , words: List (String)
   }
 
 type alias Model =
@@ -46,16 +52,14 @@ type alias Model =
     , toggleCustomWordsEntry : Bool -- True = show
     , toggleSoundEffects : Bool -- True = show
     , settings :
-      { spies: Bool
-      , basicWords: Bool
-      , advancedWords: Bool
-      , customWords: Bool
-      }
+      { spies: Bool,
+      customWords: Bool }
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
     , customWordsString : String
     , customWords : List (String)
+    , wordlists : List (Wordlist)
     , allWords : List (String)
     , cards : List (Card)
     }
@@ -71,18 +75,24 @@ init _ =
         ""                                 -- debugString
         False                              -- toggleLightbox: for info, true = open
         False                              -- toggleQR: toggle QR display, true = open
-        False                               -- toggleSidebar: toggle sidebar, true = open
-        True                               -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
+        False                              -- toggleSidebar: toggle sidebar, true = open
+        False                              -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
         False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
         { spies = True
-        , basicWords = False
-        , advancedWords = False
         , customWords = True }            -- settings
         0                                  -- remainingRed: remaining red cards
         0                                  -- remainingBlue: remaining blue cards
-        "PASSWORD"                         -- password: the encoded game board string
-        ""                                 -- customWordsString
-        ["Noneeeeeeeeeee"]
+        ""                                 -- password: the encoded game board string
+        ""                                 -- customWordsString: initial textarea string
+        []                                 -- customWords: initial list
+        [ { key = 0, name = "basic words", include = True, words = wordlistBasic }
+        , { key = 1, name = "advanced words", include = False, words = wordlistAdvanced }
+        , { key = 2, name = "color words", include = False, words = wordlistColors }
+        , { key = 3, name = "Halloween words", include = False, words = wordlistHalloween }
+        , { key = 4, name = "German words", include = False, words = wordlistDeutsch }
+        , { key = 5, name = "French words", include = False, words = wordlistFrancais }
+        , { key = 6, name = "Spanish words", include = False, words = wordlistEspanol }
+        ]
         []                                 -- allWords: list of all possible card words
         (List.repeat 25 (Card "" 0 False)) -- cards: list of 25 cards, initially blank
       )
@@ -99,8 +109,7 @@ type Msg
     | ToggleCustomWordsEntry
     | ToggleSoundEffects
     | ToggleSpies
-    | ToggleBasicWords
-    | ToggleAdvancedWords
+    | ToggleWordlist Int
     | ToggleCustomWords
     | SetCustomWords String
     | SaveCustomWords
@@ -150,20 +159,12 @@ update msg model =
             ( { model | settings = newSettings }
             , Cmd.none)
 
-      ToggleBasicWords ->
-          let
-            oldSettings = model.settings
-            newSettings = { oldSettings | basicWords = not oldSettings.basicWords }
-          in
-            ( { model | settings = newSettings }
-            , Cmd.none)
 
-      ToggleAdvancedWords ->
+      ToggleWordlist key ->
           let
-            oldSettings = model.settings
-            newSettings = { oldSettings | advancedWords = not oldSettings.advancedWords }
+            wordlists = List.map (maybeToggle key) model.wordlists
           in
-            ( { model | settings = newSettings }
+            ( { model | wordlists = wordlists }
             , Cmd.none)
 
       ToggleCustomWords ->
@@ -180,7 +181,7 @@ update msg model =
 
       SaveCustomWords ->
         let
-          customWords = Set.toList (Set.fromList  (List.filter isNotEmpty (String.split "\n" model.customWordsString)))
+          customWords = Set.toList (Set.fromList  (List.filter isNotEmpty (List.map String.trim (String.split "\n" model.customWordsString))))
           customWordsString = String.join "\n" customWords
         in
           ( { model | customWords = customWords, customWordsString = customWordsString, toggleCustomWordsEntry = False }
@@ -199,10 +200,10 @@ update msg model =
 
       NewGame ->
         let
-            wordlist = List.append
-                         (List.append (if model.settings.basicWords then wordlistBasic else [])
-                                     (if model.settings.advancedWords then wordlistAdvanced else []))
-                         (if model.settings.customWords then model.customWords else [])
+            wordlist = List.append 
+                          (List.concatMap .words (List.filter .include model.wordlists))
+                          (if model.settings.customWords then model.customWords else [])
+            
             (newWords, seed1) = Random.step (Random.List.shuffle wordlist) model.seed
             (newTurn, seed2) = Random.step Random.Extra.bool seed1
             (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
@@ -228,6 +229,14 @@ update msg model =
 
       Tick _ ->
         ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
+
+maybeToggle : Int -> Wordlist -> Wordlist
+maybeToggle key wordlist =
+  if key == wordlist.key then
+    { wordlist | include = not wordlist.include}
+  else
+    wordlist
+
 
 isNotEmpty : String -> Bool
 isNotEmpty str = 
@@ -382,9 +391,15 @@ lightboxInfo = [ div [ class "leftside"]
                 ]
               ]
 
+drawWordlistToggle : Wordlist -> Html Msg
+drawWordlistToggle wordlist =
+  li [] [ a [ class "", onClick (ToggleWordlist wordlist.key) ] [ span [ class ("icon " ++ if wordlist.include then "checked" else "unchecked")] [], text ("Use " ++ wordlist.name)] ]
+
+
 view : Model -> Html Msg
 view model =
   let
+    wordlistToggles = List.map drawWordlistToggle model.wordlists
     addCards cards =
      drawCard 0 cards
   in
@@ -399,12 +414,11 @@ view model =
             , li [] [ a [ class "", onClick ToggleSoundEffects ] [ span [ class ("icon " ++ if model.toggleSoundEffects then "checked" else "unchecked")] [], text "Enable sound effects"] ]
             ]
           , ul []
-            [ li [] [ a [ class "", onClick ToggleBasicWords ] [ span [ class ("icon " ++ if model.settings.basicWords then "checked" else "unchecked")] [], text "Use default words"] ]
-            , li [] [ a [ class "", onClick ToggleAdvancedWords ] [ span [ class ("icon " ++ if model.settings.advancedWords then "checked" else "unchecked")] [], text "Use advanced words"] ]
-            , li [] [ a [ class "", onClick ToggleCustomWords ] [ span [ class ("icon " ++ if model.settings.customWords then "checked" else "unchecked")] [], text "Use custom words"] ]
-            ]
+            (List.append
+              wordlistToggles
+              [ li [] [ a [ class "", onClick ToggleCustomWords ] [ span [ class ("icon " ++ if model.settings.customWords then "checked" else "unchecked")] [], text "Use custom words"] ] ])
           , ul []
-            [ li [] [ a [ class "", onClick ToggleCustomWordsEntry ] [ span [ class "icon edit"] [], text "Edit custom wordlist (to do)"] ]
+            [ li [] [ a [ class "", onClick ToggleCustomWordsEntry ] [ span [ class "icon edit"] [], text "Edit custom wordlist"] ]
             , li [] [ a [ class "", onClick ToggleSidebar ] [ span [ class "icon close"] [], text "Close settings"] ]
             ]
           ]
@@ -413,7 +427,7 @@ view model =
           [ div [ class "textarea_area" ] [ textarea [ placeholder "Enter one word per line", onInput SetCustomWords, value model.customWordsString ] [] ]
           , div [ class "button_area" ]
             [ button [ onClick SaveCustomWords ] [ text "Save" ]
-            , button [ onClick CancelCustomWords ] [ text "Cancel" ]
+            , button [ onClick CancelCustomWords, class "button--cancel" ] [ text "Cancel" ]
             ]
           ]
       , div [ class "center" ]
