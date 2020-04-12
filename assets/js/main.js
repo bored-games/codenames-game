@@ -5339,14 +5339,20 @@ var $author$project$Spymaster$Model = function (seed) {
 				return function (toggleLightbox) {
 					return function (toggleQR) {
 						return function (toggleSidebar) {
-							return function (toggleSoundEffects) {
-								return function (settings) {
-									return function (redRemaining) {
-										return function (blueRemaining) {
-											return function (password) {
-												return function (allWords) {
-													return function (cards) {
-														return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, settings: settings, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, turn: turn};
+							return function (toggleCustomWordsEntry) {
+								return function (toggleSoundEffects) {
+									return function (settings) {
+										return function (redRemaining) {
+											return function (blueRemaining) {
+												return function (password) {
+													return function (customWordsString) {
+														return function (customWords) {
+															return function (allWords) {
+																return function (cards) {
+																	return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, settings: settings, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, turn: turn};
+																};
+															};
+														};
 													};
 												};
 											};
@@ -6445,6 +6451,129 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var $elm$core$Set$Set_elm_builtin = function (a) {
+	return {$: 'Set_elm_builtin', a: a};
+};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0.a;
+		return $elm$core$Set$Set_elm_builtin(
+			A3($elm$core$Dict$insert, key, _Utils_Tuple0, dict));
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
 var $author$project$Spymaster$hiddenBlue = function (c) {
 	return (!function ($) {
 		return $.uncovered;
@@ -6458,6 +6587,9 @@ var $author$project$Spymaster$hiddenRed = function (c) {
 	}(c)) && (function ($) {
 		return $.team;
 	}(c) === 1);
+};
+var $author$project$Spymaster$isNotEmpty = function (str) {
+	return !$elm$core$String$isEmpty(str);
 };
 var $elm$core$Maybe$map2 = F3(
 	function (func, ma, mb) {
@@ -7276,121 +7408,11 @@ var $owanturist$elm_union_find$UnionFind$QuickUnionPathCompression = F2(
 	function (a, b) {
 		return {$: 'QuickUnionPathCompression', a: a, b: b};
 	});
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $owanturist$elm_union_find$UnionFind$quickUnionPathCompression = A2($owanturist$elm_union_find$UnionFind$QuickUnionPathCompression, 0, $elm$core$Dict$empty);
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $elm$core$Dict$Black = {$: 'Black'};
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = {$: 'Red'};
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
 var $owanturist$elm_union_find$UnionFind$findCompressed = F2(
 	function (id, dict) {
 		var _v0 = A2($elm$core$Dict$get, id, dict);
@@ -7741,6 +7763,12 @@ var $author$project$Spymaster$update = F2(
 						model,
 						{toggleSidebar: !model.toggleSidebar}),
 					$elm$core$Platform$Cmd$none);
+			case 'ToggleCustomWordsEntry':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{toggleCustomWordsEntry: !model.toggleCustomWordsEntry}),
+					$elm$core$Platform$Cmd$none);
 			case 'ToggleSoundEffects':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7787,6 +7815,33 @@ var $author$project$Spymaster$update = F2(
 						model,
 						{settings: newSettings}),
 					$elm$core$Platform$Cmd$none);
+			case 'SetCustomWords':
+				var str = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customWordsString: str}),
+					$elm$core$Platform$Cmd$none);
+			case 'SaveCustomWords':
+				var customWords = $elm$core$Set$toList(
+					$elm$core$Set$fromList(
+						A2(
+							$elm$core$List$filter,
+							$author$project$Spymaster$isNotEmpty,
+							A2($elm$core$String$split, '\n', model.customWordsString))));
+				var customWordsString = A2($elm$core$String$join, '\n', customWords);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customWords: customWords, customWordsString: customWordsString, toggleCustomWordsEntry: false}),
+					$elm$core$Platform$Cmd$none);
+			case 'CancelCustomWords':
+				var customWordsString = A2($elm$core$String$join, '\n', model.customWords);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customWordsString: customWordsString, toggleCustomWordsEntry: false}),
+					$elm$core$Platform$Cmd$none);
 			case 'PassTurn':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7800,8 +7855,7 @@ var $author$project$Spymaster$update = F2(
 						$elm$core$List$append,
 						model.settings.basicWords ? $author$project$Wordlist$wordlistBasic : _List_Nil,
 						model.settings.advancedWords ? $author$project$Wordlist$wordlistAdvanced : _List_Nil),
-					model.settings.customWords ? _List_fromArray(
-						['not yet']) : _List_Nil);
+					model.settings.customWords ? model.customWords : _List_Nil);
 				var myPrime = _List_fromArray(
 					[true, false, true, false, true, true, false, false, true, true, true, true, false, true, false, false, false, false, true, true, false, false, false, true, true, true, true, false, true, false, false, false, false, true, false, true, true, false, false, false, false, true, false, false, false, false, true, false, true, false, true, true]);
 				var _v1 = A2(
@@ -7891,8 +7945,10 @@ var $author$project$Spymaster$init = function (_v0) {
 		$author$project$Spymaster$update,
 		$author$project$Spymaster$NewGame,
 		$author$project$Spymaster$Model(
-			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(true)(false)(
-			{advancedWords: false, basicWords: true, customWords: false, spies: true})(0)(0)('PASSWORD')($author$project$Wordlist$wordlistAdvanced)(
+			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(true)(false)(
+			{advancedWords: false, basicWords: false, customWords: true, spies: true})(0)(0)('PASSWORD')('')(
+			_List_fromArray(
+				['Noneeeeeeeeeee']))(_List_Nil)(
 			A2(
 				$elm$core$List$repeat,
 				25,
@@ -8177,16 +8233,23 @@ var $author$project$Spymaster$subscriptions = function (_v0) {
 				A2($elm$time$Time$every, 1000, $author$project$Spymaster$Tick)
 			]));
 };
+var $author$project$Spymaster$CancelCustomWords = {$: 'CancelCustomWords'};
 var $author$project$Spymaster$PassTurn = {$: 'PassTurn'};
+var $author$project$Spymaster$SaveCustomWords = {$: 'SaveCustomWords'};
+var $author$project$Spymaster$SetCustomWords = function (a) {
+	return {$: 'SetCustomWords', a: a};
+};
 var $author$project$Spymaster$ToggleAdvancedWords = {$: 'ToggleAdvancedWords'};
 var $author$project$Spymaster$ToggleBasicWords = {$: 'ToggleBasicWords'};
 var $author$project$Spymaster$ToggleCustomWords = {$: 'ToggleCustomWords'};
+var $author$project$Spymaster$ToggleCustomWordsEntry = {$: 'ToggleCustomWordsEntry'};
 var $author$project$Spymaster$ToggleLightbox = {$: 'ToggleLightbox'};
 var $author$project$Spymaster$ToggleQR = {$: 'ToggleQR'};
 var $author$project$Spymaster$ToggleSidebar = {$: 'ToggleSidebar'};
 var $author$project$Spymaster$ToggleSoundEffects = {$: 'ToggleSoundEffects'};
 var $author$project$Spymaster$ToggleSpies = {$: 'ToggleSpies'};
 var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -8384,7 +8447,43 @@ var $author$project$Spymaster$lightboxInfo = _List_fromArray(
 			]))
 	]);
 var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Spymaster$view = function (model) {
 	var addCards = function (cards) {
 		return A2($author$project$Spymaster$drawCard, 0, cards);
@@ -8433,7 +8532,7 @@ var $author$project$Spymaster$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class(
-						'sidebar' + (model.toggleSidebar ? ' hidden' : ''))
+						'sidebar' + (model.toggleSidebar ? '' : ' hidden'))
 					]),
 				_List_fromArray(
 					[
@@ -8545,7 +8644,7 @@ var $author$project$Spymaster$view = function (model) {
 														'icon ' + (model.settings.advancedWords ? 'checked' : 'unchecked'))
 													]),
 												_List_Nil),
-												$elm$html$Html$text('Use adult words')
+												$elm$html$Html$text('Use advanced words')
 											]))
 									])),
 								A2(
@@ -8588,7 +8687,8 @@ var $author$project$Spymaster$view = function (model) {
 										$elm$html$Html$a,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('')
+												$elm$html$Html$Attributes$class(''),
+												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleCustomWordsEntry)
 											]),
 										_List_fromArray(
 											[
@@ -8625,6 +8725,63 @@ var $author$project$Spymaster$view = function (model) {
 												_List_Nil),
 												$elm$html$Html$text('Close settings')
 											]))
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class(
+						'customWordsBar' + (model.toggleCustomWordsEntry ? '' : ' hidden'))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('textarea_area')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$textarea,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$placeholder('Enter one word per line'),
+										$elm$html$Html$Events$onInput($author$project$Spymaster$SetCustomWords),
+										$elm$html$Html$Attributes$value(model.customWordsString)
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button_area')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Spymaster$SaveCustomWords)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Save')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Spymaster$CancelCustomWords)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Cancel')
 									]))
 							]))
 					])),

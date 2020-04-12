@@ -1,16 +1,16 @@
 module Spymaster exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_)
-import Html.Attributes exposing (class, id)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button)
+import Html.Attributes exposing (class, id, placeholder, value)
+import Html.Events exposing (onClick, onInput)
 import Random exposing (Seed, initialSeed, step)
 import Array exposing (Array, fromList, get, slice)
 import Random.Array exposing (shuffle)
 import Random.List exposing (shuffle)
 import Random.Extra exposing (bool)
 import Time
-
+import Set exposing (fromList, toList)
 import Wordlist exposing (wordlistBasic, wordlistAdvanced)
 import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
@@ -43,6 +43,7 @@ type alias Model =
     , toggleLightbox : Bool     -- True = show
     , toggleQR : Bool           -- True = show
     , toggleSidebar : Bool      -- True = show
+    , toggleCustomWordsEntry : Bool -- True = show
     , toggleSoundEffects : Bool -- True = show
     , settings :
       { spies: Bool
@@ -53,6 +54,8 @@ type alias Model =
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
+    , customWordsString : String
+    , customWords : List (String)
     , allWords : List (String)
     , cards : List (Card)
     }
@@ -68,16 +71,19 @@ init _ =
         ""                                 -- debugString
         False                              -- toggleLightbox: for info, true = open
         False                              -- toggleQR: toggle QR display, true = open
-        True                               -- toggleSidebar: toggle sidebar, true = open
+        False                               -- toggleSidebar: toggle sidebar, true = open
+        True                               -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
         False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
         { spies = True
-        , basicWords = True
+        , basicWords = False
         , advancedWords = False
-        , customWords = False }            -- settings
+        , customWords = True }            -- settings
         0                                  -- remainingRed: remaining red cards
         0                                  -- remainingBlue: remaining blue cards
         "PASSWORD"                         -- password: the encoded game board string
-        wordlistAdvanced                   -- allWords: list of all possible card words
+        ""                                 -- customWordsString
+        ["Noneeeeeeeeeee"]
+        []                                 -- allWords: list of all possible card words
         (List.repeat 25 (Card "" 0 False)) -- cards: list of 25 cards, initially blank
       )
 
@@ -90,11 +96,15 @@ type Msg
     | ToggleLightbox
     | ToggleQR
     | ToggleSidebar
+    | ToggleCustomWordsEntry
     | ToggleSoundEffects
     | ToggleSpies
     | ToggleBasicWords
     | ToggleAdvancedWords
     | ToggleCustomWords
+    | SetCustomWords String
+    | SaveCustomWords
+    | CancelCustomWords
     | PassTurn
     | NewGame
     | Tick Time.Posix
@@ -122,6 +132,10 @@ update msg model =
 
       ToggleSidebar ->
           ( { model | toggleSidebar = not model.toggleSidebar }
+          , Cmd.none)
+
+      ToggleCustomWordsEntry ->
+          ( { model | toggleCustomWordsEntry = not model.toggleCustomWordsEntry }
           , Cmd.none)
 
       ToggleSoundEffects ->
@@ -160,6 +174,25 @@ update msg model =
             ( { model | settings = newSettings }
             , Cmd.none)
 
+      SetCustomWords str ->
+          ( { model | customWordsString = str }
+          , Cmd.none)
+
+      SaveCustomWords ->
+        let
+          customWords = Set.toList (Set.fromList  (List.filter isNotEmpty (String.split "\n" model.customWordsString)))
+          customWordsString = String.join "\n" customWords
+        in
+          ( { model | customWords = customWords, customWordsString = customWordsString, toggleCustomWordsEntry = False }
+          , Cmd.none)
+
+      CancelCustomWords ->
+        let
+          customWordsString = String.join "\n" model.customWords
+        in
+          ( { model | customWordsString = customWordsString, toggleCustomWordsEntry = False }
+          , Cmd.none)
+    
       PassTurn ->
           ( { model | turn = not model.turn }
           , Cmd.none)
@@ -169,7 +202,7 @@ update msg model =
             wordlist = List.append
                          (List.append (if model.settings.basicWords then wordlistBasic else [])
                                      (if model.settings.advancedWords then wordlistAdvanced else []))
-                         (if model.settings.customWords then ["not yet"] else [])
+                         (if model.settings.customWords then model.customWords else [])
             (newWords, seed1) = Random.step (Random.List.shuffle wordlist) model.seed
             (newTurn, seed2) = Random.step Random.Extra.bool seed1
             (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
@@ -195,6 +228,10 @@ update msg model =
 
       Tick _ ->
         ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
+
+isNotEmpty : String -> Bool
+isNotEmpty str = 
+  not (String.isEmpty str)
 
 listBoolToBigInt : List (Bool) -> ( BigInt )
 listBoolToBigInt digits =
@@ -356,7 +393,7 @@ view model =
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [] [] ]
       , div [ class "debug" ] [ {- text model.debugString -} ]
       , div
-        [ class ("sidebar" ++ (if model.toggleSidebar then " hidden" else ""))]
+        [ class ("sidebar" ++ (if model.toggleSidebar then "" else " hidden"))]
           [ ul []
             [ li [] [ a [ class "", onClick ToggleSpies ] [ span [ class ("icon " ++ if model.settings.spies then "checked" else "unchecked")] [], text "Show spies"] ]
             , li [] [ a [ class "", onClick ToggleSoundEffects ] [ span [ class ("icon " ++ if model.toggleSoundEffects then "checked" else "unchecked")] [], text "Enable sound effects"] ]
@@ -367,8 +404,16 @@ view model =
             , li [] [ a [ class "", onClick ToggleCustomWords ] [ span [ class ("icon " ++ if model.settings.customWords then "checked" else "unchecked")] [], text "Use custom words"] ]
             ]
           , ul []
-            [ li [] [ a [ class "" ] [ span [ class "icon edit"] [], text "Edit custom wordlist (to do)"] ]
+            [ li [] [ a [ class "", onClick ToggleCustomWordsEntry ] [ span [ class "icon edit"] [], text "Edit custom wordlist (to do)"] ]
             , li [] [ a [ class "", onClick ToggleSidebar ] [ span [ class "icon close"] [], text "Close settings"] ]
+            ]
+          ]
+      , div
+        [ class ("customWordsBar" ++ (if model.toggleCustomWordsEntry then "" else " hidden"))]
+          [ div [ class "textarea_area" ] [ textarea [ placeholder "Enter one word per line", onInput SetCustomWords, value model.customWordsString ] [] ]
+          , div [ class "button_area" ]
+            [ button [ onClick SaveCustomWords ] [ text "Save" ]
+            , button [ onClick CancelCustomWords ] [ text "Cancel" ]
             ]
           ]
       , div [ class "center" ]
