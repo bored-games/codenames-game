@@ -1,7 +1,7 @@
-module Main exposing (Model, Msg(..), init, main, update, view)
+module Spymaster exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (div)
+import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Random exposing (Seed, initialSeed, step)
@@ -11,7 +11,7 @@ import Random.List exposing (shuffle)
 import Random.Extra exposing (bool)
 import Time
 
-import Wordlist exposing (wordlistAdvanced)
+import Wordlist exposing (wordlistBasic, wordlistAdvanced)
 import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
 
@@ -44,7 +44,12 @@ type alias Model =
     , toggleQR : Bool           -- True = show
     , toggleSidebar : Bool      -- True = show
     , toggleSoundEffects : Bool -- True = show
-    , toggleSpies : Bool        -- True = show
+    , settings :
+      { spies: Bool
+      , basicWords: Bool
+      , advancedWords: Bool
+      , customWords: Bool
+      }
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
@@ -65,7 +70,10 @@ init _ =
         False                              -- toggleQR: toggle QR display, true = open
         True                               -- toggleSidebar: toggle sidebar, true = open
         False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
-        True                               -- toggleSpies: toggle spy images, true = open
+        { spies = True
+        , basicWords = True
+        , advancedWords = False
+        , customWords = False }            -- settings
         0                                  -- remainingRed: remaining red cards
         0                                  -- remainingBlue: remaining blue cards
         "PASSWORD"                         -- password: the encoded game board string
@@ -84,6 +92,9 @@ type Msg
     | ToggleSidebar
     | ToggleSoundEffects
     | ToggleSpies
+    | ToggleBasicWords
+    | ToggleAdvancedWords
+    | ToggleCustomWords
     | PassTurn
     | NewGame
     | Tick Time.Posix
@@ -118,8 +129,36 @@ update msg model =
           , Cmd.none)
 
       ToggleSpies ->
-          ( { model | toggleSpies = not model.toggleSpies }
-          , Cmd.none)
+          let
+            oldSettings = model.settings
+            newSettings = { oldSettings | spies = not oldSettings.spies }
+          in
+            ( { model | settings = newSettings }
+            , Cmd.none)
+
+      ToggleBasicWords ->
+          let
+            oldSettings = model.settings
+            newSettings = { oldSettings | basicWords = not oldSettings.basicWords }
+          in
+            ( { model | settings = newSettings }
+            , Cmd.none)
+
+      ToggleAdvancedWords ->
+          let
+            oldSettings = model.settings
+            newSettings = { oldSettings | advancedWords = not oldSettings.advancedWords }
+          in
+            ( { model | settings = newSettings }
+            , Cmd.none)
+
+      ToggleCustomWords ->
+          let
+            oldSettings = model.settings
+            newSettings = { oldSettings | customWords = not oldSettings.customWords }
+          in
+            ( { model | settings = newSettings }
+            , Cmd.none)
 
       PassTurn ->
           ( { model | turn = not model.turn }
@@ -127,7 +166,11 @@ update msg model =
 
       NewGame ->
         let
-            (newWords, seed1) = Random.step (Random.List.shuffle model.allWords) model.seed
+            wordlist = List.append
+                         (List.append (if model.settings.basicWords then wordlistBasic else [])
+                                     (if model.settings.advancedWords then wordlistAdvanced else []))
+                         (if model.settings.customWords then ["not yet"] else [])
+            (newWords, seed1) = Random.step (Random.List.shuffle wordlist) model.seed
             (newTurn, seed2) = Random.step Random.Extra.bool seed1
             (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
             assassinID = Maybe.withDefault 0 (Array.get 0 newIDs)
@@ -138,7 +181,6 @@ update msg model =
             boolList2 = Array.set (51-(2*assassinID)) True (Array.set (50-(2*assassinID)) True boolList1)
             boolList3 = ammendArray blueIDs (ammendArray redIDs boolList2 True False) False True
             myPrime = [True, False, True, False, True, True, False, False, True, True, True, True, False, True, False, False, False, False, True, True, False, False, False, True, True, True, True, False, True, False, False, False, False, True, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, False, True, True]
-         {- myPrime = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False] -}
             bigint1 = listBoolToBigInt <| List.map2 xor myPrime (Array.toList boolList3)
         in
           ( { model | cards = newShuffledCards
@@ -147,6 +189,7 @@ update msg model =
                     , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
                     , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
                     , password = base32Encode bigint1
+                    , allWords = wordlist
                     }
           , Cmd.none)
 
@@ -315,13 +358,13 @@ view model =
       , div
         [ class ("sidebar" ++ (if model.toggleSidebar then " hidden" else ""))]
           [ ul []
-            [ li [] [ a [ class "", onClick ToggleSpies ] [ span [ class ("icon " ++ if model.toggleSpies then "checked" else "unchecked")] [], text "Show spies"] ]
+            [ li [] [ a [ class "", onClick ToggleSpies ] [ span [ class ("icon " ++ if model.settings.spies then "checked" else "unchecked")] [], text "Show spies"] ]
             , li [] [ a [ class "", onClick ToggleSoundEffects ] [ span [ class ("icon " ++ if model.toggleSoundEffects then "checked" else "unchecked")] [], text "Enable sound effects"] ]
             ]
           , ul []
-            [ li [] [ a [ class "" ] [ span [ class "icon checked"] [], text "Use default words"] ]
-            , li [] [ a [ class "" ] [ span [ class "icon checked"] [], text "Use adult words"] ]
-            , li [] [ a [ class "" ] [ span [ class "icon checked"] [], text "Use custom words"] ]
+            [ li [] [ a [ class "", onClick ToggleBasicWords ] [ span [ class ("icon " ++ if model.settings.basicWords then "checked" else "unchecked")] [], text "Use default words"] ]
+            , li [] [ a [ class "", onClick ToggleAdvancedWords ] [ span [ class ("icon " ++ if model.settings.advancedWords then "checked" else "unchecked")] [], text "Use advanced words"] ]
+            , li [] [ a [ class "", onClick ToggleCustomWords ] [ span [ class ("icon " ++ if model.settings.customWords then "checked" else "unchecked")] [], text "Use custom words"] ]
             ]
           , ul []
             [ li [] [ a [ class "" ] [ span [ class "icon edit"] [], text "Edit custom wordlist (to do)"] ]
@@ -329,7 +372,7 @@ view model =
             ]
           ]
       , div [ class "center" ]
-        [ main_ [ class ((if model.turn then "red-turn" else "blue-turn") ++ (if model.toggleSpies then "" else " hide_spies")) ]
+        [ main_ [ class ((if model.turn then "red-turn" else "blue-turn") ++ (if model.settings.spies then "" else " hide_spies")) ]
           (addCards model.cards)
         , div [ class "bottom" ]
             [ div [ class "bottom_left bottom_no_stretch" ]
