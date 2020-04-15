@@ -28,7 +28,8 @@
     // prevent backspace from redirecting browser
     window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+0008'||e.keyIdentifier=='Backspace'||e.keyCode==8){if(e.target==document.body){e.preventDefault();return false;}}},true);
     var app = Elm.Spymaster.init({node:document.getElementById('elm-node')});
-    
+
+
     app.ports.outputPort.subscribe(function (data) {
         data = JSON.parse(data);
         console.log("Message from client:")
@@ -36,7 +37,6 @@
         console.log(data['content']);
 
         if (data["action"] == "new_game") {
-
           var sizepx = Math.round(Math.min(window.innerWidth*.85, window.innerHeight*.85));
           const qrcodeContainer = document.getElementById("qrcode");
           qrcodeContainer.innerHTML = ""; 
@@ -47,10 +47,19 @@
           });
           qrcode.makeCode(data["content"]);
         }
-
     });
+
+    
+		var urlParams = new URLSearchParams(window.location.search);
+		var seed = urlParams.get('s');
+    if (seed != null ) {
+			seed = parseInt(seed);
+    } else {
+      seed = Math.floor(Date.now() / 1000)
+    }
+    
+    app.ports.inputPort.send( {"action": "set_game", "content": seed} );
         
-    // app.ports.inputPort.send( {"action": "connect_to_server", "content": "welcome!"} );
   </script>
 
 </body>

@@ -1,4 +1,4 @@
-port module Spymaster exposing (Model, Msg(..), init, main, update, outputPort, subscriptions, view)
+port module Spymaster exposing (Model, Msg(..), init, main, update, inputPort, outputPort, subscriptions, view)
 
 import Browser
 import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button)
@@ -14,7 +14,8 @@ import Set exposing (fromList, toList)
 import Wordlist exposing (wordlistBasic, wordlistAdvanced, wordlistColors, wordlistHalloween, wordlistDeutsch, wordlistFrancais, wordlistEspanol)
 import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
-import Json.Encode exposing (encode, int, string, object)
+import Json.Encode
+import Json.Decode
 
 -- MAIN
 
@@ -29,6 +30,12 @@ main =
 
 
 -- MODEL
+type alias JSONMessage = 
+  { action : String 
+  , content : Json.Encode.Value
+  }
+
+
 type alias Card =
   { word : String
   , team : Int -- 0 = spectator, -1 = assassin, 1 = red, 2 = blue
@@ -68,35 +75,34 @@ type alias Model =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    update NewGame 
-      (Model
-        (Random.initialSeed 99999999)      -- seed: to do: randomize
-        False                              -- turn: True = red, False = blue
-        0                                  -- currentTimer: to do: enable
-        ""                                 -- debugString
-        False                              -- toggleLightbox: for info, true = open
-        False                              -- toggleQR: toggle QR display, true = open
-        False                              -- toggleSidebar: toggle sidebar, true = open
-        False                              -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
-        False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
-        { spies = True
-        , customWords = True }            -- settings
-        0                                  -- remainingRed: remaining red cards
-        0                                  -- remainingBlue: remaining blue cards
-        ""                                 -- password: the encoded game board string
-        ""                                 -- customWordsString: initial textarea string
-        []                                 -- customWords: initial list
-        [ { key = 0, name = "basic words", include = True, words = wordlistBasic }
-        , { key = 1, name = "advanced words", include = False, words = wordlistAdvanced }
-        , { key = 2, name = "color words", include = False, words = wordlistColors }
-        , { key = 3, name = "Halloween words", include = False, words = wordlistHalloween }
-        , { key = 4, name = "German words", include = False, words = wordlistDeutsch }
-        , { key = 5, name = "French words", include = False, words = wordlistFrancais }
-        , { key = 6, name = "Spanish words", include = False, words = wordlistEspanol }
-        ]
-        []                                 -- allWords: list of all possible card words
-        (List.repeat 25 (Card "" 0 False)) -- cards: list of 25 cards, initially blank
-      )
+    (Model
+      (Random.initialSeed 99999999)      -- seed: to do: randomize
+      False                              -- turn: True = red, False = blue
+      0                                  -- currentTimer: to do: enable
+      ""                                 -- debugString
+      False                              -- toggleLightbox: for info, true = open
+      False                              -- toggleQR: toggle QR display, true = open
+      False                              -- toggleSidebar: toggle sidebar, true = open
+      False                              -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
+      False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
+      { spies = True
+      , customWords = True }            -- settings
+      0                                  -- remainingRed: remaining red cards
+      0                                  -- remainingBlue: remaining blue cards
+      ""                                 -- password: the encoded game board string
+      ""                                 -- customWordsString: initial textarea string
+      []                                 -- customWords: initial list
+      [ { key = 0, name = "basic words", include = True, words = wordlistBasic }
+      , { key = 1, name = "advanced words", include = False, words = wordlistAdvanced }
+      , { key = 2, name = "color words", include = False, words = wordlistColors }
+      , { key = 3, name = "Halloween words", include = False, words = wordlistHalloween }
+      , { key = 4, name = "German words", include = False, words = wordlistDeutsch }
+      , { key = 5, name = "French words", include = False, words = wordlistFrancais }
+      , { key = 6, name = "Spanish words", include = False, words = wordlistEspanol }
+      ]
+      []                                 -- allWords: list of all possible card words
+      (List.repeat 25 (Card "" 0 False)) -- cards: list of 25 cards, initially blank
+    , Cmd.none)
 
 
 -- UPDATE
@@ -118,6 +124,7 @@ type Msg
     | PassTurn
     | NewGame
     | Tick Time.Posix
+    | GetJSON Json.Encode.Value   -- Parse incoming JSON
 
 
 update : Msg -> Model -> ( Model, Cmd Msg)
@@ -231,6 +238,25 @@ update msg model =
 
       Tick _ ->
         ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
+
+      GetJSON json ->
+        case Json.Decode.decodeValue decodeJSON json of
+          Ok {action, content} ->
+            case action of
+              "set_game"   ->
+                case Json.Decode.decodeValue Json.Decode.int content of
+                Ok num ->
+                  update NewGame { model | seed = Random.initialSeed num }
+                _ ->
+                  update NewGame model
+
+              _ ->
+                (Debug.log "Error: unknown code in JSON message" model, Cmd.none ) -- Error: missing code
+
+          Err _ ->
+            ( { model | debugString = "Bad JSON: " ++ Json.Encode.encode 0 json}, Cmd.none )
+
+
 
 maybeToggle : Int -> Wordlist -> Wordlist
 maybeToggle key wordlist =
@@ -360,15 +386,24 @@ drawCard index cards =
       []
 
 
+decodeJSON : Json.Decode.Decoder JSONMessage
+decodeJSON =
+  Json.Decode.map2
+    JSONMessage
+    (Json.Decode.field "action" Json.Decode.string)
+    (Json.Decode.field "content" Json.Decode.value)
+
 -- SUBSCRIPTIONS
 
 
 port outputPort : (String) -> Cmd msg
+port inputPort : (Json.Encode.Value -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
   Sub.batch
     [ Time.every 1000 Tick
+    , inputPort GetJSON
   {-  , Browser.Events.onKeyUp (Json.Decode.map (KeyChanged False) (Json.Decode.field "key" Json.Decode.string))
     , Browser.Events.onKeyDown (Json.Decode.map (KeyChanged True) (Json.Decode.field "key" Json.Decode.string)) -}
     ]

@@ -4394,6 +4394,52 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 });
 
 
+
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
+
+
 // CREATE
 
 var _Regex_never = /.^/;
@@ -4493,52 +4539,6 @@ var _Regex_splitAtMost = F3(function(n, re, str)
 });
 
 var _Regex_infinity = Infinity;
-
-
-
-function _Time_now(millisToPosix)
-{
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(millisToPosix(Date.now())));
-	});
-}
-
-var _Time_setInterval = F2(function(interval, task)
-{
-	return _Scheduler_binding(function(callback)
-	{
-		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
-		return function() { clearInterval(id); };
-	});
-});
-
-function _Time_here()
-{
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(
-			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
-		));
-	});
-}
-
-
-function _Time_getZoneName()
-{
-	return _Scheduler_binding(function(callback)
-	{
-		try
-		{
-			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
-		}
-		catch (e)
-		{
-			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
-		}
-		callback(_Scheduler_succeed(name));
-	});
-}
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5369,7 +5369,6 @@ var $author$project$Spymaster$Model = function (seed) {
 		};
 	};
 };
-var $author$project$Spymaster$NewGame = {$: 'NewGame'};
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
 		return {$: 'Seed', a: a, b: b};
@@ -5389,6 +5388,8 @@ var $elm$random$Random$initialSeed = function (x) {
 	return $elm$random$Random$next(
 		A2($elm$random$Random$Seed, state2, incr));
 };
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -5410,6 +5411,473 @@ var $elm$core$List$repeat = F2(
 	function (n, value) {
 		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
 	});
+var $author$project$Wordlist$wordlistAdvanced = _List_Nil;
+var $author$project$Wordlist$wordlistBasic = _List_fromArray(
+	['hotdog', 'dance', 'cross', 'cotton', 'match', 'france', 'ball', 'bow', 'mercury', 'net', 'spider', 'cat', 'whip', 'stock', 'princess', 'check', 'bed', 'thief', 'park', 'bar', 'czech', 'thumb', 'plastic', 'leprechaun', 'bell', 'triangle', 'light', 'calf', 'straw', 'cloak', 'mexico', 'ship', 'wind', 'lion', 'london', 'fair', 'force', 'phoenix', 'buck', 'ice cream', 'van', 'drill', 'tube', 'link', 'seal', 'fish', 'iron', 'block', 'doctor', 'degree', 'roulette', 'moon', 'angel', 'shot', 'octopus', 'death', 'time', 'queen', 'circle', 'bark', 'figure', 'file', 'back', 'antarctica', 'dwarf', 'nurse', 'lemon', 'cap', 'belt', 'air', 'switch', 'board', 'eye', 'dice', 'kid', 'police', 'rock', 'screen', 'trap', 'drop', 'agent', 'rabbit', 'vet', 'date', 'chocolate', 'bridge', 'beach', 'cold', 'horn', 'bank', 'stick', 'paste', 'bugle', 'ruler', 'rome', 'battery', 'pound', 'spine', 'mount', 'jupiter', 'boulder', 'glove', 'buffalo', 'parachute', 'gas', 'key', 'casino', 'torch', 'pit', 'king', 'revolution', 'palm', 'ice', 'piano', 'code', 'crane', 'grass', 'pool', 'helicopter', 'mug', 'fan', 'saturn', 'canada', 'skyscraper', 'opera', 'nut', 'heart', 'theater', 'turkey', 'route', 'court', 'alps', 'round', 'orange', 'diamond', 'scale', 'well', 'band', 'train', 'poison', 'fighter', 'shop', 'shadow', 'rose', 'arm', 'ground', 'slip', 'duck', 'pirate', 'jet', 'comic', 'soul', 'strike', 'forest', 'capital', 'table', 'litter', 'car', 'grace', 'pumpkin', 'copper', 'egypt', 'suit', 'robin', 'charge', 'cricket', 'card', 'boom', 'platypus', 'missile', 'part', 'bomb', 'plane', 'hawk', 'sub', 'press', 'box', 'shark', 'stream', 'deck', 'hotel', 'cast', 'alien', 'pilot', 'state', 'fly', 'pitch', 'cook', 'moscow', 'tag', 'spot', 'kiwi', 'trip', 'spell', 'star', 'snowman', 'concert', 'web', 'hospital', 'scorpion', 'laser', 'pyramid', 'sock', 'hood', 'mine', 'penguin', 'spring', 'worm', 'india', 'temple', 'whale', 'fall', 'hollywood', 'fire', 'field', 'tower', 'wake', 'needle', 'centaur', 'change', 'bermuda', 'note', 'tablet', 'ring', 'horse', 'microscope', 'mammoth', 'europe', 'kangaroo', 'bottle', 'fence', 'wave', 'head', 'tie', 'olive', 'teacher', 'jack', 'satellite', 'limousine', 'knight', 'contract', 'scuba diver', 'plate', 'mouse', 'pistol', 'engine', 'string', 'knife', 'cell', 'organ', 'pass', 'stadium', 'sueprhero', 'foot', 'horseshoe', 'log', 'ketchup', 'scientist', 'lab', 'slug', 'himalayas', 'dinosaur', 'lawyer', 'australia', 'pie', 'march', 'africa', 'line', 'war', 'row', 'shakespeare', 'night', 'church', 'cover', 'jam', 'green', 'dragon', 'oil', 'new york', 'honey', 'loch ness', 'witch', 'spike', 'cliff', 'compound', 'crown', 'bill', 'cycle', 'berry', 'america', 'boot', 'chick', 'face', 'school', 'wall', 'atlantis', 'water', 'pin', 'lead', 'port', 'tooth', 'lock', 'pan', 'dog', 'post', 'fork', 'novel', 'club', 'aztec', 'yard', 'ambulance', 'ham', 'undertaker', 'flute', 'china', 'nail', 'day', 'model', 'crash', 'film', 'bug', 'smuggler', 'swing', 'sound', 'gold', 'olympus', 'mass', 'staff', 'greece', 'tap', 'shoe', 'pupil', 'hook', 'snow', 'glass', 'hole', 'eagle', 'unicorn', 'amazon', 'lap', 'washer', 'robot', 'pole', 'beijing', 'telescope', 'soldier', 'ivory', 'ghost', 'center', 'berlin', 'server', 'pants', 'vacuum', 'chair', 'washington', 'watch', 'disease', 'play', 'brush', 'bond', 'conductor', 'ray', 'germany', 'pipe', 'sink', 'maple', 'chest', 'dress', 'draft', 'mail', 'carrot', 'bolt', 'giant', 'millionaire', 'tail', 'tokyo', 'button', 'mint', 'england', 'hand', 'paper', 'tick', 'ninja', 'bat', 'marble', 'square', 'mouth', 'mole', 'plot', 'space', 'trunk', 'bear', 'beat', 'genius', 'spy', 'luck', 'life', 'game', 'embassy', 'apple', 'racket']);
+var $author$project$Wordlist$wordlistColors = _List_fromArray(
+	['red', 'orange', 'yellow', 'green', 'blue', 'black', 'white', 'cyan', 'pink', 'purple', 'grey', 'brown', 'magenta', 'tan', 'cyan', 'olive', 'maroon', 'navy', 'aquamarine', 'silver', 'gold', 'turquoise', 'lime', 'teal', 'indigo', 'violet']);
+var $author$project$Wordlist$wordlistDeutsch = _List_fromArray(
+	['Roulette', 'Osten', 'Drache', 'Afrika', 'Krieg', 'Alpen', 'Honig', 'Frankreich', 'Bombe', 'Winnetou', 'Kasino', 'Mexiko', 'Wolkenkratzer', 'Verein', 'Saturn', 'Feder', 'Alien', 'Hamburger', 'Peitsche', 'Berlin', 'Antarktis', 'Adler', 'Schneemann', 'Europa', 'Konzert', 'Loch Ness', 'Schokolade', 'Peking', 'Jet', 'Inka', 'Millionär', 'Becken', 'Dinosaurier', 'Optik', 'Pirat', 'Strasse', 'Hupe', 'Essen', 'Pinguin', 'Siegel', 'Spinne', 'Bart', 'Geschoss', 'Blüte', 'Botschaft', 'Moos', 'Pistole', 'Abgabe', 'Krankheit', 'Bahn', 'Spion', 'Tafel', 'Prinzessin', 'Bart', 'Genie', 'Quartett', 'Dieb', 'Torte', 'Oper', 'Tau', 'Ritter', 'Chemie', 'Stadion', 'Arm', 'Limousine', 'Linse', 'Geist', 'Kippe', 'Laster', 'Melone', 'Lakritze', 'Fuchs', 'Laser', 'Boot', 'Tod', 'Korn', 'Krankenhaus', 'Bande', 'Skelett', 'Mal', 'Oktopus', 'Batterie', 'Hubschrauber', 'Dame', 'Känguru', 'Pflaster', 'Mikroskop', 'Erde', 'Zentaur', 'Messe', 'Superheld', 'Ton', 'Teleskop', 'Römer', 'Fallschirm', 'Stamm', 'Schnabeltier', 'Brand', 'Olymp', 'Schild', 'Satellit', 'Lippe', 'Engel', 'Miene', 'Roboter', 'Kokos', 'Einhorn', 'Läufer', 'Hexe', 'Bund', 'Bergsteiger', 'Elf', 'Taucher', 'Iris', 'Gift', 'Gang', 'Brücke', 'Pfeife', 'Feuer', 'Kiel', 'Tisch', 'Star', 'Wal', 'Leiter', 'Mond', 'Ladung', 'Fisch', 'Bauer', 'Doktor', 'Strudel', 'Kirche', 'Bremse', 'Gürtel', 'Hahn', 'Zitrone', 'Kapele', 'Wind', 'Strauss', 'Löwe', 'Satz', 'Auge', 'Grund', 'Luft', 'Kater', 'Hase', 'Matte', 'Bank', 'Kerze', 'Gras', 'Wirtschaft', 'Auflauf', 'Dichtung', 'Zwerg', 'Gehalt', 'Wald', 'Chor', 'Auto', 'Feige', 'Burg', 'Erika', 'Apfel', 'Mangel', 'Öl', 'Rolle', 'Koch', 'Stock', 'Bär', 'Dietrich', 'Katze', 'Schule', 'Leben', 'Ente', 'Glück', 'Schotten', 'Riese', 'Mark', 'Gesicht', 'Lager', 'Strand', 'Fall', 'Hotel', 'Jura', 'Wasser', 'Niete', 'Papier', 'Geschirr', 'Wurm', 'Knie', 'Anwalt', 'Drossel', 'Forscher', 'Hering', 'Tanz', 'Sekretär', 'Karotte', 'Drucker', 'Ketschup', 'Blinker', 'Nacht', 'Stift', 'Meer', 'Flügel', 'Fuss', 'Schein', 'Maus', 'Funken', 'Messer', 'Bock', 'Theater', 'Po', 'Polizei', 'Atlas', 'Schiff', 'Stempel', 'Pilot', 'Schelle', 'Daumen', 'Leuchte', 'Lehrer', 'Umzug', 'Flasche', 'Finger', 'Tag', 'Riegel', 'König', 'Mast', 'Glas', 'Käfer', 'Königin', 'Bogen', 'Zahn', 'Wanze', 'Hund', 'Scheibe', 'Pferd', 'Schalter', 'Schuh', 'Schimmel', 'Stuhl', 'Demo', 'Krone', 'Bein', 'Eis', 'Börse', 'Gold', 'Takt', 'Gabel', 'Fliege', 'Zeit', 'Jäger', 'Flöte', 'Kunde', 'Fackel', 'Nuss', 'Schnee', 'Schlange', 'Elfenbein', 'Tempo', 'Soldat', 'Bach', 'Pyramide', 'Vorsatz', 'Schnur', 'Gericht', 'Stern', 'Kamm', 'Ring', 'Busch', 'Horn', 'Platte', 'Herz', 'Decke', 'Ball', 'Rücken', 'Kanal', 'Maler', 'Nadel', 'Heide', 'Linie', 'Boxer', 'Korb', 'Reif', 'Blau', 'Ausdruck', 'Taste', 'Zug', 'Schirm', 'Kiefer', 'Spiel', 'Washington', 'Fleck', 'Mini', 'Knopf', 'Gut', 'Mund', 'Kohle', 'Akt', 'Grad', 'Himalaja', 'Brause', 'Bett', 'Viertel', 'Wand', 'Rute', 'Turm', 'Bulle', 'Karte', 'Figur', 'Tor', 'Fest', 'Raute', 'Zoll', 'Kreuz', 'Loge', 'Netz', 'Mutter', 'Punkt', 'Riemen', 'Pass', 'Verband', 'Fläche', 'Hut', 'Loch', 'Watt', 'Glocke', 'Horst', 'Kraft', 'Luxemburg', 'Schloss', 'Birne', 'Maschine', 'Note', 'Welle', 'Film', 'Storm', 'Absatz', 'Haupt', 'Blatt', 'Pol', 'Mandel', 'Mittel', 'Indien', 'Jahr', 'Fessel', 'Leim', 'Schale', 'Seite', 'Aufzug', 'Bau', 'Quelle', 'Kreis', 'Harz', 'Bindung', 'Wurf', 'Uhr', 'Golf', 'New', 'York', 'Rost', 'Australien', 'Rost', 'Bayern', 'Nagel', 'Tokio', 'Toast', 'Ägypten', 'Zylinder', 'London', 'Muschel', 'Morgenstern', 'Würfel', 'Moskau', 'Weide', 'China', 'Kapitän', 'Shakespeare', 'Lösung', 'Hollywood', 'Rasen', 'Griechenland', 'Rock', 'Rom', 'Krebs', 'Hand', 'Flur', 'Ninja', 'Steuer', 'Brötchen', 'Zelle', 'Kiwi', 'Barren', 'Deutschland', 'Löffel', 'Staat', 'Futter', 'Amerikaner', 'Schuppen', 'Atlantis', 'Orange', 'England', 'Pension']);
+var $author$project$Wordlist$wordlistEspanol = _List_fromArray(
+	['Hollywood', 'Pantalla', 'Juego', 'Canica', 'Dinosaurio', 'Gato', 'Tono', 'Lazo', 'Grecia', 'Cubierta', 'Pico', 'Centro', 'Vacío', 'Unicornio', 'Enterrador', 'Calcetín', 'Lago Ness', 'Caballo', 'Berlin', 'Ornitorrinco', 'Puerto', 'Cofre', 'Caja', 'Compuesto', 'Nave', 'Reloj', 'Espacio', 'Flauta', 'Torre', 'Muerte', 'Pozo', 'Justo', 'Diente', 'Staff', 'Cuenta', 'Disparo', 'Rey', 'Sartén', 'Cuadrado', 'Búfalo', 'Científico', 'Pollo', 'Atlantis', 'Espía', 'Correo', 'Nuez', 'Registro', 'Pirata', 'Cara', 'Pegar', 'Enfermedad', 'Patio', 'Montar', 'Babosa', 'Dados', 'Plomo', 'Gancho', 'Zanahoria', 'Veneno', 'Acción', 'Pie', 'Antorcha', 'Brazo', 'Figura', 'Mina', 'Traje', 'Grúa', 'Beijing', 'Masa', 'Microscopio', 'Motor', 'China', 'Paja', 'Pantalón', 'Europa', 'Bota', 'Princesa', 'Liga', 'Suerte', 'Aceituna', 'Palma', 'Maestro', 'Pulgar', 'Pulpo', 'Capucha', 'Empate', 'Doctor', 'Despertar', 'Grillo', 'Millonario', 'Nueva York', 'Estado', 'Bermudas', 'Parque', 'Pavo', 'Chocolate', 'Viaje', 'Raqueta', 'Bate', 'Chorro', 'Shakespearei', 'Tornillo', 'Interruptor', 'Pared', 'Alma', 'Fantasma', 'Tiempo', 'Danza', 'Amazonas', 'Gracia', 'Moscú', 'Calabaza', 'Antártida', 'Látigo', 'Corazón', 'Mesa', 'Bola', 'Luchador', 'Frío', 'Día', 'Primavera', 'Encuentro', 'Diamante', 'Centauro', 'Marzo', 'Ruleta', 'Perro', 'Cruz', 'Onda', 'Pato', 'Viento', 'Lugar', 'Rascacielos', 'Papel', 'Manzana', 'Aceite', 'Cocinar', 'Volar', 'Reparto', 'Oso', 'Broche', 'Ladrón', 'Trompa', 'América', 'Novela', 'Célula', 'Arco', 'Modelo', 'Cuchillo', 'Caballero', 'Corte', 'Hierro', 'Ballena', 'Sombra', 'Contrato', 'Mercurio', 'Conductor', 'Sello', 'Carro', 'Anillo', 'Niño', 'Piano', 'Láser', 'Sonido', 'Polo', 'Superhéroe', 'Revolución', 'Hoyo', 'Gas', 'Vidrio', 'Washington', 'Corteza', 'Nieve', 'Marfil', 'Pipa', 'Tapa', 'Grado', 'Tokio', 'Iglesia', 'Pay', 'Tubo', 'Bloque', 'Cómico', 'Pez', 'Puente', 'Luna', 'Parte', 'Azteca', 'Contrabandista', 'Tren', 'Embajada', 'Pupila', 'Buzo', 'Hielo', 'Trampa', 'Código', 'Zapato', 'Servidor', 'Club', 'Fila', 'Pirámide', 'Insecto', 'Pingüino', 'Libra', 'Himalaya', 'Checa', 'Roma', 'Ojo', 'Tablero', 'Cama', 'Punto', 'Francia', 'Mamut', 'Algodón', 'Robin', 'Red', 'Corneta', 'Maple', 'Inglaterra', 'Campo', 'Robot', 'Trama', 'África', 'Etiqueta', 'Boca', 'Kiwi', 'Lunar', 'Escuela', 'Hundir', 'Pistola', 'Ópera', 'Menta', 'Raíz', 'Submarino', 'Corona', 'Lomo', 'Avión', 'México', 'Capa', 'Círculo', 'Pastilla', 'Australia', 'Verde', 'Egipto', 'Línea', 'Abogado', 'Bruja', 'Paracaídas', 'Choque', 'Oro', 'Nota', 'León', 'Plástico', 'Telaraña', 'Ambulancia', 'Hospital', 'Hechizo', 'Seguro', 'Agua', 'Londres', 'Casino', 'Ciclo', 'Bar', 'Acantilado', 'Redondo', 'Bmba', 'Gigante', 'Mano', 'ninja', 'Rosa', 'Resbalar', 'Limosina', 'Pase', 'Teatro', 'Plato', 'Satélite', 'Catsup', 'Hotel', 'Cola', 'Garrapata', 'Suelo', 'Policía', 'Enano', 'Ventilador', 'Vestido', 'Saturno', 'Pasto', 'Cepillo', 'Silla', 'Roca', 'Piloto', 'Telescopio', 'Archivo', 'Laboratorio', 'India', 'Regla', 'Clavo', 'Columpio', 'Olimpia', 'Cambio', 'Frcha', 'Corriente', 'Misil', 'Escala', 'Banda', 'Ángel', 'Prensa', 'Baya', 'Carta', 'Comprobar', 'Borrador', 'Cabeza', 'Regazo', 'Naranja', 'Helado', 'Película', 'Lavadora', 'Piscina', 'Tiburón', 'Camioneta', 'Cuerda', 'Ternera', 'Halcón', 'Águila', 'Aguja', 'Bosque', 'Dragón', 'Clave', 'Cinturón', 'Gorra', 'Taladro', 'Guante', 'Pasta', 'Otoño', 'Fuego', 'Araña', 'Espina', 'Soldado', 'Cuerno', 'Reina', 'Jamón', 'Litro', 'Vida', 'Templo', 'Conejo', 'Botón', 'Juego', 'Estrella', 'Júpiter', 'Veterinaria', 'Nioche', 'aire', 'Batería', 'Genio', 'Tienda', 'Botella', 'Estadio', 'Alien', 'Luz', 'Triángulo', 'Limón', 'Enfermera', 'Gota', 'Pista', 'Banco', 'Alemania', 'Lombriz', 'Rayo', 'Capital', 'Paro', 'Guerra', 'Concierto', 'Miel', 'Canadá', 'Ciervo', 'Mono de Nieve', 'Vencer', 'Atasco', 'Cobre', 'Playa', 'Campana', 'Duende', 'Fénix', 'Fuerza', 'Explosión', 'Tenedor', 'Alpes', 'Poste', 'Cerca', 'Canguro', 'Ratón', 'Taza', 'Herradura', 'Escorpión', 'Agente', 'Helicóptero', 'Agujero', 'Órgano', 'Gato', 'Carga']);
+var $author$project$Wordlist$wordlistFrancais = _List_fromArray(
+	['Accident', 'Achat', 'Acné', 'Action', 'Adolescent', 'Afrique', 'Aiguille', 'Allumer', 'Alpes', 'Alphabet', 'Altitude', 'Amérique', 'Ami', 'Amour', 'Ampoule', 'Anniversaire', 'Appétit', 'Araignée', 'Arbre', 'Arc', 'Arc-en-ciel', 'Argent', 'Arme', 'Armée', 'Ascenseur', 'Asie', 'Assis', 'Astronaute', 'Atchoum', 'Athlète', 'Atlantide', 'Aube', 'Australie', 'Avec', 'Aventure', 'Avion', 'Avocat', 'Bac', 'Baguette', 'Bain', 'Baiser', 'Balai', 'Balle', 'Ballon', 'Bambou', 'Banane', 'Bannir', 'Barbe', 'Barrière', 'Bas', 'Basket', 'Bateau', 'Bâton', 'Batterie', 'Bébé', 'Beethoven', 'Bête', 'Biberon', 'Bière', 'Blanc', 'blé', 'Bleu', 'Bob', 'Boisson', 'Boîte', 'Bombe', 'Bonbon', 'Bonnet', 'Bord', 'Bordeaux', 'Botte', 'Boue', 'Bougie', 'Boule', 'Bouteille', 'Bouton', 'Branche', 'Bras', 'Bravo', 'Bretagne', 'Brise', 'Brosse', 'Bruit', 'Brume', 'Brun', 'Bûche', 'Bulle', 'Bureau', 'But', 'Cabane', 'Cabine', 'Cacher', 'Cadeau', 'Cafard', 'Café', 'Caisse', 'Calculer', 'Calme', 'Caméra', 'Camion', 'Camping', 'Canada', 'Canard', 'Canette', 'Canine', 'Cap', 'Capitalisme', 'Car', 'Carotte', 'Carré', 'Carte', 'Carton', 'Casque', 'Casser', 'Cassette', 'Cauchemar', 'Cause', 'Ceinture', 'Cellule', 'Cercle', 'Chaîne', 'Chair', 'Chaise', 'Champ', 'Champion', 'Chant', 'Chapeau', 'Charbon', 'Charge', 'Chasse', 'Chat', 'Château', 'Chaud', 'Chaussure', 'Chauve', 'Chef', 'Chemise', 'Chêne', 'Cher', 'Cheval', 'Chevalier', 'Cheveu', 'Chien', 'Chiffre', 'Chine', 'Chocolat', 'Chômage', 'Ciel', 'Cil', 'Cinéma', 'Cire', 'Cirque', 'Citron', 'Clé', 'Clou', 'Clown', 'Coach', 'Coccinelle', 'Code', 'Cœur', 'Col', 'Colle', 'Colline', 'Colonne', 'Cône', 'Confort', 'Continu', 'Contre', 'Conversation', 'Copain', 'Coq', 'Coquillage', 'Corbeau', 'Corde', 'Corps', 'Côte', 'Coude', 'Couloir', 'Coup', 'Cour', 'Courant', 'Courrier', 'Cours', 'Course', 'Court', 'Couteau', 'Couvert', 'Couverture', 'Cowboy', 'Crac', 'Crayon', 'Crème', 'Critique', 'Crochet', 'Croix', 'Croûte', 'Cuillère', 'Cuir', 'Cuisine', 'Culotte', 'Cycle', 'Dard', 'Dé', 'Debout', 'Défaut', 'Dehors', 'Démocratie', 'Dent', 'Dentiste', 'Dessin', 'Devoir', 'Diamant', 'Dictionnaire', 'Dieu', 'Dinosaure', 'Discours', 'Disque', 'Dix', 'Docteur', 'Doigt', 'Domino', 'Dormir', 'Droit', 'Eau', 'Échec', 'Échelle', 'Éclair', 'École', 'Écran', 'Écraser', 'Écrit', 'Église', 'Égout', 'Électricité', 'Éléphant', 'Élève', 'Elfe', 'Empreinte', 'Enceinte', 'Épice', 'Épine', 'Erreur', 'Espace', 'Espion', 'Essence', 'État', 'Été', 'Étoile', 'Étranger', 'Éventail', 'Évolution', 'Explosoin', 'Extension', 'Face', 'Fan', 'Farce', 'Fatigue', 'Fauteuil', 'Fayot', 'Fenêtre', 'Fer', 'Fête', 'Feu', 'Feuille', 'Fidèle', 'Fil', 'Fille', 'Flamme', 'Flèche', 'Fleur', 'Fleuve', 'Fond', 'Football', 'Forêt', 'Forger', 'Foudre', 'Fouet', 'Four', 'Fourmi', 'Froid', 'Fromage', 'Front', 'Fruit', 'Fuir', 'Futur', 'Garçon', 'Gâteau', 'Gauche', 'Gaz', 'Gazon', 'Gel', 'Genou', 'Glace', 'Gomme', 'Gorge', 'Goutte', 'Grand', 'Grèce', 'Grenouille', 'Grippe', 'Gris', 'Gros', 'Groupe', 'Guitare', 'Hasard', 'Haut', 'Hélicoptère', 'Herbe', 'Heureux', 'Histoire', 'Hiver', 'Hôtel', 'Hugo', 'Huile', 'Humide', 'Humour', 'Indice', 'Internet', 'Inviter', 'Italie', 'Jacques', 'Jambe', 'Jambon', 'Jardin', 'Jaune', 'Jean', 'Jeanne', 'Jet', 'Jeu', 'Jogging', 'Jour', 'Journal', 'Jupiter', 'Kilo', 'Kiwi', 'Laine', 'Lait', 'Langue', 'Lapin', 'Latin', 'Laver', 'Lecteur', 'Léger', 'Lent', 'Lettre', 'Lien', 'Ligne', 'Linge', 'Lion', 'Lit', 'Livre', 'Loi', 'Long', 'Louis', 'Loup', 'Lumière', 'Lundi', 'Lune', 'Lunette', 'Machine', 'Macho', 'main', 'Maison', 'Maîtresse', 'Mal', 'Maladie', 'Maman', 'Mammouth', 'Manger', 'Marais', 'Marc', 'Marche', 'Mariage', 'Marie', 'Mariée', 'Marque', 'Marseille', 'Masse', 'Mer', 'Messe', 'Mètre', 'Métro', 'Miaou', 'Micro', 'Mieux', 'Mille', 'Mine', 'Miroir', 'Moderne', 'Moitié', 'Monde', 'Monstre', 'Montagne', 'Montre', 'Mort', 'Moteur', 'Moto', 'Mou', 'Mouche', 'Moulin', 'Moustache', 'Mouton', 'Mur', 'Muscle', 'Musique', 'Mystère', 'Nage', 'Nature', 'Neige', 'Neutre', 'New York', 'Nez', 'Nid', 'Ninja', 'Niveau', 'Noël', 'Nœud', 'Noir', 'Nous', 'Nuage', 'Nuit', 'Numéro', 'Œil', 'Œuf', 'Oiseau', 'Olympique', 'Ombre', 'Ongle', 'Or', 'Oral', 'Orange', 'Ordinateur', 'Ordre', 'Ordure', 'Oreille', 'Organe', 'Orgueil', 'Ours', 'Outil', 'Ouvert', 'Ovale', 'Pain', 'Palais', 'Panneau', 'Pantalon', 'Pantin', 'Papa', 'Papier', 'Papillon', 'Paradis', 'Parc', 'Paris', 'Parole', 'Partie', 'Passe', 'Pâte', 'Patin', 'Patte', 'Paul', 'Payer', 'Pêche', 'Peinture', 'Pendule', 'Penser', 'Personne', 'Petit', 'Peur', 'Philosophe', 'Photo', 'Phrase', 'Piano', 'Pièce', 'Pied', 'Pierre', 'Pile', 'Pilote', 'Pince', 'Pioche', 'Pion', 'Pirate', 'Pire', 'Piscine', 'Place', 'Plafond', 'Plage', 'Plaie', 'Plan', 'Planche', 'Planète', 'Plante', 'Plastique', 'Plat', 'Plat', 'Plomb', 'Plonger', 'Pluie', 'Poche', 'Poète', 'Poids', 'Poing', 'Point', 'Poivre', 'Police', 'Politique', 'Pollen', 'Polo', 'Pomme', 'Pompe', 'Pont', 'Population', 'Port', 'Porte', 'Portefeuille', 'Positif', 'Poste', 'Poubelle', 'Poule', 'Poupée', 'Pousser', 'Poussière', 'Pouvoir', 'Préhistoire', 'Premier', 'Présent', 'Presse', 'Prier', 'Princesse', 'Prise', 'Privé', 'Professeur', 'Psychologie', 'Public', 'Pull', 'Punk', 'Puzzle', 'Pyjama', 'Quatre', 'Quinze', 'Race', 'Radio', 'Raisin', 'Rap', 'Rayé', 'Rayon', 'Réfléchir', 'Reine', 'Repas', 'Reptile', 'Requin', 'Rêve', 'Riche', 'Rideau', 'Rien', 'Rire', 'Robinet', 'Roche', 'Roi', 'Rond', 'Rose', 'Roue', 'Rouge', 'Rouille', 'Roux', 'Russie', 'Sable', 'Sabre', 'Sac', 'Sain', 'Saison', 'Sale', 'Salle', 'Salut', 'Samu', 'Sandwich', 'Sang', 'Sapin', 'Satellite', 'Saumon', 'Saut', 'Savoir', 'Schtroumpf', 'Science', 'Scout', 'Sec', 'Seine', 'Sel', 'Sept', 'Serpent', 'Serrer', 'Sexe', 'Shampooing', 'Siècle', 'Siège', 'Sieste', 'Silhouette', 'Sirène', 'Ski', 'Soleil', 'Sommeil', 'Son', 'Sonner', 'Sorcière', 'Sourd', 'Souris', 'Sport', 'Star', 'Station', 'Stylo', 'Sur', 'Surface', 'Sushi', 'Swing', 'Tableau', 'Tache', 'Taille', 'Tante', 'Tapis', 'Tard', 'Taxi', 'Téléphone', 'Télévision', 'Temple', 'Temps', 'Tennis', 'Tête', 'Thé', 'Tigre', 'Tintin', 'Tissu', 'Titre', 'Titre', 'Toast', 'Toilette', 'Tokyo', 'Tombe', 'Ton', 'Top', 'Touche', 'Toujours', 'Tour', 'Tournoi', 'Tout', 'Trace', 'Train', 'Traîner', 'Transport', 'Travail', 'Trésor', 'Triangle', 'Triste', 'Trône', 'Troupeau', 'Tsar', 'Tube', 'Tuer', 'Tuer', 'Tupperware', 'Tuyau', 'Twitter', 'Type', 'Université', 'Vache', 'Vache', 'Vague', 'Vaisselle', 'Valeur', 'Ver', 'Verdict', 'Verre', 'Vers', 'Vert', 'Veste', 'Viande', 'Vide', 'Vie', 'Vieux', 'Ville', 'Vin', 'Vingt', 'Violon', 'Vipère', 'Vision', 'Vite', 'Vive', 'Vœu', 'Voile', 'Voisin', 'Voiture', 'Vol', 'Volume', 'Vote', 'Vouloir', 'Voyage', 'Zen', 'Zéro', 'Zodiaque', 'Zone', 'Zoo']);
+var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
+	['abnormal', 'abominable', 'afraid', 'afterlife', 'agony ', 'alarming', 'alien', 'angel', 'apparition', 'autumn', 'axe ', 'banshee', 'basilisk', 'bat', 'beast', 'behemoth', 'black', 'blood ', 'bogeyman', 'bones', 'boo', 'broom', 'bury', 'cadaver', 'candy', 'carve', 'casket', 'cat', 'cauldron', 'cemetery', 'Cerberus', 'changeling', 'chill', 'cider', 'claws', 'clown', 'coffin', 'cold ', 'convulse ', 'corpse', 'costume', 'creak ', 'creepy', 'crone', 'crypt', 'dark', 'dead', 'demon ', 'devil ', 'dire', 'disease', 'disguise', 'disturbed ', 'donuts', 'Dracula', 'dragon', 'dread ', 'drown ', 'ecto-plasm', 'eerie', 'evil', 'eye', 'fangs', 'fatal ', 'fear ', 'fiend', 'fog', 'Frankenstein', 'freak', 'fright', 'gargoyle', 'ghastly', 'ghost ', 'ghoul', 'goblin', 'goo', 'gore ', 'grave', 'gruesome', 'Halloween', 'haunted', 'hayride', 'heart', 'Hell ', 'helpless', 'horror', 'howl', 'insane', 'jack-o\'-lantern', 'kill ', 'leaves', 'macabre', 'magic', 'mask', 'mausoleum', 'menace ', 'midnight', 'monster ', 'moon ', 'morbid', 'mummy', 'murder', 'mutant', 'mystery', 'mystical', 'night', 'occult', 'October', 'ogre', 'ominous', 'orange', 'owl', 'pagan', 'pain ', 'paranormal', 'party', 'phantasm', 'phantom', 'poltergeist', 'potion', 'pumpkin', 'putrid ', 'raven', 'reaper', 'rotten ', 'scare', 'scream ', 'shadow', 'shiver', 'silence', 'sinister ', 'skeleton ', 'skull', 'slime', 'specter', 'spell', 'spider', 'spirit', 'spooky', 'stab', 'stalk ', 'strange', 'strangle', 'suicide ', 'supernatural', 'superstition', 'sweets', 'tarantula', 'tense ', 'terrify ', 'thrill', 'tomb', 'torture ', 'treat', 'tremble', 'trick', 'troll', 'undead', 'unearth', 'vampire', 'villain', 'wand', 'warlock', 'web', 'weird', 'werewolf', 'wicked', 'witch', 'wizard', 'wraith', 'zombie ']);
+var $author$project$Spymaster$init = function (_v0) {
+	return _Utils_Tuple2(
+		$author$project$Spymaster$Model(
+			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(false)(false)(
+			{customWords: true, spies: true})(0)(0)('')('')(_List_Nil)(
+			_List_fromArray(
+				[
+					{include: true, key: 0, name: 'basic words', words: $author$project$Wordlist$wordlistBasic},
+					{include: false, key: 1, name: 'advanced words', words: $author$project$Wordlist$wordlistAdvanced},
+					{include: false, key: 2, name: 'color words', words: $author$project$Wordlist$wordlistColors},
+					{include: false, key: 3, name: 'Halloween words', words: $author$project$Wordlist$wordlistHalloween},
+					{include: false, key: 4, name: 'German words', words: $author$project$Wordlist$wordlistDeutsch},
+					{include: false, key: 5, name: 'French words', words: $author$project$Wordlist$wordlistFrancais},
+					{include: false, key: 6, name: 'Spanish words', words: $author$project$Wordlist$wordlistEspanol}
+				]))(_List_Nil)(
+			A2(
+				$elm$core$List$repeat,
+				25,
+				A3($author$project$Spymaster$Card, '', 0, false))),
+		$elm$core$Platform$Cmd$none);
+};
+var $author$project$Spymaster$GetJSON = function (a) {
+	return {$: 'GetJSON', a: a};
+};
+var $author$project$Spymaster$Tick = function (a) {
+	return {$: 'Tick', a: a};
+};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 'Every', a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {processes: processes, taggers: taggers};
+	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 'Nothing') {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$setInterval = _Time_setInterval;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return $elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = $elm$core$Process$spawn(
+				A2(
+					$elm$time$Time$setInterval,
+					interval,
+					A2($elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					$elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3($elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var $elm$time$Time$onEffects = F3(
+	function (router, subs, _v0) {
+		var processes = _v0.processes;
+		var rightStep = F3(
+			function (_v6, id, _v7) {
+				var spawns = _v7.a;
+				var existing = _v7.b;
+				var kills = _v7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						$elm$core$Task$andThen,
+						function (_v5) {
+							return kills;
+						},
+						$elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _v4) {
+				var spawns = _v4.a;
+				var existing = _v4.b;
+				var kills = _v4.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _v3) {
+				var spawns = _v3.a;
+				var existing = _v3.b;
+				var kills = _v3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3($elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _v1 = A6(
+			$elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				$elm$core$Dict$empty,
+				$elm$core$Task$succeed(_Utils_Tuple0)));
+		var spawnList = _v1.a;
+		var existingDict = _v1.b;
+		var killTask = _v1.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (newProcesses) {
+				return $elm$core$Task$succeed(
+					A2($elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
+		if (_v0.$ === 'Nothing') {
+			return $elm$core$Task$succeed(state);
+		} else {
+			var taggers = _v0.a;
+			var tellTaggers = function (time) {
+				return $elm$core$Task$sequence(
+					A2(
+						$elm$core$List$map,
+						function (tagger) {
+							return A2(
+								$elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$succeed(state);
+				},
+				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$time$Time$subMap = F2(
+	function (f, _v0) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		return A2(
+			$elm$time$Time$Every,
+			interval,
+			A2($elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
+var $elm$time$Time$subscription = _Platform_leaf('Time');
+var $elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return $elm$time$Time$subscription(
+			A2($elm$time$Time$Every, interval, tagger));
+	});
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $author$project$Spymaster$inputPort = _Platform_incomingPort('inputPort', $elm$json$Json$Decode$value);
+var $author$project$Spymaster$subscriptions = function (_v0) {
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				A2($elm$time$Time$every, 1000, $author$project$Spymaster$Tick),
+				$author$project$Spymaster$inputPort($author$project$Spymaster$GetJSON)
+			]));
+};
+var $author$project$Spymaster$NewGame = {$: 'NewGame'};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
@@ -5764,7 +6232,6 @@ var $cmditch$elm_bigint$BigInt$add = F2(
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var $elm$core$Basics$compare = _Utils_compare;
 var $cmditch$elm_bigint$BigInt$signFromInt = function (x) {
 	var _v0 = A2($elm$core$Basics$compare, x, 0);
 	switch (_v0.$) {
@@ -6188,11 +6655,6 @@ var $elm$core$Array$get = F2(
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6450,6 +6912,18 @@ var $elm$core$List$concatMap = F2(
 		return $elm$core$List$concat(
 			A2($elm$core$List$map, f, list));
 	});
+var $author$project$Spymaster$JSONMessage = F2(
+	function (action, content) {
+		return {action: action, content: content};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Spymaster$decodeJSON = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Spymaster$JSONMessage,
+	A2($elm$json$Json$Decode$field, 'action', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'content', $elm$json$Json$Decode$value));
+var $elm$json$Json$Decode$decodeValue = _Json_run;
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6464,117 +6938,7 @@ var $elm$core$List$filter = F2(
 var $elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
 };
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
-var $elm$core$Dict$Black = {$: 'Black'};
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = {$: 'Red'};
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
 var $elm$core$Set$insert = F2(
 	function (key, _v0) {
 		var dict = _v0.a;
@@ -6598,6 +6962,7 @@ var $author$project$Spymaster$hiddenRed = function (c) {
 		return $.team;
 	}(c) === 1);
 };
+var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$Spymaster$isNotEmpty = function (str) {
 	return !$elm$core$String$isEmpty(str);
 };
@@ -7250,14 +7615,13 @@ var $author$project$Spymaster$listBoolToBigInt = function (digits) {
 		return $cmditch$elm_bigint$BigInt$fromInt(0);
 	}
 };
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Spymaster$maybeToggle = F2(
 	function (key, wordlist) {
 		return _Utils_eq(key, wordlist.key) ? _Utils_update(
 			wordlist,
 			{include: !wordlist.include}) : wordlist;
 	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -7373,37 +7737,6 @@ var $elm$random$Random$list = F2(
 			function (seed) {
 				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
 			});
-	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
 	});
 var $owanturist$elm_union_find$UnionFind$findFast = F2(
 	function (id, dict) {
@@ -7760,543 +8093,272 @@ var $author$project$Spymaster$uncover = F3(
 var $elm$core$Basics$xor = _Basics_xor;
 var $author$project$Spymaster$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'UncoverCard':
-				var index = msg.a;
-				var newCards = A3($author$project$Spymaster$uncover, 0, index, model.cards);
-				var redRemaining = $elm$core$List$length(
-					A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newCards));
-				var blueRemaining = $elm$core$List$length(
-					A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newCards));
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{blueRemaining: blueRemaining, cards: newCards, redRemaining: redRemaining}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleLightbox':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{toggleLightbox: !model.toggleLightbox}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleQR':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{toggleQR: !model.toggleQR}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleSidebar':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{toggleSidebar: !model.toggleSidebar}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleCustomWordsEntry':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{toggleCustomWordsEntry: !model.toggleCustomWordsEntry}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleSoundEffects':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{toggleSoundEffects: !model.toggleSoundEffects}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleSpies':
-				var oldSettings = model.settings;
-				var newSettings = _Utils_update(
-					oldSettings,
-					{spies: !oldSettings.spies});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{settings: newSettings}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleWordlist':
-				var key = msg.a;
-				var wordlists = A2(
-					$elm$core$List$map,
-					$author$project$Spymaster$maybeToggle(key),
-					model.wordlists);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{wordlists: wordlists}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleCustomWords':
-				var oldSettings = model.settings;
-				var newSettings = _Utils_update(
-					oldSettings,
-					{customWords: !oldSettings.customWords});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{settings: newSettings}),
-					$elm$core$Platform$Cmd$none);
-			case 'SetCustomWords':
-				var str = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{customWordsString: str}),
-					$elm$core$Platform$Cmd$none);
-			case 'SaveCustomWords':
-				var customWords = $elm$core$Set$toList(
-					$elm$core$Set$fromList(
-						A2(
-							$elm$core$List$filter,
-							$author$project$Spymaster$isNotEmpty,
-							A2(
-								$elm$core$List$map,
-								$elm$core$String$trim,
-								A2($elm$core$String$split, '\n', model.customWordsString)))));
-				var customWordsString = A2($elm$core$String$join, '\n', customWords);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{customWords: customWords, customWordsString: customWordsString, toggleCustomWordsEntry: false}),
-					$elm$core$Platform$Cmd$none);
-			case 'CancelCustomWords':
-				var customWordsString = A2($elm$core$String$join, '\n', model.customWords);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{customWordsString: customWordsString, toggleCustomWordsEntry: false}),
-					$elm$core$Platform$Cmd$none);
-			case 'PassTurn':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{turn: !model.turn}),
-					$elm$core$Platform$Cmd$none);
-			case 'NewGame':
-				var wordlist = A2(
-					$elm$core$List$append,
-					A2(
-						$elm$core$List$concatMap,
-						function ($) {
-							return $.words;
-						},
-						A2(
-							$elm$core$List$filter,
-							function ($) {
-								return $.include;
-							},
-							model.wordlists)),
-					model.settings.customWords ? model.customWords : _List_Nil);
-				var myPrime = _List_fromArray(
-					[true, false, true, false, true, true, false, false, true, true, true, true, false, true, false, false, false, false, true, true, false, false, false, true, true, true, true, false, true, false, false, false, false, true, false, true, true, false, false, false, false, true, false, false, false, false, true, false, true, false, true, true]);
-				var _v1 = A2(
-					$elm$random$Random$step,
-					$elm_community$random_extra$Random$List$shuffle(wordlist),
-					model.seed);
-				var newWords = _v1.a;
-				var seed1 = _v1.b;
-				var _v2 = A2($elm$random$Random$step, $elm_community$random_extra$Random$Extra$bool, seed1);
-				var newTurn = _v2.a;
-				var seed2 = _v2.b;
-				var boolList1 = A3(
-					$elm$core$Array$set,
-					0,
-					newTurn,
-					A2($elm$core$Array$repeat, 53, false));
-				var _v3 = A2(
-					$elm$random$Random$step,
-					$elm_community$random_extra$Random$Array$shuffle(
-						$elm$core$Array$fromList(
-							A2($elm$core$List$range, 0, 24))),
-					seed2);
-				var newIDs = _v3.a;
-				var seed3 = _v3.b;
-				var assassinID = A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					A2($elm$core$Array$get, 0, newIDs));
-				var boolList2 = A3(
-					$elm$core$Array$set,
-					51 - (2 * assassinID),
-					true,
-					A3($elm$core$Array$set, 50 - (2 * assassinID), true, boolList1));
-				var blueIDs = $elm$core$Array$toList(
-					A3(
-						$elm$core$Array$slice,
-						newTurn ? 10 : 9,
-						18,
-						newIDs));
-				var redIDs = $elm$core$Array$toList(
-					A3(
-						$elm$core$Array$slice,
-						1,
-						newTurn ? 10 : 9,
-						newIDs));
-				var boolList3 = A4(
-					$author$project$Spymaster$ammendArray,
-					blueIDs,
-					A4($author$project$Spymaster$ammendArray, redIDs, boolList2, true, false),
-					false,
-					true);
-				var bigint1 = $author$project$Spymaster$listBoolToBigInt(
-					A3(
-						$elm$core$List$map2,
-						$elm$core$Basics$xor,
-						myPrime,
-						$elm$core$Array$toList(boolList3)));
-				var newPassword = $author$project$Spymaster$base32Encode(bigint1);
-				var newShuffledCards = A2(
-					$elm$core$List$indexedMap,
-					A3($author$project$Spymaster$colorCards, assassinID, redIDs, blueIDs),
-					A2($author$project$Spymaster$populateCards, model.cards, newWords));
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							allWords: wordlist,
-							blueRemaining: $elm$core$List$length(
-								A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newShuffledCards)),
-							cards: newShuffledCards,
-							password: newPassword,
-							redRemaining: $elm$core$List$length(
-								A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newShuffledCards)),
-							seed: seed3,
-							turn: newTurn
-						}),
-					$author$project$Spymaster$outputPort(
-						A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'action',
-										$elm$json$Json$Encode$string('new_game')),
-										_Utils_Tuple2(
-										'content',
-										$elm$json$Json$Encode$string(newPassword))
-									])))));
-			default:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{currentTimer: model.currentTimer + 1}),
-					$elm$core$Platform$Cmd$none);
-		}
-	});
-var $author$project$Wordlist$wordlistAdvanced = _List_Nil;
-var $author$project$Wordlist$wordlistBasic = _List_fromArray(
-	['hotdog', 'dance', 'cross', 'cotton', 'match', 'france', 'ball', 'bow', 'mercury', 'net', 'spider', 'cat', 'whip', 'stock', 'princess', 'check', 'bed', 'thief', 'park', 'bar', 'czech', 'thumb', 'plastic', 'leprechaun', 'bell', 'triangle', 'light', 'calf', 'straw', 'cloak', 'mexico', 'ship', 'wind', 'lion', 'london', 'fair', 'force', 'phoenix', 'buck', 'ice cream', 'van', 'drill', 'tube', 'link', 'seal', 'fish', 'iron', 'block', 'doctor', 'degree', 'roulette', 'moon', 'angel', 'shot', 'octopus', 'death', 'time', 'queen', 'circle', 'bark', 'figure', 'file', 'back', 'antarctica', 'dwarf', 'nurse', 'lemon', 'cap', 'belt', 'air', 'switch', 'board', 'eye', 'dice', 'kid', 'police', 'rock', 'screen', 'trap', 'drop', 'agent', 'rabbit', 'vet', 'date', 'chocolate', 'bridge', 'beach', 'cold', 'horn', 'bank', 'stick', 'paste', 'bugle', 'ruler', 'rome', 'battery', 'pound', 'spine', 'mount', 'jupiter', 'boulder', 'glove', 'buffalo', 'parachute', 'gas', 'key', 'casino', 'torch', 'pit', 'king', 'revolution', 'palm', 'ice', 'piano', 'code', 'crane', 'grass', 'pool', 'helicopter', 'mug', 'fan', 'saturn', 'canada', 'skyscraper', 'opera', 'nut', 'heart', 'theater', 'turkey', 'route', 'court', 'alps', 'round', 'orange', 'diamond', 'scale', 'well', 'band', 'train', 'poison', 'fighter', 'shop', 'shadow', 'rose', 'arm', 'ground', 'slip', 'duck', 'pirate', 'jet', 'comic', 'soul', 'strike', 'forest', 'capital', 'table', 'litter', 'car', 'grace', 'pumpkin', 'copper', 'egypt', 'suit', 'robin', 'charge', 'cricket', 'card', 'boom', 'platypus', 'missile', 'part', 'bomb', 'plane', 'hawk', 'sub', 'press', 'box', 'shark', 'stream', 'deck', 'hotel', 'cast', 'alien', 'pilot', 'state', 'fly', 'pitch', 'cook', 'moscow', 'tag', 'spot', 'kiwi', 'trip', 'spell', 'star', 'snowman', 'concert', 'web', 'hospital', 'scorpion', 'laser', 'pyramid', 'sock', 'hood', 'mine', 'penguin', 'spring', 'worm', 'india', 'temple', 'whale', 'fall', 'hollywood', 'fire', 'field', 'tower', 'wake', 'needle', 'centaur', 'change', 'bermuda', 'note', 'tablet', 'ring', 'horse', 'microscope', 'mammoth', 'europe', 'kangaroo', 'bottle', 'fence', 'wave', 'head', 'tie', 'olive', 'teacher', 'jack', 'satellite', 'limousine', 'knight', 'contract', 'scuba diver', 'plate', 'mouse', 'pistol', 'engine', 'string', 'knife', 'cell', 'organ', 'pass', 'stadium', 'sueprhero', 'foot', 'horseshoe', 'log', 'ketchup', 'scientist', 'lab', 'slug', 'himalayas', 'dinosaur', 'lawyer', 'australia', 'pie', 'march', 'africa', 'line', 'war', 'row', 'shakespeare', 'night', 'church', 'cover', 'jam', 'green', 'dragon', 'oil', 'new york', 'honey', 'loch ness', 'witch', 'spike', 'cliff', 'compound', 'crown', 'bill', 'cycle', 'berry', 'america', 'boot', 'chick', 'face', 'school', 'wall', 'atlantis', 'water', 'pin', 'lead', 'port', 'tooth', 'lock', 'pan', 'dog', 'post', 'fork', 'novel', 'club', 'aztec', 'yard', 'ambulance', 'ham', 'undertaker', 'flute', 'china', 'nail', 'day', 'model', 'crash', 'film', 'bug', 'smuggler', 'swing', 'sound', 'gold', 'olympus', 'mass', 'staff', 'greece', 'tap', 'shoe', 'pupil', 'hook', 'snow', 'glass', 'hole', 'eagle', 'unicorn', 'amazon', 'lap', 'washer', 'robot', 'pole', 'beijing', 'telescope', 'soldier', 'ivory', 'ghost', 'center', 'berlin', 'server', 'pants', 'vacuum', 'chair', 'washington', 'watch', 'disease', 'play', 'brush', 'bond', 'conductor', 'ray', 'germany', 'pipe', 'sink', 'maple', 'chest', 'dress', 'draft', 'mail', 'carrot', 'bolt', 'giant', 'millionaire', 'tail', 'tokyo', 'button', 'mint', 'england', 'hand', 'paper', 'tick', 'ninja', 'bat', 'marble', 'square', 'mouth', 'mole', 'plot', 'space', 'trunk', 'bear', 'beat', 'genius', 'spy', 'luck', 'life', 'game', 'embassy', 'apple', 'racket']);
-var $author$project$Wordlist$wordlistColors = _List_fromArray(
-	['red', 'orange', 'yellow', 'green', 'blue', 'black', 'white', 'cyan', 'pink', 'purple', 'grey', 'brown', 'magenta', 'tan', 'cyan', 'olive', 'maroon', 'navy', 'aquamarine', 'silver', 'gold', 'turquoise', 'lime', 'teal', 'indigo', 'violet']);
-var $author$project$Wordlist$wordlistDeutsch = _List_fromArray(
-	['Roulette', 'Osten', 'Drache', 'Afrika', 'Krieg', 'Alpen', 'Honig', 'Frankreich', 'Bombe', 'Winnetou', 'Kasino', 'Mexiko', 'Wolkenkratzer', 'Verein', 'Saturn', 'Feder', 'Alien', 'Hamburger', 'Peitsche', 'Berlin', 'Antarktis', 'Adler', 'Schneemann', 'Europa', 'Konzert', 'Loch Ness', 'Schokolade', 'Peking', 'Jet', 'Inka', 'Millionär', 'Becken', 'Dinosaurier', 'Optik', 'Pirat', 'Strasse', 'Hupe', 'Essen', 'Pinguin', 'Siegel', 'Spinne', 'Bart', 'Geschoss', 'Blüte', 'Botschaft', 'Moos', 'Pistole', 'Abgabe', 'Krankheit', 'Bahn', 'Spion', 'Tafel', 'Prinzessin', 'Bart', 'Genie', 'Quartett', 'Dieb', 'Torte', 'Oper', 'Tau', 'Ritter', 'Chemie', 'Stadion', 'Arm', 'Limousine', 'Linse', 'Geist', 'Kippe', 'Laster', 'Melone', 'Lakritze', 'Fuchs', 'Laser', 'Boot', 'Tod', 'Korn', 'Krankenhaus', 'Bande', 'Skelett', 'Mal', 'Oktopus', 'Batterie', 'Hubschrauber', 'Dame', 'Känguru', 'Pflaster', 'Mikroskop', 'Erde', 'Zentaur', 'Messe', 'Superheld', 'Ton', 'Teleskop', 'Römer', 'Fallschirm', 'Stamm', 'Schnabeltier', 'Brand', 'Olymp', 'Schild', 'Satellit', 'Lippe', 'Engel', 'Miene', 'Roboter', 'Kokos', 'Einhorn', 'Läufer', 'Hexe', 'Bund', 'Bergsteiger', 'Elf', 'Taucher', 'Iris', 'Gift', 'Gang', 'Brücke', 'Pfeife', 'Feuer', 'Kiel', 'Tisch', 'Star', 'Wal', 'Leiter', 'Mond', 'Ladung', 'Fisch', 'Bauer', 'Doktor', 'Strudel', 'Kirche', 'Bremse', 'Gürtel', 'Hahn', 'Zitrone', 'Kapele', 'Wind', 'Strauss', 'Löwe', 'Satz', 'Auge', 'Grund', 'Luft', 'Kater', 'Hase', 'Matte', 'Bank', 'Kerze', 'Gras', 'Wirtschaft', 'Auflauf', 'Dichtung', 'Zwerg', 'Gehalt', 'Wald', 'Chor', 'Auto', 'Feige', 'Burg', 'Erika', 'Apfel', 'Mangel', 'Öl', 'Rolle', 'Koch', 'Stock', 'Bär', 'Dietrich', 'Katze', 'Schule', 'Leben', 'Ente', 'Glück', 'Schotten', 'Riese', 'Mark', 'Gesicht', 'Lager', 'Strand', 'Fall', 'Hotel', 'Jura', 'Wasser', 'Niete', 'Papier', 'Geschirr', 'Wurm', 'Knie', 'Anwalt', 'Drossel', 'Forscher', 'Hering', 'Tanz', 'Sekretär', 'Karotte', 'Drucker', 'Ketschup', 'Blinker', 'Nacht', 'Stift', 'Meer', 'Flügel', 'Fuss', 'Schein', 'Maus', 'Funken', 'Messer', 'Bock', 'Theater', 'Po', 'Polizei', 'Atlas', 'Schiff', 'Stempel', 'Pilot', 'Schelle', 'Daumen', 'Leuchte', 'Lehrer', 'Umzug', 'Flasche', 'Finger', 'Tag', 'Riegel', 'König', 'Mast', 'Glas', 'Käfer', 'Königin', 'Bogen', 'Zahn', 'Wanze', 'Hund', 'Scheibe', 'Pferd', 'Schalter', 'Schuh', 'Schimmel', 'Stuhl', 'Demo', 'Krone', 'Bein', 'Eis', 'Börse', 'Gold', 'Takt', 'Gabel', 'Fliege', 'Zeit', 'Jäger', 'Flöte', 'Kunde', 'Fackel', 'Nuss', 'Schnee', 'Schlange', 'Elfenbein', 'Tempo', 'Soldat', 'Bach', 'Pyramide', 'Vorsatz', 'Schnur', 'Gericht', 'Stern', 'Kamm', 'Ring', 'Busch', 'Horn', 'Platte', 'Herz', 'Decke', 'Ball', 'Rücken', 'Kanal', 'Maler', 'Nadel', 'Heide', 'Linie', 'Boxer', 'Korb', 'Reif', 'Blau', 'Ausdruck', 'Taste', 'Zug', 'Schirm', 'Kiefer', 'Spiel', 'Washington', 'Fleck', 'Mini', 'Knopf', 'Gut', 'Mund', 'Kohle', 'Akt', 'Grad', 'Himalaja', 'Brause', 'Bett', 'Viertel', 'Wand', 'Rute', 'Turm', 'Bulle', 'Karte', 'Figur', 'Tor', 'Fest', 'Raute', 'Zoll', 'Kreuz', 'Loge', 'Netz', 'Mutter', 'Punkt', 'Riemen', 'Pass', 'Verband', 'Fläche', 'Hut', 'Loch', 'Watt', 'Glocke', 'Horst', 'Kraft', 'Luxemburg', 'Schloss', 'Birne', 'Maschine', 'Note', 'Welle', 'Film', 'Storm', 'Absatz', 'Haupt', 'Blatt', 'Pol', 'Mandel', 'Mittel', 'Indien', 'Jahr', 'Fessel', 'Leim', 'Schale', 'Seite', 'Aufzug', 'Bau', 'Quelle', 'Kreis', 'Harz', 'Bindung', 'Wurf', 'Uhr', 'Golf', 'New', 'York', 'Rost', 'Australien', 'Rost', 'Bayern', 'Nagel', 'Tokio', 'Toast', 'Ägypten', 'Zylinder', 'London', 'Muschel', 'Morgenstern', 'Würfel', 'Moskau', 'Weide', 'China', 'Kapitän', 'Shakespeare', 'Lösung', 'Hollywood', 'Rasen', 'Griechenland', 'Rock', 'Rom', 'Krebs', 'Hand', 'Flur', 'Ninja', 'Steuer', 'Brötchen', 'Zelle', 'Kiwi', 'Barren', 'Deutschland', 'Löffel', 'Staat', 'Futter', 'Amerikaner', 'Schuppen', 'Atlantis', 'Orange', 'England', 'Pension']);
-var $author$project$Wordlist$wordlistEspanol = _List_fromArray(
-	['Hollywood', 'Pantalla', 'Juego', 'Canica', 'Dinosaurio', 'Gato', 'Tono', 'Lazo', 'Grecia', 'Cubierta', 'Pico', 'Centro', 'Vacío', 'Unicornio', 'Enterrador', 'Calcetín', 'Lago Ness', 'Caballo', 'Berlin', 'Ornitorrinco', 'Puerto', 'Cofre', 'Caja', 'Compuesto', 'Nave', 'Reloj', 'Espacio', 'Flauta', 'Torre', 'Muerte', 'Pozo', 'Justo', 'Diente', 'Staff', 'Cuenta', 'Disparo', 'Rey', 'Sartén', 'Cuadrado', 'Búfalo', 'Científico', 'Pollo', 'Atlantis', 'Espía', 'Correo', 'Nuez', 'Registro', 'Pirata', 'Cara', 'Pegar', 'Enfermedad', 'Patio', 'Montar', 'Babosa', 'Dados', 'Plomo', 'Gancho', 'Zanahoria', 'Veneno', 'Acción', 'Pie', 'Antorcha', 'Brazo', 'Figura', 'Mina', 'Traje', 'Grúa', 'Beijing', 'Masa', 'Microscopio', 'Motor', 'China', 'Paja', 'Pantalón', 'Europa', 'Bota', 'Princesa', 'Liga', 'Suerte', 'Aceituna', 'Palma', 'Maestro', 'Pulgar', 'Pulpo', 'Capucha', 'Empate', 'Doctor', 'Despertar', 'Grillo', 'Millonario', 'Nueva York', 'Estado', 'Bermudas', 'Parque', 'Pavo', 'Chocolate', 'Viaje', 'Raqueta', 'Bate', 'Chorro', 'Shakespearei', 'Tornillo', 'Interruptor', 'Pared', 'Alma', 'Fantasma', 'Tiempo', 'Danza', 'Amazonas', 'Gracia', 'Moscú', 'Calabaza', 'Antártida', 'Látigo', 'Corazón', 'Mesa', 'Bola', 'Luchador', 'Frío', 'Día', 'Primavera', 'Encuentro', 'Diamante', 'Centauro', 'Marzo', 'Ruleta', 'Perro', 'Cruz', 'Onda', 'Pato', 'Viento', 'Lugar', 'Rascacielos', 'Papel', 'Manzana', 'Aceite', 'Cocinar', 'Volar', 'Reparto', 'Oso', 'Broche', 'Ladrón', 'Trompa', 'América', 'Novela', 'Célula', 'Arco', 'Modelo', 'Cuchillo', 'Caballero', 'Corte', 'Hierro', 'Ballena', 'Sombra', 'Contrato', 'Mercurio', 'Conductor', 'Sello', 'Carro', 'Anillo', 'Niño', 'Piano', 'Láser', 'Sonido', 'Polo', 'Superhéroe', 'Revolución', 'Hoyo', 'Gas', 'Vidrio', 'Washington', 'Corteza', 'Nieve', 'Marfil', 'Pipa', 'Tapa', 'Grado', 'Tokio', 'Iglesia', 'Pay', 'Tubo', 'Bloque', 'Cómico', 'Pez', 'Puente', 'Luna', 'Parte', 'Azteca', 'Contrabandista', 'Tren', 'Embajada', 'Pupila', 'Buzo', 'Hielo', 'Trampa', 'Código', 'Zapato', 'Servidor', 'Club', 'Fila', 'Pirámide', 'Insecto', 'Pingüino', 'Libra', 'Himalaya', 'Checa', 'Roma', 'Ojo', 'Tablero', 'Cama', 'Punto', 'Francia', 'Mamut', 'Algodón', 'Robin', 'Red', 'Corneta', 'Maple', 'Inglaterra', 'Campo', 'Robot', 'Trama', 'África', 'Etiqueta', 'Boca', 'Kiwi', 'Lunar', 'Escuela', 'Hundir', 'Pistola', 'Ópera', 'Menta', 'Raíz', 'Submarino', 'Corona', 'Lomo', 'Avión', 'México', 'Capa', 'Círculo', 'Pastilla', 'Australia', 'Verde', 'Egipto', 'Línea', 'Abogado', 'Bruja', 'Paracaídas', 'Choque', 'Oro', 'Nota', 'León', 'Plástico', 'Telaraña', 'Ambulancia', 'Hospital', 'Hechizo', 'Seguro', 'Agua', 'Londres', 'Casino', 'Ciclo', 'Bar', 'Acantilado', 'Redondo', 'Bmba', 'Gigante', 'Mano', 'ninja', 'Rosa', 'Resbalar', 'Limosina', 'Pase', 'Teatro', 'Plato', 'Satélite', 'Catsup', 'Hotel', 'Cola', 'Garrapata', 'Suelo', 'Policía', 'Enano', 'Ventilador', 'Vestido', 'Saturno', 'Pasto', 'Cepillo', 'Silla', 'Roca', 'Piloto', 'Telescopio', 'Archivo', 'Laboratorio', 'India', 'Regla', 'Clavo', 'Columpio', 'Olimpia', 'Cambio', 'Frcha', 'Corriente', 'Misil', 'Escala', 'Banda', 'Ángel', 'Prensa', 'Baya', 'Carta', 'Comprobar', 'Borrador', 'Cabeza', 'Regazo', 'Naranja', 'Helado', 'Película', 'Lavadora', 'Piscina', 'Tiburón', 'Camioneta', 'Cuerda', 'Ternera', 'Halcón', 'Águila', 'Aguja', 'Bosque', 'Dragón', 'Clave', 'Cinturón', 'Gorra', 'Taladro', 'Guante', 'Pasta', 'Otoño', 'Fuego', 'Araña', 'Espina', 'Soldado', 'Cuerno', 'Reina', 'Jamón', 'Litro', 'Vida', 'Templo', 'Conejo', 'Botón', 'Juego', 'Estrella', 'Júpiter', 'Veterinaria', 'Nioche', 'aire', 'Batería', 'Genio', 'Tienda', 'Botella', 'Estadio', 'Alien', 'Luz', 'Triángulo', 'Limón', 'Enfermera', 'Gota', 'Pista', 'Banco', 'Alemania', 'Lombriz', 'Rayo', 'Capital', 'Paro', 'Guerra', 'Concierto', 'Miel', 'Canadá', 'Ciervo', 'Mono de Nieve', 'Vencer', 'Atasco', 'Cobre', 'Playa', 'Campana', 'Duende', 'Fénix', 'Fuerza', 'Explosión', 'Tenedor', 'Alpes', 'Poste', 'Cerca', 'Canguro', 'Ratón', 'Taza', 'Herradura', 'Escorpión', 'Agente', 'Helicóptero', 'Agujero', 'Órgano', 'Gato', 'Carga']);
-var $author$project$Wordlist$wordlistFrancais = _List_fromArray(
-	['Accident', 'Achat', 'Acné', 'Action', 'Adolescent', 'Afrique', 'Aiguille', 'Allumer', 'Alpes', 'Alphabet', 'Altitude', 'Amérique', 'Ami', 'Amour', 'Ampoule', 'Anniversaire', 'Appétit', 'Araignée', 'Arbre', 'Arc', 'Arc-en-ciel', 'Argent', 'Arme', 'Armée', 'Ascenseur', 'Asie', 'Assis', 'Astronaute', 'Atchoum', 'Athlète', 'Atlantide', 'Aube', 'Australie', 'Avec', 'Aventure', 'Avion', 'Avocat', 'Bac', 'Baguette', 'Bain', 'Baiser', 'Balai', 'Balle', 'Ballon', 'Bambou', 'Banane', 'Bannir', 'Barbe', 'Barrière', 'Bas', 'Basket', 'Bateau', 'Bâton', 'Batterie', 'Bébé', 'Beethoven', 'Bête', 'Biberon', 'Bière', 'Blanc', 'blé', 'Bleu', 'Bob', 'Boisson', 'Boîte', 'Bombe', 'Bonbon', 'Bonnet', 'Bord', 'Bordeaux', 'Botte', 'Boue', 'Bougie', 'Boule', 'Bouteille', 'Bouton', 'Branche', 'Bras', 'Bravo', 'Bretagne', 'Brise', 'Brosse', 'Bruit', 'Brume', 'Brun', 'Bûche', 'Bulle', 'Bureau', 'But', 'Cabane', 'Cabine', 'Cacher', 'Cadeau', 'Cafard', 'Café', 'Caisse', 'Calculer', 'Calme', 'Caméra', 'Camion', 'Camping', 'Canada', 'Canard', 'Canette', 'Canine', 'Cap', 'Capitalisme', 'Car', 'Carotte', 'Carré', 'Carte', 'Carton', 'Casque', 'Casser', 'Cassette', 'Cauchemar', 'Cause', 'Ceinture', 'Cellule', 'Cercle', 'Chaîne', 'Chair', 'Chaise', 'Champ', 'Champion', 'Chant', 'Chapeau', 'Charbon', 'Charge', 'Chasse', 'Chat', 'Château', 'Chaud', 'Chaussure', 'Chauve', 'Chef', 'Chemise', 'Chêne', 'Cher', 'Cheval', 'Chevalier', 'Cheveu', 'Chien', 'Chiffre', 'Chine', 'Chocolat', 'Chômage', 'Ciel', 'Cil', 'Cinéma', 'Cire', 'Cirque', 'Citron', 'Clé', 'Clou', 'Clown', 'Coach', 'Coccinelle', 'Code', 'Cœur', 'Col', 'Colle', 'Colline', 'Colonne', 'Cône', 'Confort', 'Continu', 'Contre', 'Conversation', 'Copain', 'Coq', 'Coquillage', 'Corbeau', 'Corde', 'Corps', 'Côte', 'Coude', 'Couloir', 'Coup', 'Cour', 'Courant', 'Courrier', 'Cours', 'Course', 'Court', 'Couteau', 'Couvert', 'Couverture', 'Cowboy', 'Crac', 'Crayon', 'Crème', 'Critique', 'Crochet', 'Croix', 'Croûte', 'Cuillère', 'Cuir', 'Cuisine', 'Culotte', 'Cycle', 'Dard', 'Dé', 'Debout', 'Défaut', 'Dehors', 'Démocratie', 'Dent', 'Dentiste', 'Dessin', 'Devoir', 'Diamant', 'Dictionnaire', 'Dieu', 'Dinosaure', 'Discours', 'Disque', 'Dix', 'Docteur', 'Doigt', 'Domino', 'Dormir', 'Droit', 'Eau', 'Échec', 'Échelle', 'Éclair', 'École', 'Écran', 'Écraser', 'Écrit', 'Église', 'Égout', 'Électricité', 'Éléphant', 'Élève', 'Elfe', 'Empreinte', 'Enceinte', 'Épice', 'Épine', 'Erreur', 'Espace', 'Espion', 'Essence', 'État', 'Été', 'Étoile', 'Étranger', 'Éventail', 'Évolution', 'Explosoin', 'Extension', 'Face', 'Fan', 'Farce', 'Fatigue', 'Fauteuil', 'Fayot', 'Fenêtre', 'Fer', 'Fête', 'Feu', 'Feuille', 'Fidèle', 'Fil', 'Fille', 'Flamme', 'Flèche', 'Fleur', 'Fleuve', 'Fond', 'Football', 'Forêt', 'Forger', 'Foudre', 'Fouet', 'Four', 'Fourmi', 'Froid', 'Fromage', 'Front', 'Fruit', 'Fuir', 'Futur', 'Garçon', 'Gâteau', 'Gauche', 'Gaz', 'Gazon', 'Gel', 'Genou', 'Glace', 'Gomme', 'Gorge', 'Goutte', 'Grand', 'Grèce', 'Grenouille', 'Grippe', 'Gris', 'Gros', 'Groupe', 'Guitare', 'Hasard', 'Haut', 'Hélicoptère', 'Herbe', 'Heureux', 'Histoire', 'Hiver', 'Hôtel', 'Hugo', 'Huile', 'Humide', 'Humour', 'Indice', 'Internet', 'Inviter', 'Italie', 'Jacques', 'Jambe', 'Jambon', 'Jardin', 'Jaune', 'Jean', 'Jeanne', 'Jet', 'Jeu', 'Jogging', 'Jour', 'Journal', 'Jupiter', 'Kilo', 'Kiwi', 'Laine', 'Lait', 'Langue', 'Lapin', 'Latin', 'Laver', 'Lecteur', 'Léger', 'Lent', 'Lettre', 'Lien', 'Ligne', 'Linge', 'Lion', 'Lit', 'Livre', 'Loi', 'Long', 'Louis', 'Loup', 'Lumière', 'Lundi', 'Lune', 'Lunette', 'Machine', 'Macho', 'main', 'Maison', 'Maîtresse', 'Mal', 'Maladie', 'Maman', 'Mammouth', 'Manger', 'Marais', 'Marc', 'Marche', 'Mariage', 'Marie', 'Mariée', 'Marque', 'Marseille', 'Masse', 'Mer', 'Messe', 'Mètre', 'Métro', 'Miaou', 'Micro', 'Mieux', 'Mille', 'Mine', 'Miroir', 'Moderne', 'Moitié', 'Monde', 'Monstre', 'Montagne', 'Montre', 'Mort', 'Moteur', 'Moto', 'Mou', 'Mouche', 'Moulin', 'Moustache', 'Mouton', 'Mur', 'Muscle', 'Musique', 'Mystère', 'Nage', 'Nature', 'Neige', 'Neutre', 'New York', 'Nez', 'Nid', 'Ninja', 'Niveau', 'Noël', 'Nœud', 'Noir', 'Nous', 'Nuage', 'Nuit', 'Numéro', 'Œil', 'Œuf', 'Oiseau', 'Olympique', 'Ombre', 'Ongle', 'Or', 'Oral', 'Orange', 'Ordinateur', 'Ordre', 'Ordure', 'Oreille', 'Organe', 'Orgueil', 'Ours', 'Outil', 'Ouvert', 'Ovale', 'Pain', 'Palais', 'Panneau', 'Pantalon', 'Pantin', 'Papa', 'Papier', 'Papillon', 'Paradis', 'Parc', 'Paris', 'Parole', 'Partie', 'Passe', 'Pâte', 'Patin', 'Patte', 'Paul', 'Payer', 'Pêche', 'Peinture', 'Pendule', 'Penser', 'Personne', 'Petit', 'Peur', 'Philosophe', 'Photo', 'Phrase', 'Piano', 'Pièce', 'Pied', 'Pierre', 'Pile', 'Pilote', 'Pince', 'Pioche', 'Pion', 'Pirate', 'Pire', 'Piscine', 'Place', 'Plafond', 'Plage', 'Plaie', 'Plan', 'Planche', 'Planète', 'Plante', 'Plastique', 'Plat', 'Plat', 'Plomb', 'Plonger', 'Pluie', 'Poche', 'Poète', 'Poids', 'Poing', 'Point', 'Poivre', 'Police', 'Politique', 'Pollen', 'Polo', 'Pomme', 'Pompe', 'Pont', 'Population', 'Port', 'Porte', 'Portefeuille', 'Positif', 'Poste', 'Poubelle', 'Poule', 'Poupée', 'Pousser', 'Poussière', 'Pouvoir', 'Préhistoire', 'Premier', 'Présent', 'Presse', 'Prier', 'Princesse', 'Prise', 'Privé', 'Professeur', 'Psychologie', 'Public', 'Pull', 'Punk', 'Puzzle', 'Pyjama', 'Quatre', 'Quinze', 'Race', 'Radio', 'Raisin', 'Rap', 'Rayé', 'Rayon', 'Réfléchir', 'Reine', 'Repas', 'Reptile', 'Requin', 'Rêve', 'Riche', 'Rideau', 'Rien', 'Rire', 'Robinet', 'Roche', 'Roi', 'Rond', 'Rose', 'Roue', 'Rouge', 'Rouille', 'Roux', 'Russie', 'Sable', 'Sabre', 'Sac', 'Sain', 'Saison', 'Sale', 'Salle', 'Salut', 'Samu', 'Sandwich', 'Sang', 'Sapin', 'Satellite', 'Saumon', 'Saut', 'Savoir', 'Schtroumpf', 'Science', 'Scout', 'Sec', 'Seine', 'Sel', 'Sept', 'Serpent', 'Serrer', 'Sexe', 'Shampooing', 'Siècle', 'Siège', 'Sieste', 'Silhouette', 'Sirène', 'Ski', 'Soleil', 'Sommeil', 'Son', 'Sonner', 'Sorcière', 'Sourd', 'Souris', 'Sport', 'Star', 'Station', 'Stylo', 'Sur', 'Surface', 'Sushi', 'Swing', 'Tableau', 'Tache', 'Taille', 'Tante', 'Tapis', 'Tard', 'Taxi', 'Téléphone', 'Télévision', 'Temple', 'Temps', 'Tennis', 'Tête', 'Thé', 'Tigre', 'Tintin', 'Tissu', 'Titre', 'Titre', 'Toast', 'Toilette', 'Tokyo', 'Tombe', 'Ton', 'Top', 'Touche', 'Toujours', 'Tour', 'Tournoi', 'Tout', 'Trace', 'Train', 'Traîner', 'Transport', 'Travail', 'Trésor', 'Triangle', 'Triste', 'Trône', 'Troupeau', 'Tsar', 'Tube', 'Tuer', 'Tuer', 'Tupperware', 'Tuyau', 'Twitter', 'Type', 'Université', 'Vache', 'Vache', 'Vague', 'Vaisselle', 'Valeur', 'Ver', 'Verdict', 'Verre', 'Vers', 'Vert', 'Veste', 'Viande', 'Vide', 'Vie', 'Vieux', 'Ville', 'Vin', 'Vingt', 'Violon', 'Vipère', 'Vision', 'Vite', 'Vive', 'Vœu', 'Voile', 'Voisin', 'Voiture', 'Vol', 'Volume', 'Vote', 'Vouloir', 'Voyage', 'Zen', 'Zéro', 'Zodiaque', 'Zone', 'Zoo']);
-var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
-	['abnormal', 'abominable', 'afraid', 'afterlife', 'agony ', 'alarming', 'alien', 'angel', 'apparition', 'autumn', 'axe ', 'banshee', 'basilisk', 'bat', 'beast', 'behemoth', 'black', 'blood ', 'bogeyman', 'bones', 'boo', 'broom', 'bury', 'cadaver', 'candy', 'carve', 'casket', 'cat', 'cauldron', 'cemetery', 'Cerberus', 'changeling', 'chill', 'cider', 'claws', 'clown', 'coffin', 'cold ', 'convulse ', 'corpse', 'costume', 'creak ', 'creepy', 'crone', 'crypt', 'dark', 'dead', 'demon ', 'devil ', 'dire', 'disease', 'disguise', 'disturbed ', 'donuts', 'Dracula', 'dragon', 'dread ', 'drown ', 'ecto-plasm', 'eerie', 'evil', 'eye', 'fangs', 'fatal ', 'fear ', 'fiend', 'fog', 'Frankenstein', 'freak', 'fright', 'gargoyle', 'ghastly', 'ghost ', 'ghoul', 'goblin', 'goo', 'gore ', 'grave', 'gruesome', 'Halloween', 'haunted', 'hayride', 'heart', 'Hell ', 'helpless', 'horror', 'howl', 'insane', 'jack-o\'-lantern', 'kill ', 'leaves', 'macabre', 'magic', 'mask', 'mausoleum', 'menace ', 'midnight', 'monster ', 'moon ', 'morbid', 'mummy', 'murder', 'mutant', 'mystery', 'mystical', 'night', 'occult', 'October', 'ogre', 'ominous', 'orange', 'owl', 'pagan', 'pain ', 'paranormal', 'party', 'phantasm', 'phantom', 'poltergeist', 'potion', 'pumpkin', 'putrid ', 'raven', 'reaper', 'rotten ', 'scare', 'scream ', 'shadow', 'shiver', 'silence', 'sinister ', 'skeleton ', 'skull', 'slime', 'specter', 'spell', 'spider', 'spirit', 'spooky', 'stab', 'stalk ', 'strange', 'strangle', 'suicide ', 'supernatural', 'superstition', 'sweets', 'tarantula', 'tense ', 'terrify ', 'thrill', 'tomb', 'torture ', 'treat', 'tremble', 'trick', 'troll', 'undead', 'unearth', 'vampire', 'villain', 'wand', 'warlock', 'web', 'weird', 'werewolf', 'wicked', 'witch', 'wizard', 'wraith', 'zombie ']);
-var $author$project$Spymaster$init = function (_v0) {
-	return A2(
-		$author$project$Spymaster$update,
-		$author$project$Spymaster$NewGame,
-		$author$project$Spymaster$Model(
-			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(false)(false)(
-			{customWords: true, spies: true})(0)(0)('')('')(_List_Nil)(
-			_List_fromArray(
-				[
-					{include: true, key: 0, name: 'basic words', words: $author$project$Wordlist$wordlistBasic},
-					{include: false, key: 1, name: 'advanced words', words: $author$project$Wordlist$wordlistAdvanced},
-					{include: false, key: 2, name: 'color words', words: $author$project$Wordlist$wordlistColors},
-					{include: false, key: 3, name: 'Halloween words', words: $author$project$Wordlist$wordlistHalloween},
-					{include: false, key: 4, name: 'German words', words: $author$project$Wordlist$wordlistDeutsch},
-					{include: false, key: 5, name: 'French words', words: $author$project$Wordlist$wordlistFrancais},
-					{include: false, key: 6, name: 'Spanish words', words: $author$project$Wordlist$wordlistEspanol}
-				]))(_List_Nil)(
-			A2(
-				$elm$core$List$repeat,
-				25,
-				A3($author$project$Spymaster$Card, '', 0, false))));
-};
-var $author$project$Spymaster$Tick = function (a) {
-	return {$: 'Tick', a: a};
-};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 'Every', a: a, b: b};
-	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {processes: processes, taggers: taggers};
-	});
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 'Nothing') {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
-	});
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
+		update:
 		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3($elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
+			switch (msg.$) {
+				case 'UncoverCard':
+					var index = msg.a;
+					var newCards = A3($author$project$Spymaster$uncover, 0, index, model.cards);
+					var redRemaining = $elm$core$List$length(
+						A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newCards));
+					var blueRemaining = $elm$core$List$length(
+						A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newCards));
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{blueRemaining: blueRemaining, cards: newCards, redRemaining: redRemaining}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleLightbox':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toggleLightbox: !model.toggleLightbox}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleQR':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toggleQR: !model.toggleQR}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleSidebar':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toggleSidebar: !model.toggleSidebar}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleCustomWordsEntry':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toggleCustomWordsEntry: !model.toggleCustomWordsEntry}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleSoundEffects':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toggleSoundEffects: !model.toggleSoundEffects}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleSpies':
+					var oldSettings = model.settings;
+					var newSettings = _Utils_update(
+						oldSettings,
+						{spies: !oldSettings.spies});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{settings: newSettings}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleWordlist':
+					var key = msg.a;
+					var wordlists = A2(
+						$elm$core$List$map,
+						$author$project$Spymaster$maybeToggle(key),
+						model.wordlists);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{wordlists: wordlists}),
+						$elm$core$Platform$Cmd$none);
+				case 'ToggleCustomWords':
+					var oldSettings = model.settings;
+					var newSettings = _Utils_update(
+						oldSettings,
+						{customWords: !oldSettings.customWords});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{settings: newSettings}),
+						$elm$core$Platform$Cmd$none);
+				case 'SetCustomWords':
+					var str = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{customWordsString: str}),
+						$elm$core$Platform$Cmd$none);
+				case 'SaveCustomWords':
+					var customWords = $elm$core$Set$toList(
+						$elm$core$Set$fromList(
+							A2(
+								$elm$core$List$filter,
+								$author$project$Spymaster$isNotEmpty,
+								A2(
+									$elm$core$List$map,
+									$elm$core$String$trim,
+									A2($elm$core$String$split, '\n', model.customWordsString)))));
+					var customWordsString = A2($elm$core$String$join, '\n', customWords);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{customWords: customWords, customWordsString: customWordsString, toggleCustomWordsEntry: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'CancelCustomWords':
+					var customWordsString = A2($elm$core$String$join, '\n', model.customWords);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{customWordsString: customWordsString, toggleCustomWordsEntry: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'PassTurn':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{turn: !model.turn}),
+						$elm$core$Platform$Cmd$none);
+				case 'NewGame':
+					var wordlist = A2(
+						$elm$core$List$append,
+						A2(
+							$elm$core$List$concatMap,
+							function ($) {
+								return $.words;
+							},
+							A2(
+								$elm$core$List$filter,
+								function ($) {
+									return $.include;
+								},
+								model.wordlists)),
+						model.settings.customWords ? model.customWords : _List_Nil);
+					var myPrime = _List_fromArray(
+						[true, false, true, false, true, true, false, false, true, true, true, true, false, true, false, false, false, false, true, true, false, false, false, true, true, true, true, false, true, false, false, false, false, true, false, true, true, false, false, false, false, true, false, false, false, false, true, false, true, false, true, true]);
+					var _v1 = A2(
+						$elm$random$Random$step,
+						$elm_community$random_extra$Random$List$shuffle(wordlist),
+						model.seed);
+					var newWords = _v1.a;
+					var seed1 = _v1.b;
+					var _v2 = A2($elm$random$Random$step, $elm_community$random_extra$Random$Extra$bool, seed1);
+					var newTurn = _v2.a;
+					var seed2 = _v2.b;
+					var boolList1 = A3(
+						$elm$core$Array$set,
+						0,
+						newTurn,
+						A2($elm$core$Array$repeat, 53, false));
+					var _v3 = A2(
+						$elm$random$Random$step,
+						$elm_community$random_extra$Random$Array$shuffle(
+							$elm$core$Array$fromList(
+								A2($elm$core$List$range, 0, 24))),
+						seed2);
+					var newIDs = _v3.a;
+					var seed3 = _v3.b;
+					var assassinID = A2(
+						$elm$core$Maybe$withDefault,
+						0,
+						A2($elm$core$Array$get, 0, newIDs));
+					var boolList2 = A3(
+						$elm$core$Array$set,
+						51 - (2 * assassinID),
+						true,
+						A3($elm$core$Array$set, 50 - (2 * assassinID), true, boolList1));
+					var blueIDs = $elm$core$Array$toList(
+						A3(
+							$elm$core$Array$slice,
+							newTurn ? 10 : 9,
+							18,
+							newIDs));
+					var redIDs = $elm$core$Array$toList(
+						A3(
+							$elm$core$Array$slice,
+							1,
+							newTurn ? 10 : 9,
+							newIDs));
+					var boolList3 = A4(
+						$author$project$Spymaster$ammendArray,
+						blueIDs,
+						A4($author$project$Spymaster$ammendArray, redIDs, boolList2, true, false),
+						false,
+						true);
+					var bigint1 = $author$project$Spymaster$listBoolToBigInt(
+						A3(
+							$elm$core$List$map2,
+							$elm$core$Basics$xor,
+							myPrime,
+							$elm$core$Array$toList(boolList3)));
+					var newPassword = $author$project$Spymaster$base32Encode(bigint1);
+					var newShuffledCards = A2(
+						$elm$core$List$indexedMap,
+						A3($author$project$Spymaster$colorCards, assassinID, redIDs, blueIDs),
+						A2($author$project$Spymaster$populateCards, model.cards, newWords));
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								allWords: wordlist,
+								blueRemaining: $elm$core$List$length(
+									A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newShuffledCards)),
+								cards: newShuffledCards,
+								password: newPassword,
+								redRemaining: $elm$core$List$length(
+									A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newShuffledCards)),
+								seed: seed3,
+								turn: newTurn
+							}),
+						$author$project$Spymaster$outputPort(
+							A2(
+								$elm$json$Json$Encode$encode,
+								0,
+								$elm$json$Json$Encode$object(
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											'action',
+											$elm$json$Json$Encode$string('new_game')),
+											_Utils_Tuple2(
+											'content',
+											$elm$json$Json$Encode$string(newPassword))
+										])))));
+				case 'Tick':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{currentTimer: model.currentTimer + 1}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					var json = msg.a;
+					var _v4 = A2($elm$json$Json$Decode$decodeValue, $author$project$Spymaster$decodeJSON, json);
+					if (_v4.$ === 'Ok') {
+						var action = _v4.a.action;
+						var content = _v4.a.content;
+						if (action === 'set_game') {
+							var _v6 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
+							if (_v6.$ === 'Ok') {
+								var num = _v6.a;
+								var $temp$msg = $author$project$Spymaster$NewGame,
+									$temp$model = _Utils_update(
+									model,
+									{
+										seed: $elm$random$Random$initialSeed(num)
+									});
+								msg = $temp$msg;
+								model = $temp$model;
+								continue update;
+							} else {
+								var $temp$msg = $author$project$Spymaster$NewGame,
+									$temp$model = model;
+								msg = $temp$msg;
+								model = $temp$model;
+								continue update;
+							}
+						} else {
+							return _Utils_Tuple2(
+								A2($elm$core$Debug$log, 'Error: unknown code in JSON message', model),
+								$elm$core$Platform$Cmd$none);
+						}
+					} else {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									debugString: 'Bad JSON: ' + A2($elm$json$Json$Encode$encode, 0, json)
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
 			}
 		}
 	});
-var $elm$core$Dict$merge = F6(
-	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
-		var stepState = F3(
-			function (rKey, rValue, _v0) {
-				stepState:
-				while (true) {
-					var list = _v0.a;
-					var result = _v0.b;
-					if (!list.b) {
-						return _Utils_Tuple2(
-							list,
-							A3(rightStep, rKey, rValue, result));
-					} else {
-						var _v2 = list.a;
-						var lKey = _v2.a;
-						var lValue = _v2.b;
-						var rest = list.b;
-						if (_Utils_cmp(lKey, rKey) < 0) {
-							var $temp$rKey = rKey,
-								$temp$rValue = rValue,
-								$temp$_v0 = _Utils_Tuple2(
-								rest,
-								A3(leftStep, lKey, lValue, result));
-							rKey = $temp$rKey;
-							rValue = $temp$rValue;
-							_v0 = $temp$_v0;
-							continue stepState;
-						} else {
-							if (_Utils_cmp(lKey, rKey) > 0) {
-								return _Utils_Tuple2(
-									list,
-									A3(rightStep, rKey, rValue, result));
-							} else {
-								return _Utils_Tuple2(
-									rest,
-									A4(bothStep, lKey, lValue, rValue, result));
-							}
-						}
-					}
-				}
-			});
-		var _v3 = A3(
-			$elm$core$Dict$foldl,
-			stepState,
-			_Utils_Tuple2(
-				$elm$core$Dict$toList(leftDict),
-				initialResult),
-			rightDict);
-		var leftovers = _v3.a;
-		var intermediateResult = _v3.b;
-		return A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v4, result) {
-					var k = _v4.a;
-					var v = _v4.b;
-					return A3(leftStep, k, v, result);
-				}),
-			intermediateResult,
-			leftovers);
-	});
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$setInterval = _Time_setInterval;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$time$Time$spawnHelp = F3(
-	function (router, intervals, processes) {
-		if (!intervals.b) {
-			return $elm$core$Task$succeed(processes);
-		} else {
-			var interval = intervals.a;
-			var rest = intervals.b;
-			var spawnTimer = $elm$core$Process$spawn(
-				A2(
-					$elm$time$Time$setInterval,
-					interval,
-					A2($elm$core$Platform$sendToSelf, router, interval)));
-			var spawnRest = function (id) {
-				return A3(
-					$elm$time$Time$spawnHelp,
-					router,
-					rest,
-					A3($elm$core$Dict$insert, interval, id, processes));
-			};
-			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
-		}
-	});
-var $elm$time$Time$onEffects = F3(
-	function (router, subs, _v0) {
-		var processes = _v0.processes;
-		var rightStep = F3(
-			function (_v6, id, _v7) {
-				var spawns = _v7.a;
-				var existing = _v7.b;
-				var kills = _v7.c;
-				return _Utils_Tuple3(
-					spawns,
-					existing,
-					A2(
-						$elm$core$Task$andThen,
-						function (_v5) {
-							return kills;
-						},
-						$elm$core$Process$kill(id)));
-			});
-		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
-		var leftStep = F3(
-			function (interval, taggers, _v4) {
-				var spawns = _v4.a;
-				var existing = _v4.b;
-				var kills = _v4.c;
-				return _Utils_Tuple3(
-					A2($elm$core$List$cons, interval, spawns),
-					existing,
-					kills);
-			});
-		var bothStep = F4(
-			function (interval, taggers, id, _v3) {
-				var spawns = _v3.a;
-				var existing = _v3.b;
-				var kills = _v3.c;
-				return _Utils_Tuple3(
-					spawns,
-					A3($elm$core$Dict$insert, interval, id, existing),
-					kills);
-			});
-		var _v1 = A6(
-			$elm$core$Dict$merge,
-			leftStep,
-			bothStep,
-			rightStep,
-			newTaggers,
-			processes,
-			_Utils_Tuple3(
-				_List_Nil,
-				$elm$core$Dict$empty,
-				$elm$core$Task$succeed(_Utils_Tuple0)));
-		var spawnList = _v1.a;
-		var existingDict = _v1.b;
-		var killTask = _v1.c;
-		return A2(
-			$elm$core$Task$andThen,
-			function (newProcesses) {
-				return $elm$core$Task$succeed(
-					A2($elm$time$Time$State, newTaggers, newProcesses));
-			},
-			A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
-				},
-				killTask));
-	});
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$onSelfMsg = F3(
-	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
-		if (_v0.$ === 'Nothing') {
-			return $elm$core$Task$succeed(state);
-		} else {
-			var taggers = _v0.a;
-			var tellTaggers = function (time) {
-				return $elm$core$Task$sequence(
-					A2(
-						$elm$core$List$map,
-						function (tagger) {
-							return A2(
-								$elm$core$Platform$sendToApp,
-								router,
-								tagger(time));
-						},
-						taggers));
-			};
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v1) {
-					return $elm$core$Task$succeed(state);
-				},
-				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
-		}
-	});
-var $elm$time$Time$subMap = F2(
-	function (f, _v0) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		return A2(
-			$elm$time$Time$Every,
-			interval,
-			A2($elm$core$Basics$composeL, f, tagger));
-	});
-_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
-var $elm$time$Time$subscription = _Platform_leaf('Time');
-var $elm$time$Time$every = F2(
-	function (interval, tagger) {
-		return $elm$time$Time$subscription(
-			A2($elm$time$Time$Every, interval, tagger));
-	});
-var $author$project$Spymaster$subscriptions = function (_v0) {
-	return $elm$core$Platform$Sub$batch(
-		_List_fromArray(
-			[
-				A2($elm$time$Time$every, 1000, $author$project$Spymaster$Tick)
-			]));
-};
 var $author$project$Spymaster$CancelCustomWords = {$: 'CancelCustomWords'};
 var $author$project$Spymaster$PassTurn = {$: 'PassTurn'};
 var $author$project$Spymaster$SaveCustomWords = {$: 'SaveCustomWords'};
@@ -8552,12 +8614,10 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
