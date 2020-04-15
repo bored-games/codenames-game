@@ -1,4 +1,4 @@
-module Spymaster exposing (Model, Msg(..), init, main, update, view)
+port module Spymaster exposing (Model, Msg(..), init, main, update, outputPort, subscriptions, view)
 
 import Browser
 import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button)
@@ -14,6 +14,7 @@ import Set exposing (fromList, toList)
 import Wordlist exposing (wordlistBasic, wordlistAdvanced, wordlistColors, wordlistHalloween, wordlistDeutsch, wordlistFrancais, wordlistEspanol)
 import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
+import Json.Encode exposing (encode, int, string, object)
 
 -- MAIN
 
@@ -216,16 +217,17 @@ update msg model =
             boolList3 = ammendArray blueIDs (ammendArray redIDs boolList2 True False) False True
             myPrime = [True, False, True, False, True, True, False, False, True, True, True, True, False, True, False, False, False, False, True, True, False, False, False, True, True, True, True, False, True, False, False, False, False, True, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, False, True, True]
             bigint1 = listBoolToBigInt <| List.map2 xor myPrime (Array.toList boolList3)
+            newPassword = base32Encode bigint1
         in
           ( { model | cards = newShuffledCards
                     , seed = seed3
                     , turn = newTurn
                     , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
                     , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
-                    , password = base32Encode bigint1
+                    , password = newPassword
                     , allWords = wordlist
                     }
-          , Cmd.none)
+        , outputPort (Json.Encode.encode 0 (Json.Encode.object [ ("action", Json.Encode.string "new_game"), ("content", Json.Encode.string newPassword) ] ) ) )
 
       Tick _ ->
         ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
@@ -360,6 +362,9 @@ drawCard index cards =
 
 -- SUBSCRIPTIONS
 
+
+port outputPort : (String) -> Cmd msg
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
   Sub.batch
@@ -405,7 +410,7 @@ view model =
   in
     div [ class "container" ]
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] lightboxInfo ]
-      , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [] [] ]
+      , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [ id "qrcode" ] [] ]
       , div [ class "debug" ] [ {- text model.debugString -} ]
       , div
         [ class ("sidebar" ++ (if model.toggleSidebar then "" else " hidden"))]

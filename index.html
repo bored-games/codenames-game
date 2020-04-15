@@ -16,9 +16,8 @@
 	<link href='https://fonts.googleapis.com/css?family=Gloria+Hallelujah' rel='stylesheet' type='text/css'>
     
 	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
-	<script src="assets/js/BigInteger.min.js"></script>
+	<!--script src="assets/js/BigInteger.min.js"></script>-->
   <script src="assets/js/qrcode.min.js"></script>
-  
   <script src="assets/js/main.js"></script>
 
 </head>
@@ -29,6 +28,29 @@
     // prevent backspace from redirecting browser
     window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+0008'||e.keyIdentifier=='Backspace'||e.keyCode==8){if(e.target==document.body){e.preventDefault();return false;}}},true);
     var app = Elm.Spymaster.init({node:document.getElementById('elm-node')});
+    
+    app.ports.outputPort.subscribe(function (data) {
+        data = JSON.parse(data);
+        console.log("Message from client:")
+        console.log(data);
+        console.log(data['content']);
+
+        if (data["action"] == "new_game") {
+
+          var sizepx = Math.round(Math.min(window.innerWidth*.85, window.innerHeight*.85));
+          const qrcodeContainer = document.getElementById("qrcode");
+          qrcodeContainer.innerHTML = ""; 
+          const qrcode = new QRCode(qrcodeContainer, {
+            width : sizepx,
+            height : sizepx,
+            correctLevel : QRCode.CorrectLevel.M
+          });
+          qrcode.makeCode(data["content"]);
+        }
+
+    });
+        
+    // app.ports.inputPort.send( {"action": "connect_to_server", "content": "welcome!"} );
   </script>
 
 </body>

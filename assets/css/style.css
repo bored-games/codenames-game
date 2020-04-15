@@ -493,7 +493,7 @@ em {
   background: linear-gradient(-10deg, #b6a69c 0, rgb(212, 206, 202) 100%);
   box-shadow: 0 0 10px rgba(0, 0, 0, .4);
   border: 1px solid #fff;
-  width: 80%;
+  max-width: 80%;
   transition: .25s linear all;
   color: #222;
   border-radius: 6px;

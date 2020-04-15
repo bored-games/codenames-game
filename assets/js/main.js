@@ -7258,6 +7258,21 @@ var $author$project$Spymaster$maybeToggle = F2(
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Spymaster$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
 var $author$project$Spymaster$populateCards = F2(
 	function (cards, words) {
 		if (cards.b) {
@@ -7927,6 +7942,7 @@ var $author$project$Spymaster$update = F2(
 						$elm$core$Basics$xor,
 						myPrime,
 						$elm$core$Array$toList(boolList3)));
+				var newPassword = $author$project$Spymaster$base32Encode(bigint1);
 				var newShuffledCards = A2(
 					$elm$core$List$indexedMap,
 					A3($author$project$Spymaster$colorCards, assassinID, redIDs, blueIDs),
@@ -7939,13 +7955,26 @@ var $author$project$Spymaster$update = F2(
 							blueRemaining: $elm$core$List$length(
 								A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newShuffledCards)),
 							cards: newShuffledCards,
-							password: $author$project$Spymaster$base32Encode(bigint1),
+							password: newPassword,
 							redRemaining: $elm$core$List$length(
 								A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newShuffledCards)),
 							seed: seed3,
 							turn: newTurn
 						}),
-					$elm$core$Platform$Cmd$none);
+					$author$project$Spymaster$outputPort(
+						A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							$elm$json$Json$Encode$object(
+								_List_fromArray(
+									[
+										_Utils_Tuple2(
+										'action',
+										$elm$json$Json$Encode$string('new_game')),
+										_Utils_Tuple2(
+										'content',
+										$elm$json$Json$Encode$string(newPassword))
+									])))));
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7976,7 +8005,7 @@ var $author$project$Spymaster$init = function (_v0) {
 			{customWords: true, spies: true})(0)(0)('')('')(_List_Nil)(
 			_List_fromArray(
 				[
-					{include: false, key: 0, name: 'basic words', words: $author$project$Wordlist$wordlistBasic},
+					{include: true, key: 0, name: 'basic words', words: $author$project$Wordlist$wordlistBasic},
 					{include: false, key: 1, name: 'advanced words', words: $author$project$Wordlist$wordlistAdvanced},
 					{include: false, key: 2, name: 'color words', words: $author$project$Wordlist$wordlistColors},
 					{include: false, key: 3, name: 'Halloween words', words: $author$project$Wordlist$wordlistHalloween},
@@ -8283,7 +8312,6 @@ var $author$project$Spymaster$ToggleSoundEffects = {$: 'ToggleSoundEffects'};
 var $author$project$Spymaster$ToggleSpies = {$: 'ToggleSpies'};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -8583,7 +8611,13 @@ var $author$project$Spymaster$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2($elm$html$Html$div, _List_Nil, _List_Nil)
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('qrcode')
+							]),
+						_List_Nil)
 					])),
 				A2(
 				$elm$html$Html$div,
