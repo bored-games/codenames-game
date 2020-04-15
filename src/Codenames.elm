@@ -1,4 +1,4 @@
-port module Spymaster exposing (Model, Msg(..), init, main, update, inputPort, outputPort, subscriptions, view)
+port module Codenames exposing (Model, Msg(..), init, main, update, inputPort, outputPort, subscriptions, view)
 
 import Browser
 import Browser.Events

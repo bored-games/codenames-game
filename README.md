@@ -1,5 +1,5 @@
-# 🕵️ Spymaster 🕵️
-An offline browser-based game similar to "Codenames" written in Elm.
+# 🕵️ Codenames 🕵️
+An offline browser-based version of the popular game *Codenames* written in Elm.
 
 ## Objective
 Two teams take turns receiving clues and picking words from a set of cards until one team has found all of their words or the *Assassin* is selected.
@@ -26,7 +26,7 @@ To synchonize game boards, however, the parameter `s=<int>` may be appended to t
 ## Compile
 The Elm code has already been compiled into the Javascript that is used by `index.html`, but if additional changes are made, the source can be recompiled with
 
-```elm make src/Spymaster.elm --output=assets/js/main.js && elm reactor```
+```elm make src/Codenames.elm --output=assets/js/main.js && elm reactor```
 
 ## Legal note
 The US Government's Form Letter 108 emphasizes that
