@@ -5448,6 +5448,9 @@ var $author$project$Spymaster$init = function (_v0) {
 var $author$project$Spymaster$GetJSON = function (a) {
 	return {$: 'GetJSON', a: a};
 };
+var $author$project$Spymaster$KeyChanged = function (a) {
+	return {$: 'KeyChanged', a: a};
+};
 var $author$project$Spymaster$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
@@ -5867,17 +5870,230 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$value = _Json_decodeValue;
 var $author$project$Spymaster$inputPort = _Platform_incomingPort('inputPort', $elm$json$Json$Decode$value);
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
+	});
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyUp = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keyup');
+var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Spymaster$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
 				A2($elm$time$Time$every, 1000, $author$project$Spymaster$Tick),
-				$author$project$Spymaster$inputPort($author$project$Spymaster$GetJSON)
+				$author$project$Spymaster$inputPort($author$project$Spymaster$GetJSON),
+				$elm$browser$Browser$Events$onKeyUp(
+				A2(
+					$elm$json$Json$Decode$map,
+					$author$project$Spymaster$KeyChanged,
+					A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string)))
 			]));
 };
+var $author$project$Spymaster$ClearUI = {$: 'ClearUI'};
 var $author$project$Spymaster$NewGame = {$: 'NewGame'};
+var $author$project$Spymaster$PassTurn = {$: 'PassTurn'};
+var $author$project$Spymaster$ToggleQR = {$: 'ToggleQR'};
+var $author$project$Spymaster$ToggleSidebar = {$: 'ToggleSidebar'};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
@@ -6916,8 +7132,6 @@ var $author$project$Spymaster$JSONMessage = F2(
 	function (action, content) {
 		return {action: action, content: content};
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Spymaster$decodeJSON = A3(
 	$elm$json$Json$Decode$map2,
 	$author$project$Spymaster$JSONMessage,
@@ -8316,16 +8530,54 @@ var $author$project$Spymaster$update = F2(
 							model,
 							{currentTimer: model.currentTimer + 1}),
 						$elm$core$Platform$Cmd$none);
+				case 'ClearUI':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{toggleCustomWordsEntry: false, toggleLightbox: false, toggleQR: false, toggleSidebar: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'KeyChanged':
+					var key = msg.a;
+					var command = function () {
+						switch (key) {
+							case ' ':
+								return $elm$core$Maybe$Just(
+									A2($author$project$Spymaster$update, $author$project$Spymaster$PassTurn, model));
+							case 'Escape':
+								return $elm$core$Maybe$Just(
+									A2($author$project$Spymaster$update, $author$project$Spymaster$ClearUI, model));
+							case 'q':
+								return $elm$core$Maybe$Just(
+									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleQR, model));
+							case 'Q':
+								return $elm$core$Maybe$Just(
+									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleQR, model));
+							case 's':
+								return $elm$core$Maybe$Just(
+									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleSidebar, model));
+							case 'S':
+								return $elm$core$Maybe$Just(
+									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleSidebar, model));
+							default:
+								return $elm$core$Maybe$Nothing;
+						}
+					}();
+					if (command.$ === 'Just') {
+						var cmd = command.a;
+						return cmd;
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
 				default:
 					var json = msg.a;
-					var _v4 = A2($elm$json$Json$Decode$decodeValue, $author$project$Spymaster$decodeJSON, json);
-					if (_v4.$ === 'Ok') {
-						var action = _v4.a.action;
-						var content = _v4.a.content;
+					var _v6 = A2($elm$json$Json$Decode$decodeValue, $author$project$Spymaster$decodeJSON, json);
+					if (_v6.$ === 'Ok') {
+						var action = _v6.a.action;
+						var content = _v6.a.content;
 						if (action === 'set_game') {
-							var _v6 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
-							if (_v6.$ === 'Ok') {
-								var num = _v6.a;
+							var _v8 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
+							if (_v8.$ === 'Ok') {
+								var num = _v8.a;
 								var $temp$msg = $author$project$Spymaster$NewGame,
 									$temp$model = _Utils_update(
 									model,
@@ -8360,7 +8612,6 @@ var $author$project$Spymaster$update = F2(
 		}
 	});
 var $author$project$Spymaster$CancelCustomWords = {$: 'CancelCustomWords'};
-var $author$project$Spymaster$PassTurn = {$: 'PassTurn'};
 var $author$project$Spymaster$SaveCustomWords = {$: 'SaveCustomWords'};
 var $author$project$Spymaster$SetCustomWords = function (a) {
 	return {$: 'SetCustomWords', a: a};
@@ -8368,8 +8619,6 @@ var $author$project$Spymaster$SetCustomWords = function (a) {
 var $author$project$Spymaster$ToggleCustomWords = {$: 'ToggleCustomWords'};
 var $author$project$Spymaster$ToggleCustomWordsEntry = {$: 'ToggleCustomWordsEntry'};
 var $author$project$Spymaster$ToggleLightbox = {$: 'ToggleLightbox'};
-var $author$project$Spymaster$ToggleQR = {$: 'ToggleQR'};
-var $author$project$Spymaster$ToggleSidebar = {$: 'ToggleSidebar'};
 var $author$project$Spymaster$ToggleSoundEffects = {$: 'ToggleSoundEffects'};
 var $author$project$Spymaster$ToggleSpies = {$: 'ToggleSpies'};
 var $elm$html$Html$a = _VirtualDom_node('a');

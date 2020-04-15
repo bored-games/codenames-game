@@ -1,6 +1,7 @@
 port module Spymaster exposing (Model, Msg(..), init, main, update, inputPort, outputPort, subscriptions, view)
 
 import Browser
+import Browser.Events
 import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button)
 import Html.Attributes exposing (class, id, placeholder, value)
 import Html.Events exposing (onClick, onInput)
@@ -124,6 +125,8 @@ type Msg
     | PassTurn
     | NewGame
     | Tick Time.Posix
+    | ClearUI
+    | KeyChanged String
     | GetJSON Json.Encode.Value   -- Parse incoming JSON
 
 
@@ -238,6 +241,28 @@ update msg model =
 
       Tick _ ->
         ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
+
+      ClearUI -> 
+        ( { model | toggleLightbox = False, toggleQR = False, toggleSidebar = False, toggleCustomWordsEntry = False}, Cmd.none )
+
+      KeyChanged key ->
+        let
+          command =
+            case key of
+              " "      -> Just (update PassTurn model)
+              "Escape"     -> Just (update ClearUI model)
+              "q"      -> Just (update ToggleQR model)
+              "Q"      -> Just (update ToggleQR model)
+              "s"      -> Just (update ToggleSidebar model)
+              "S"      -> Just (update ToggleSidebar model)
+              _ -> Nothing
+        in
+          case command of
+            Just cmd ->
+              cmd
+            _ ->
+              ( model, Cmd.none )
+
 
       GetJSON json ->
         case Json.Decode.decodeValue decodeJSON json of
@@ -404,8 +429,8 @@ subscriptions _ =
   Sub.batch
     [ Time.every 1000 Tick
     , inputPort GetJSON
-  {-  , Browser.Events.onKeyUp (Json.Decode.map (KeyChanged False) (Json.Decode.field "key" Json.Decode.string))
-    , Browser.Events.onKeyDown (Json.Decode.map (KeyChanged True) (Json.Decode.field "key" Json.Decode.string)) -}
+    , Browser.Events.onKeyUp (Json.Decode.map KeyChanged (Json.Decode.field "key" Json.Decode.string))
+    {-- , Browser.Events.onKeyDown (Json.Decode.map (KeyChanged True) (Json.Decode.field "key" Json.Decode.string)) --}
     ]
 
 

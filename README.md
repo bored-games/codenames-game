@@ -18,6 +18,10 @@ A separate application, found at `./spymaster/index.html`, is used for decryptin
 
 <p align="center"><img src="docs/preview.png" width="1000px" alt="" /></p>
 
+## Synchronizing games
+Currently this is a local game, meaning there is no active communication with a central server. If you are playing remotely with friends, each player will need to select a card manually to make a move.
+
+To synchonize game boards, however, the parameter `s=<int>` may be appended to the URL (`index.php?s=123`). All games should then load the same cards and colors, and clicking *New Game* the same number of times should also work fine.
 
 ## Compile
 The Elm code has already been compiled into the Javascript that is used by `index.html`, but if additional changes are made, the source can be recompiled with
