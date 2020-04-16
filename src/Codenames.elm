@@ -1,10 +1,11 @@
 port module Codenames exposing (Model, Msg(..), init, main, update, inputPort, outputPort, subscriptions, view)
 
 import Browser
+import Browser.Dom
 import Browser.Events
-import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button)
-import Html.Attributes exposing (class, id, placeholder, value)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button, strong, br ,p)
+import Html.Attributes exposing (class, id, placeholder, value, href, target)
+import Html.Events exposing (onClick, onInput, onFocus, onBlur)
 import Random exposing (Seed, initialSeed, step)
 import Array exposing (Array, fromList, get, slice)
 import Random.Array exposing (shuffle)
@@ -17,6 +18,7 @@ import BigInt exposing (BigInt, toString, divmod, fromHexString)
 import Hex exposing (toString)
 import Json.Encode
 import Json.Decode
+import Task
 
 -- MAIN
 
@@ -54,6 +56,7 @@ type alias Model =
     { seed : Seed
     , turn : Bool -- True = red, False = blue
     , currentTimer : Int
+    , blockKeyShortcuts : Bool
     , debugString : String
     , toggleLightbox : Bool     -- True = show
     , toggleQR : Bool           -- True = show
@@ -80,6 +83,7 @@ init _ =
       (Random.initialSeed 99999999)      -- seed: to do: randomize
       False                              -- turn: True = red, False = blue
       0                                  -- currentTimer: to do: enable
+      False                              -- blockKeyShortcuts during Focus of textareas
       ""                                 -- debugString
       False                              -- toggleLightbox: for info, true = open
       False                              -- toggleQR: toggle QR display, true = open
@@ -126,8 +130,10 @@ type Msg
     | NewGame
     | Tick Time.Posix
     | ClearUI
+    | BlockKeyShortcuts Bool
     | KeyChanged String
     | GetJSON Json.Encode.Value   -- Parse incoming JSON
+    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg)
@@ -243,19 +249,28 @@ update msg model =
         ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
 
       ClearUI -> 
-        ( { model | toggleLightbox = False, toggleQR = False, toggleSidebar = False, toggleCustomWordsEntry = False}, Cmd.none )
+        ( { model | toggleLightbox = False, toggleQR = False, toggleSidebar = False, toggleCustomWordsEntry = False},
+          Task.attempt (\_ -> NoOp) (Browser.Dom.blur "custom_words_entry") )
+
+      BlockKeyShortcuts bool -> 
+        ( { model | blockKeyShortcuts = bool}, Cmd.none )
 
       KeyChanged key ->
         let
           command =
-            case key of
-              " "      -> Just (update PassTurn model)
-              "Escape"     -> Just (update ClearUI model)
-              "q"      -> Just (update ToggleQR model)
-              "Q"      -> Just (update ToggleQR model)
-              "s"      -> Just (update ToggleSidebar model)
-              "S"      -> Just (update ToggleSidebar model)
-              _ -> Nothing
+            if model.blockKeyShortcuts then
+              case key of
+                "Escape"     -> Just (update ClearUI model)
+                _ -> Nothing
+            else
+              case key of
+                " "      -> Just (update PassTurn model)
+                "Escape"     -> Just (update ClearUI model)
+                "q"      -> Just (update ToggleQR model)
+                "Q"      -> Just (update ToggleQR model)
+                "s"      -> Just (update ToggleSidebar model)
+                "S"      -> Just (update ToggleSidebar model)
+                _ -> Nothing
         in
           case command of
             Just cmd ->
@@ -280,6 +295,9 @@ update msg model =
 
           Err _ ->
             ( { model | debugString = "Bad JSON: " ++ Json.Encode.encode 0 json}, Cmd.none )
+
+      NoOp ->
+          ( model, Cmd.none)
 
 
 
@@ -437,26 +455,30 @@ subscriptions _ =
 
 
 -- VIEW
-lightboxInfo : List (Html Msg)
-lightboxInfo = [ div [ class "leftside"]
-                  [
-                    h2 [] [ text "Spymaster"] ]
-                , div [ class "rightside" ]
-                [
-                  h2 [] [ text "A Team Game for 4+ People"]
-                , div []
-                  [ div [] [ text "Divide into two teams and select one player from each team to be the Spymaster. She will have the decoded game board showing which words belong to her team. Copy the provided password or use the QR code to find the correct board with the Decryptor."]
-                  , div [] [ text "The Spymaster's job each turn is to provide one word that is not on any card, along with one number, to connect as many words as possible for her team to guess. The number (plus one) determines the maximum number of words that team may guess this turn. At any time, a team can pass, and the other team's Spymaster begins their turn."]
-                  , div [] [ text "Each guess is completed by selecting a card, revealing to which team it belongs. If a team selects a word that does not belong to their team, their turn is over. When all of one team's words are found, the team wins. If the *Assassin* is selected, the team loses immediately."]
-                  ]
-                , h2 [] [ text "Legal & copyright"]
-                , div []
-                  [ text "The US Government's Form Letter 108 emphasizes that "
-                  , blockquote [] [ text "Copyright does not protect the idea for a game, its name or title, or the method or methods for playing it. Nor does copyright protect any idea, system, method, device, or trademark ma­terial involved in developing, merchandising, or playing a game." ]
-                  , text "This program is free software: you can redistribute it or modify it under the GNU General Public License, version 3+. The source code is available on Github. Enjoy!"
+lightboxInfo : String -> List (Html Msg)
+lightboxInfo password = [ div [ class "instructions" ]
+                 [ h2 [] [ text "A team game for 4+ people"]
+                 , div []
+                   [ p [] [ text "Divide into two teams and select one player from each team to be the Spymaster. The Spymaster has access to the decrypted board showing which words belong to the team. Each turn, they will provide one word that is not on any card, along with one number, to connect as many words as possible for the team to guess. The number (plus one) determines the maximum number of words that team may guess this turn."]
+                   , p [] [ text "Each guess is completed by selecting a card, revealing to which team it belongs. If a team selects a word that does not belong to their team, their turn is over. At any time, a team can pass, and the other team's Spymaster begins their turn. When all of one team's words are found, the team wins. If the *Assassin* is selected, the team loses immediately."]
+                   ]
+                 ]
+                 , div [ class "right-side"]
+                  [ a  [ href "./spymaster", target "_blank", class "spymaster" ]
+                    [ div [ class "spymaster-preview" ] []
+                    , div [] [ strong [] [ text "Click here to access the Decryptor. " ]
+                              , br [] []
+                              , text ("Paste in the password provided at the bottom of the screen (" ++ password ++ ") to find the correct board.") ]
+                    ]
+                  , div [ class "legal" ]
+                    [ h2 [] [ text "Legal & copyright"]
+                    , div []
+                      [ text "This program is free software: you can redistribute it or modify it under the GNU General Public License, version 3+. The source code is available on Github. Enjoy!"
+                      , blockquote [] [ text "Copyright does not protect the idea for a game, its name or title, or the method or methods for playing it. Nor does copyright protect any idea, system, method, device, or trademark ma­terial involved in developing, merchandising, or playing a game." ]
+                      ]
+                    ]
                   ]
                 ]
-              ]
 
 drawWordlistToggle : Wordlist -> Html Msg
 drawWordlistToggle wordlist =
@@ -471,7 +493,7 @@ view model =
      drawCard 0 cards
   in
     div [ class "container" ]
-      [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] lightboxInfo ]
+      [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] (lightboxInfo model.password) ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [ id "qrcode" ] [] ]
       , div [ class "debug" ] [ {- text model.debugString -} ]
       , div
@@ -491,7 +513,7 @@ view model =
           ]
       , div
         [ class ("customWordsBar" ++ (if model.toggleCustomWordsEntry then "" else " hidden"))]
-          [ div [ class "textarea_area" ] [ textarea [ placeholder "Enter one word per line", onInput SetCustomWords, value model.customWordsString ] [] ]
+          [ div [ class "textarea_area" ] [ textarea [ id "custom_words_entry", placeholder "Enter one word per line", onInput SetCustomWords, value model.customWordsString, onFocus (BlockKeyShortcuts True), onBlur (BlockKeyShortcuts False) ] [] ]
           , div [ class "button_area" ]
             [ button [ onClick SaveCustomWords ] [ text "Save" ]
             , button [ onClick CancelCustomWords, class "button--cancel" ] [ text "Cancel" ]

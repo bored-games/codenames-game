@@ -5335,22 +5335,24 @@ var $author$project$Codenames$Card = F3(
 var $author$project$Codenames$Model = function (seed) {
 	return function (turn) {
 		return function (currentTimer) {
-			return function (debugString) {
-				return function (toggleLightbox) {
-					return function (toggleQR) {
-						return function (toggleSidebar) {
-							return function (toggleCustomWordsEntry) {
-								return function (toggleSoundEffects) {
-									return function (settings) {
-										return function (redRemaining) {
-											return function (blueRemaining) {
-												return function (password) {
-													return function (customWordsString) {
-														return function (customWords) {
-															return function (wordlists) {
-																return function (allWords) {
-																	return function (cards) {
-																		return {allWords: allWords, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, settings: settings, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, turn: turn, wordlists: wordlists};
+			return function (blockKeyShortcuts) {
+				return function (debugString) {
+					return function (toggleLightbox) {
+						return function (toggleQR) {
+							return function (toggleSidebar) {
+								return function (toggleCustomWordsEntry) {
+									return function (toggleSoundEffects) {
+										return function (settings) {
+											return function (redRemaining) {
+												return function (blueRemaining) {
+													return function (password) {
+														return function (customWordsString) {
+															return function (customWords) {
+																return function (wordlists) {
+																	return function (allWords) {
+																		return function (cards) {
+																			return {allWords: allWords, blockKeyShortcuts: blockKeyShortcuts, blueRemaining: blueRemaining, cards: cards, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, password: password, redRemaining: redRemaining, seed: seed, settings: settings, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, turn: turn, wordlists: wordlists};
+																		};
 																	};
 																};
 															};
@@ -5427,7 +5429,7 @@ var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
 var $author$project$Codenames$init = function (_v0) {
 	return _Utils_Tuple2(
 		$author$project$Codenames$Model(
-			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(false)(false)(
+			$elm$random$Random$initialSeed(99999999))(false)(0)(false)('')(false)(false)(false)(false)(false)(
 			{customWords: true, spies: true})(0)(0)('')('')(_List_Nil)(
 			_List_fromArray(
 				[
@@ -6091,6 +6093,7 @@ var $author$project$Codenames$subscriptions = function (_v0) {
 };
 var $author$project$Codenames$ClearUI = {$: 'ClearUI'};
 var $author$project$Codenames$NewGame = {$: 'NewGame'};
+var $author$project$Codenames$NoOp = {$: 'NoOp'};
 var $author$project$Codenames$PassTurn = {$: 'PassTurn'};
 var $author$project$Codenames$ToggleQR = {$: 'ToggleQR'};
 var $author$project$Codenames$ToggleSidebar = {$: 'ToggleSidebar'};
@@ -6170,6 +6173,25 @@ var $elm$core$List$append = F2(
 		} else {
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
 	});
 var $cmditch$elm_bigint$BigInt$Pos = function (a) {
 	return {$: 'Pos', a: a};
@@ -6981,6 +7003,7 @@ var $author$project$Codenames$base32Encode = function (input) {
 		return '';
 	}
 };
+var $elm$browser$Browser$Dom$blur = _Browser_call('blur');
 var $elm$random$Random$addOne = function (value) {
 	return _Utils_Tuple2(1, value);
 };
@@ -8543,31 +8566,52 @@ var $author$project$Codenames$update = F2(
 						_Utils_update(
 							model,
 							{toggleCustomWordsEntry: false, toggleLightbox: false, toggleQR: false, toggleSidebar: false}),
+						A2(
+							$elm$core$Task$attempt,
+							function (_v5) {
+								return $author$project$Codenames$NoOp;
+							},
+							$elm$browser$Browser$Dom$blur('custom_words_entry')));
+				case 'BlockKeyShortcuts':
+					var bool = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{blockKeyShortcuts: bool}),
 						$elm$core$Platform$Cmd$none);
 				case 'KeyChanged':
 					var key = msg.a;
 					var command = function () {
-						switch (key) {
-							case ' ':
-								return $elm$core$Maybe$Just(
-									A2($author$project$Codenames$update, $author$project$Codenames$PassTurn, model));
-							case 'Escape':
+						if (model.blockKeyShortcuts) {
+							if (key === 'Escape') {
 								return $elm$core$Maybe$Just(
 									A2($author$project$Codenames$update, $author$project$Codenames$ClearUI, model));
-							case 'q':
-								return $elm$core$Maybe$Just(
-									A2($author$project$Codenames$update, $author$project$Codenames$ToggleQR, model));
-							case 'Q':
-								return $elm$core$Maybe$Just(
-									A2($author$project$Codenames$update, $author$project$Codenames$ToggleQR, model));
-							case 's':
-								return $elm$core$Maybe$Just(
-									A2($author$project$Codenames$update, $author$project$Codenames$ToggleSidebar, model));
-							case 'S':
-								return $elm$core$Maybe$Just(
-									A2($author$project$Codenames$update, $author$project$Codenames$ToggleSidebar, model));
-							default:
+							} else {
 								return $elm$core$Maybe$Nothing;
+							}
+						} else {
+							switch (key) {
+								case ' ':
+									return $elm$core$Maybe$Just(
+										A2($author$project$Codenames$update, $author$project$Codenames$PassTurn, model));
+								case 'Escape':
+									return $elm$core$Maybe$Just(
+										A2($author$project$Codenames$update, $author$project$Codenames$ClearUI, model));
+								case 'q':
+									return $elm$core$Maybe$Just(
+										A2($author$project$Codenames$update, $author$project$Codenames$ToggleQR, model));
+								case 'Q':
+									return $elm$core$Maybe$Just(
+										A2($author$project$Codenames$update, $author$project$Codenames$ToggleQR, model));
+								case 's':
+									return $elm$core$Maybe$Just(
+										A2($author$project$Codenames$update, $author$project$Codenames$ToggleSidebar, model));
+								case 'S':
+									return $elm$core$Maybe$Just(
+										A2($author$project$Codenames$update, $author$project$Codenames$ToggleSidebar, model));
+								default:
+									return $elm$core$Maybe$Nothing;
+							}
 						}
 					}();
 					if (command.$ === 'Just') {
@@ -8576,16 +8620,16 @@ var $author$project$Codenames$update = F2(
 					} else {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
-				default:
+				case 'GetJSON':
 					var json = msg.a;
-					var _v7 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeJSON, json);
-					if (_v7.$ === 'Ok') {
-						var action = _v7.a.action;
-						var content = _v7.a.content;
+					var _v9 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeJSON, json);
+					if (_v9.$ === 'Ok') {
+						var action = _v9.a.action;
+						var content = _v9.a.content;
 						if (action === 'set_game') {
-							var _v9 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
-							if (_v9.$ === 'Ok') {
-								var num = _v9.a;
+							var _v11 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
+							if (_v11.$ === 'Ok') {
+								var num = _v11.a;
 								var $temp$msg = $author$project$Codenames$NewGame,
 									$temp$model = _Utils_update(
 									model,
@@ -8616,9 +8660,14 @@ var $author$project$Codenames$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					}
+				default:
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			}
 		}
 	});
+var $author$project$Codenames$BlockKeyShortcuts = function (a) {
+	return {$: 'BlockKeyShortcuts', a: a};
+};
 var $author$project$Codenames$CancelCustomWords = {$: 'CancelCustomWords'};
 var $author$project$Codenames$SaveCustomWords = {$: 'SaveCustomWords'};
 var $author$project$Codenames$SetCustomWords = function (a) {
@@ -8772,92 +8821,143 @@ var $author$project$Codenames$drawWordlistToggle = function (wordlist) {
 			]));
 };
 var $elm$html$Html$blockquote = _VirtualDom_node('blockquote');
+var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $author$project$Codenames$lightboxInfo = _List_fromArray(
-	[
-		A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('leftside')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Spymaster')
-					]))
-			])),
-		A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('rightside')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('A Team Game for 4+ People')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Divide into two teams and select one player from each team to be the Spymaster. She will have the decoded game board showing which words belong to her team. Copy the provided password or use the QR code to find the correct board with the Decryptor.')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('The Spymaster\'s job each turn is to provide one word that is not on any card, along with one number, to connect as many words as possible for her team to guess. The number (plus one) determines the maximum number of words that team may guess this turn. At any time, a team can pass, and the other team\'s Spymaster begins their turn.')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Each guess is completed by selecting a card, revealing to which team it belongs. If a team selects a word that does not belong to their team, their turn is over. When all of one team\'s words are found, the team wins. If the *Assassin* is selected, the team loses immediately.')
-							]))
-					])),
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Legal & copyright')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('The US Government\'s Form Letter 108 emphasizes that '),
-						A2(
-						$elm$html$Html$blockquote,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Copyright does not protect the idea for a game, its name or title, or the method or methods for playing it. Nor does copyright protect any idea, system, method, device, or trademark ma­terial involved in developing, merchandising, or playing a game.')
-							])),
-						$elm$html$Html$text('This program is free software: you can redistribute it or modify it under the GNU General Public License, version 3+. The source code is available on Github. Enjoy!')
-					]))
-			]))
-	]);
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$strong = _VirtualDom_node('strong');
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
+var $author$project$Codenames$lightboxInfo = function (password) {
+	return _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('instructions')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h2,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('A team game for 4+ people')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$p,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Divide into two teams and select one player from each team to be the Spymaster. The Spymaster has access to the decrypted board showing which words belong to the team. Each turn, they will provide one word that is not on any card, along with one number, to connect as many words as possible for the team to guess. The number (plus one) determines the maximum number of words that team may guess this turn.')
+								])),
+							A2(
+							$elm$html$Html$p,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Each guess is completed by selecting a card, revealing to which team it belongs. If a team selects a word that does not belong to their team, their turn is over. At any time, a team can pass, and the other team\'s Spymaster begins their turn. When all of one team\'s words are found, the team wins. If the *Assassin* is selected, the team loses immediately.')
+								]))
+						]))
+				])),
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('right-side')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$href('./spymaster'),
+							$elm$html$Html$Attributes$target('_blank'),
+							$elm$html$Html$Attributes$class('spymaster')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('spymaster-preview')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$strong,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Click here to access the Decryptor. ')
+										])),
+									A2($elm$html$Html$br, _List_Nil, _List_Nil),
+									$elm$html$Html$text('Paste in the password provided at the bottom of the screen (' + (password + ') to find the correct board.'))
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('legal')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h2,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Legal & copyright')
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('This program is free software: you can redistribute it or modify it under the GNU General Public License, version 3+. The source code is available on Github. Enjoy!'),
+									A2(
+									$elm$html$Html$blockquote,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Copyright does not protect the idea for a game, its name or title, or the method or methods for playing it. Nor does copyright protect any idea, system, method, device, or trademark ma­terial involved in developing, merchandising, or playing a game.')
+										]))
+								]))
+						]))
+				]))
+		]);
+};
 var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$html$Html$Events$onBlur = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'blur',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$onFocus = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'focus',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -8916,7 +9016,10 @@ var $author$project$Codenames$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2($elm$html$Html$div, _List_Nil, $author$project$Codenames$lightboxInfo)
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						$author$project$Codenames$lightboxInfo(model.password))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -9118,9 +9221,14 @@ var $author$project$Codenames$view = function (model) {
 								$elm$html$Html$textarea,
 								_List_fromArray(
 									[
+										$elm$html$Html$Attributes$id('custom_words_entry'),
 										$elm$html$Html$Attributes$placeholder('Enter one word per line'),
 										$elm$html$Html$Events$onInput($author$project$Codenames$SetCustomWords),
-										$elm$html$Html$Attributes$value(model.customWordsString)
+										$elm$html$Html$Attributes$value(model.customWordsString),
+										$elm$html$Html$Events$onFocus(
+										$author$project$Codenames$BlockKeyShortcuts(true)),
+										$elm$html$Html$Events$onBlur(
+										$author$project$Codenames$BlockKeyShortcuts(false))
 									]),
 								_List_Nil)
 							])),

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
 ::selection {
   background: rgba(0, 0, 0, .2);
 }
@@ -8,7 +10,7 @@ body {
   text-align: left;
   height: 100vh;
 	background: linear-gradient(to bottom, #827265 0, #4b4037 100%);
-  font-family: "Segoe UI", Helvetica, "Open Sans", Arial;
+  font-family: Lato, "Segoe UI", Helvetica, "Open Sans", Arial;
   overflow: hidden;
 }
 
@@ -199,8 +201,6 @@ button:hover {
 
 .decor_line {
   flex: 1 1 auto;
-  /* border-bottom: 3px solid #a24832; */
-/*  margin-right: 0.5rem; */
 }
 
 .spy {
@@ -211,12 +211,13 @@ button:hover {
 	width: 20%;
 	display: inline-block;
   background: #555;
-  background-position: center center;
-	background-size: cover;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
   margin-right: 5px;
-  z-index: 10;
   margin-top: 5px;
+  z-index: 10;
   transition: .1s linear all;
 }
 
@@ -246,10 +247,10 @@ button:hover {
 #c23 .spy { background-image: url('../static/spies/donald-maclean.png'); }
 #c24 .spy { background-image: url('../static/spies/klaus-fuchs.png'); }
 
+
 .wordbox {
   flex: 0 0 auto;
   color: #0c0b13;
-   /* background: #bc5c44; */
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   font-weight: 400;
@@ -258,8 +259,8 @@ button:hover {
   font-size: 1.8rem;
   display: flex;
   align-items: center;
-  line-height: 2.8rem;
-  font-family: Candara;
+  line-height: 3.2rem;
+  font-family: Lato, "Sego UI";
   position: relative;
   width: 100%;
   z-index: 5;
@@ -291,8 +292,6 @@ button:hover {
   z-index: -2;
   opacity: 1;
 }
-
-
 
 .wordbox span {
   width: 100%;
@@ -482,11 +481,10 @@ em {
   right: 0;
   top: 0;
   z-index: 1000;
-  transition: .1s linear all;
+  transition: .3s linear all;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation-fill-mode: both;
 }
 
 .lightbox > div {
@@ -494,7 +492,6 @@ em {
   box-shadow: 0 0 10px rgba(0, 0, 0, .4);
   border: 1px solid #fff;
   max-width: 80%;
-  transition: .25s linear all;
   color: #222;
   border-radius: 6px;
   padding: 18px;
@@ -502,18 +499,37 @@ em {
   line-height: 1.6rem;
 }
 
-.lightbox > div .leftside {
-  order: 2;
-  flex: 1 1 auto;
-  padding: 1.0rem;
-  width: 550px;
-}
-
-.lightbox > div .rightside {
+.lightbox > div .instructions {
   order: 1;
-  flex: 1 1 auto;
+  flex: 1 1 60%;
   text-align: justify;
   padding: 1.0rem 4.0rem 1.0rem 1.0rem;
+}
+
+.lightbox > div .right-side {
+  order: 2;
+  flex: 1 1 40%;
+  padding: 1.0rem;
+}
+
+.lightbox .spymaster {
+  background: rgba(0, 0, 0, .1);
+  border: 1px solid rgba(0, 0, 0, .3);
+  border-radius: 5px;
+  padding: 0.75rem;
+  display: flex;
+  text-decoration: none;
+  color: #444444;
+  transition: .2s linear all;
+}
+
+.lightbox .spymaster:hover {
+  background: rgba(0, 0, 0, .2);
+}
+
+.lightbox .legal {
+  text-align: justify;
+  padding: 1.0rem 0rem 1.0rem 0rem;
 }
 
 .lightbox h2 {
@@ -523,23 +539,17 @@ em {
   padding: 0;
 }
 
-.lightbox > div > div > div {
-  margin-bottom: 3.0rem;
-}
-
-.lightbox > div > div > div > div {
-  margin-bottom: 1.0rem;
-}
-
 blockquote {
   font-style: italic;
   color: #666;
-  margin-left: 1.0rem;
-  margin-right: 1.0rem;
+  margin-left: 0;
+  margin-right: 0;
   border-left: 3px solid #aaa;
   padding-left: 0.5rem;
   padding: 0.5rem;
   background: rgba(0, 0, 0, .05);
+  line-height: 1.4rem;
+  font-size: 0.8rem;
 }
 
 .lightbox.show {
@@ -555,6 +565,18 @@ blockquote {
 .hide_spies .spy {
   opacity: 0;
 }
+
+.spymaster-preview {
+  flex: 0 0 auto;
+  height: 5.0rem;
+  width: 5.0rem;
+  background: #e5e5e5 url('../static/images/decoder-preview.png') no-repeat;
+  background-size: contain;
+  margin-right:  0.75rem;
+  box-shadow: 0 0 4px rgba(0, 0, 0, .2);
+  border-radius: 3px;
+}
+
 
 /******** Uncovered ********/
 .uncovered:hover {
@@ -667,27 +689,3 @@ blockquote {
     transform: rotate(-4deg) translate(0px, 0px);
   }
 }
-
-/*
-
-top:-30px;
-bottom:-50px;
-left:-50%;
-right:-50%;
-background:#c0a78a;
-transform: rotate(9deg) translate(-0, 10%);
-z-index: -1;
-opacity: 0.7;
-}
-
-.wordbox:after{
-content:"";
-position:absolute;
-top:-20px;
-bottom:-50%;
-left:-50%;
-right:-50%;
-background:#7f7869;
-transform: rotate(4deg) translate(0px, 0px);
-
-*/
