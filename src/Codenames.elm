@@ -135,11 +135,11 @@ update msg model =
     case msg of
       UncoverCard index ->
         let
-          newCards = uncover 0 index model.cards
+          (newTurn, newCards) = uncover 0 index model.cards model.turn
           redRemaining = List.length (List.filter hiddenRed newCards)
           blueRemaining = List.length (List.filter hiddenBlue newCards)
         in
-          ( { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining },
+          ( { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining, turn = xor model.turn newTurn },
           Cmd.none)
 
       ToggleLightbox ->
@@ -371,18 +371,20 @@ populateCards cards words =
     
     _ -> []
 
-{- Uncover the 'target' card -}
-uncover : Int -> Int -> List (Card) -> List (Card)
-uncover index target cards =
+{- Uncover the 'target' card; return new turn and list of new cards -}
+uncover : Int -> Int -> List (Card) -> Bool -> (Bool, List (Card))
+uncover index target cards turn =
   case cards of
     c :: cs ->
       let
-          newCard = if index == target then { c | uncovered = True} else c
+          (switchTurn, newCard) = if index == target then ((turn && c.team /= 1) || (not turn && c.team /= 2), { c | uncovered = True }) else (False, c)
+          (switchTurnLater, moreCards) = uncover (index + 1) target cs turn
+          newCards = newCard :: moreCards
       in
-        newCard :: uncover (index + 1) target cs
+        (xor switchTurn switchTurnLater, newCards)
     
     _ ->
-      []
+      (False, [])
 
 hiddenRed : Card -> Bool
 hiddenRed c =

@@ -5328,11 +5328,11 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Spymaster$Card = F3(
+var $author$project$Codenames$Card = F3(
 	function (word, team, uncovered) {
 		return {team: team, uncovered: uncovered, word: word};
 	});
-var $author$project$Spymaster$Model = function (seed) {
+var $author$project$Codenames$Model = function (seed) {
 	return function (turn) {
 		return function (currentTimer) {
 			return function (debugString) {
@@ -5424,9 +5424,9 @@ var $author$project$Wordlist$wordlistFrancais = _List_fromArray(
 	['Accident', 'Achat', 'Acné', 'Action', 'Adolescent', 'Afrique', 'Aiguille', 'Allumer', 'Alpes', 'Alphabet', 'Altitude', 'Amérique', 'Ami', 'Amour', 'Ampoule', 'Anniversaire', 'Appétit', 'Araignée', 'Arbre', 'Arc', 'Arc-en-ciel', 'Argent', 'Arme', 'Armée', 'Ascenseur', 'Asie', 'Assis', 'Astronaute', 'Atchoum', 'Athlète', 'Atlantide', 'Aube', 'Australie', 'Avec', 'Aventure', 'Avion', 'Avocat', 'Bac', 'Baguette', 'Bain', 'Baiser', 'Balai', 'Balle', 'Ballon', 'Bambou', 'Banane', 'Bannir', 'Barbe', 'Barrière', 'Bas', 'Basket', 'Bateau', 'Bâton', 'Batterie', 'Bébé', 'Beethoven', 'Bête', 'Biberon', 'Bière', 'Blanc', 'blé', 'Bleu', 'Bob', 'Boisson', 'Boîte', 'Bombe', 'Bonbon', 'Bonnet', 'Bord', 'Bordeaux', 'Botte', 'Boue', 'Bougie', 'Boule', 'Bouteille', 'Bouton', 'Branche', 'Bras', 'Bravo', 'Bretagne', 'Brise', 'Brosse', 'Bruit', 'Brume', 'Brun', 'Bûche', 'Bulle', 'Bureau', 'But', 'Cabane', 'Cabine', 'Cacher', 'Cadeau', 'Cafard', 'Café', 'Caisse', 'Calculer', 'Calme', 'Caméra', 'Camion', 'Camping', 'Canada', 'Canard', 'Canette', 'Canine', 'Cap', 'Capitalisme', 'Car', 'Carotte', 'Carré', 'Carte', 'Carton', 'Casque', 'Casser', 'Cassette', 'Cauchemar', 'Cause', 'Ceinture', 'Cellule', 'Cercle', 'Chaîne', 'Chair', 'Chaise', 'Champ', 'Champion', 'Chant', 'Chapeau', 'Charbon', 'Charge', 'Chasse', 'Chat', 'Château', 'Chaud', 'Chaussure', 'Chauve', 'Chef', 'Chemise', 'Chêne', 'Cher', 'Cheval', 'Chevalier', 'Cheveu', 'Chien', 'Chiffre', 'Chine', 'Chocolat', 'Chômage', 'Ciel', 'Cil', 'Cinéma', 'Cire', 'Cirque', 'Citron', 'Clé', 'Clou', 'Clown', 'Coach', 'Coccinelle', 'Code', 'Cœur', 'Col', 'Colle', 'Colline', 'Colonne', 'Cône', 'Confort', 'Continu', 'Contre', 'Conversation', 'Copain', 'Coq', 'Coquillage', 'Corbeau', 'Corde', 'Corps', 'Côte', 'Coude', 'Couloir', 'Coup', 'Cour', 'Courant', 'Courrier', 'Cours', 'Course', 'Court', 'Couteau', 'Couvert', 'Couverture', 'Cowboy', 'Crac', 'Crayon', 'Crème', 'Critique', 'Crochet', 'Croix', 'Croûte', 'Cuillère', 'Cuir', 'Cuisine', 'Culotte', 'Cycle', 'Dard', 'Dé', 'Debout', 'Défaut', 'Dehors', 'Démocratie', 'Dent', 'Dentiste', 'Dessin', 'Devoir', 'Diamant', 'Dictionnaire', 'Dieu', 'Dinosaure', 'Discours', 'Disque', 'Dix', 'Docteur', 'Doigt', 'Domino', 'Dormir', 'Droit', 'Eau', 'Échec', 'Échelle', 'Éclair', 'École', 'Écran', 'Écraser', 'Écrit', 'Église', 'Égout', 'Électricité', 'Éléphant', 'Élève', 'Elfe', 'Empreinte', 'Enceinte', 'Épice', 'Épine', 'Erreur', 'Espace', 'Espion', 'Essence', 'État', 'Été', 'Étoile', 'Étranger', 'Éventail', 'Évolution', 'Explosoin', 'Extension', 'Face', 'Fan', 'Farce', 'Fatigue', 'Fauteuil', 'Fayot', 'Fenêtre', 'Fer', 'Fête', 'Feu', 'Feuille', 'Fidèle', 'Fil', 'Fille', 'Flamme', 'Flèche', 'Fleur', 'Fleuve', 'Fond', 'Football', 'Forêt', 'Forger', 'Foudre', 'Fouet', 'Four', 'Fourmi', 'Froid', 'Fromage', 'Front', 'Fruit', 'Fuir', 'Futur', 'Garçon', 'Gâteau', 'Gauche', 'Gaz', 'Gazon', 'Gel', 'Genou', 'Glace', 'Gomme', 'Gorge', 'Goutte', 'Grand', 'Grèce', 'Grenouille', 'Grippe', 'Gris', 'Gros', 'Groupe', 'Guitare', 'Hasard', 'Haut', 'Hélicoptère', 'Herbe', 'Heureux', 'Histoire', 'Hiver', 'Hôtel', 'Hugo', 'Huile', 'Humide', 'Humour', 'Indice', 'Internet', 'Inviter', 'Italie', 'Jacques', 'Jambe', 'Jambon', 'Jardin', 'Jaune', 'Jean', 'Jeanne', 'Jet', 'Jeu', 'Jogging', 'Jour', 'Journal', 'Jupiter', 'Kilo', 'Kiwi', 'Laine', 'Lait', 'Langue', 'Lapin', 'Latin', 'Laver', 'Lecteur', 'Léger', 'Lent', 'Lettre', 'Lien', 'Ligne', 'Linge', 'Lion', 'Lit', 'Livre', 'Loi', 'Long', 'Louis', 'Loup', 'Lumière', 'Lundi', 'Lune', 'Lunette', 'Machine', 'Macho', 'main', 'Maison', 'Maîtresse', 'Mal', 'Maladie', 'Maman', 'Mammouth', 'Manger', 'Marais', 'Marc', 'Marche', 'Mariage', 'Marie', 'Mariée', 'Marque', 'Marseille', 'Masse', 'Mer', 'Messe', 'Mètre', 'Métro', 'Miaou', 'Micro', 'Mieux', 'Mille', 'Mine', 'Miroir', 'Moderne', 'Moitié', 'Monde', 'Monstre', 'Montagne', 'Montre', 'Mort', 'Moteur', 'Moto', 'Mou', 'Mouche', 'Moulin', 'Moustache', 'Mouton', 'Mur', 'Muscle', 'Musique', 'Mystère', 'Nage', 'Nature', 'Neige', 'Neutre', 'New York', 'Nez', 'Nid', 'Ninja', 'Niveau', 'Noël', 'Nœud', 'Noir', 'Nous', 'Nuage', 'Nuit', 'Numéro', 'Œil', 'Œuf', 'Oiseau', 'Olympique', 'Ombre', 'Ongle', 'Or', 'Oral', 'Orange', 'Ordinateur', 'Ordre', 'Ordure', 'Oreille', 'Organe', 'Orgueil', 'Ours', 'Outil', 'Ouvert', 'Ovale', 'Pain', 'Palais', 'Panneau', 'Pantalon', 'Pantin', 'Papa', 'Papier', 'Papillon', 'Paradis', 'Parc', 'Paris', 'Parole', 'Partie', 'Passe', 'Pâte', 'Patin', 'Patte', 'Paul', 'Payer', 'Pêche', 'Peinture', 'Pendule', 'Penser', 'Personne', 'Petit', 'Peur', 'Philosophe', 'Photo', 'Phrase', 'Piano', 'Pièce', 'Pied', 'Pierre', 'Pile', 'Pilote', 'Pince', 'Pioche', 'Pion', 'Pirate', 'Pire', 'Piscine', 'Place', 'Plafond', 'Plage', 'Plaie', 'Plan', 'Planche', 'Planète', 'Plante', 'Plastique', 'Plat', 'Plat', 'Plomb', 'Plonger', 'Pluie', 'Poche', 'Poète', 'Poids', 'Poing', 'Point', 'Poivre', 'Police', 'Politique', 'Pollen', 'Polo', 'Pomme', 'Pompe', 'Pont', 'Population', 'Port', 'Porte', 'Portefeuille', 'Positif', 'Poste', 'Poubelle', 'Poule', 'Poupée', 'Pousser', 'Poussière', 'Pouvoir', 'Préhistoire', 'Premier', 'Présent', 'Presse', 'Prier', 'Princesse', 'Prise', 'Privé', 'Professeur', 'Psychologie', 'Public', 'Pull', 'Punk', 'Puzzle', 'Pyjama', 'Quatre', 'Quinze', 'Race', 'Radio', 'Raisin', 'Rap', 'Rayé', 'Rayon', 'Réfléchir', 'Reine', 'Repas', 'Reptile', 'Requin', 'Rêve', 'Riche', 'Rideau', 'Rien', 'Rire', 'Robinet', 'Roche', 'Roi', 'Rond', 'Rose', 'Roue', 'Rouge', 'Rouille', 'Roux', 'Russie', 'Sable', 'Sabre', 'Sac', 'Sain', 'Saison', 'Sale', 'Salle', 'Salut', 'Samu', 'Sandwich', 'Sang', 'Sapin', 'Satellite', 'Saumon', 'Saut', 'Savoir', 'Schtroumpf', 'Science', 'Scout', 'Sec', 'Seine', 'Sel', 'Sept', 'Serpent', 'Serrer', 'Sexe', 'Shampooing', 'Siècle', 'Siège', 'Sieste', 'Silhouette', 'Sirène', 'Ski', 'Soleil', 'Sommeil', 'Son', 'Sonner', 'Sorcière', 'Sourd', 'Souris', 'Sport', 'Star', 'Station', 'Stylo', 'Sur', 'Surface', 'Sushi', 'Swing', 'Tableau', 'Tache', 'Taille', 'Tante', 'Tapis', 'Tard', 'Taxi', 'Téléphone', 'Télévision', 'Temple', 'Temps', 'Tennis', 'Tête', 'Thé', 'Tigre', 'Tintin', 'Tissu', 'Titre', 'Titre', 'Toast', 'Toilette', 'Tokyo', 'Tombe', 'Ton', 'Top', 'Touche', 'Toujours', 'Tour', 'Tournoi', 'Tout', 'Trace', 'Train', 'Traîner', 'Transport', 'Travail', 'Trésor', 'Triangle', 'Triste', 'Trône', 'Troupeau', 'Tsar', 'Tube', 'Tuer', 'Tuer', 'Tupperware', 'Tuyau', 'Twitter', 'Type', 'Université', 'Vache', 'Vache', 'Vague', 'Vaisselle', 'Valeur', 'Ver', 'Verdict', 'Verre', 'Vers', 'Vert', 'Veste', 'Viande', 'Vide', 'Vie', 'Vieux', 'Ville', 'Vin', 'Vingt', 'Violon', 'Vipère', 'Vision', 'Vite', 'Vive', 'Vœu', 'Voile', 'Voisin', 'Voiture', 'Vol', 'Volume', 'Vote', 'Vouloir', 'Voyage', 'Zen', 'Zéro', 'Zodiaque', 'Zone', 'Zoo']);
 var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
 	['abnormal', 'abominable', 'afraid', 'afterlife', 'agony ', 'alarming', 'alien', 'angel', 'apparition', 'autumn', 'axe ', 'banshee', 'basilisk', 'bat', 'beast', 'behemoth', 'black', 'blood ', 'bogeyman', 'bones', 'boo', 'broom', 'bury', 'cadaver', 'candy', 'carve', 'casket', 'cat', 'cauldron', 'cemetery', 'Cerberus', 'changeling', 'chill', 'cider', 'claws', 'clown', 'coffin', 'cold ', 'convulse ', 'corpse', 'costume', 'creak ', 'creepy', 'crone', 'crypt', 'dark', 'dead', 'demon ', 'devil ', 'dire', 'disease', 'disguise', 'disturbed ', 'donuts', 'Dracula', 'dragon', 'dread ', 'drown ', 'ecto-plasm', 'eerie', 'evil', 'eye', 'fangs', 'fatal ', 'fear ', 'fiend', 'fog', 'Frankenstein', 'freak', 'fright', 'gargoyle', 'ghastly', 'ghost ', 'ghoul', 'goblin', 'goo', 'gore ', 'grave', 'gruesome', 'Halloween', 'haunted', 'hayride', 'heart', 'Hell ', 'helpless', 'horror', 'howl', 'insane', 'jack-o\'-lantern', 'kill ', 'leaves', 'macabre', 'magic', 'mask', 'mausoleum', 'menace ', 'midnight', 'monster ', 'moon ', 'morbid', 'mummy', 'murder', 'mutant', 'mystery', 'mystical', 'night', 'occult', 'October', 'ogre', 'ominous', 'orange', 'owl', 'pagan', 'pain ', 'paranormal', 'party', 'phantasm', 'phantom', 'poltergeist', 'potion', 'pumpkin', 'putrid ', 'raven', 'reaper', 'rotten ', 'scare', 'scream ', 'shadow', 'shiver', 'silence', 'sinister ', 'skeleton ', 'skull', 'slime', 'specter', 'spell', 'spider', 'spirit', 'spooky', 'stab', 'stalk ', 'strange', 'strangle', 'suicide ', 'supernatural', 'superstition', 'sweets', 'tarantula', 'tense ', 'terrify ', 'thrill', 'tomb', 'torture ', 'treat', 'tremble', 'trick', 'troll', 'undead', 'unearth', 'vampire', 'villain', 'wand', 'warlock', 'web', 'weird', 'werewolf', 'wicked', 'witch', 'wizard', 'wraith', 'zombie ']);
-var $author$project$Spymaster$init = function (_v0) {
+var $author$project$Codenames$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Spymaster$Model(
+		$author$project$Codenames$Model(
 			$elm$random$Random$initialSeed(99999999))(false)(0)('')(false)(false)(false)(false)(false)(
 			{customWords: true, spies: true})(0)(0)('')('')(_List_Nil)(
 			_List_fromArray(
@@ -5442,16 +5442,16 @@ var $author$project$Spymaster$init = function (_v0) {
 			A2(
 				$elm$core$List$repeat,
 				25,
-				A3($author$project$Spymaster$Card, '', 0, false))),
+				A3($author$project$Codenames$Card, '', 0, false))),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Spymaster$GetJSON = function (a) {
+var $author$project$Codenames$GetJSON = function (a) {
 	return {$: 'GetJSON', a: a};
 };
-var $author$project$Spymaster$KeyChanged = function (a) {
+var $author$project$Codenames$KeyChanged = function (a) {
 	return {$: 'KeyChanged', a: a};
 };
-var $author$project$Spymaster$Tick = function (a) {
+var $author$project$Codenames$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5872,7 +5872,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$value = _Json_decodeValue;
-var $author$project$Spymaster$inputPort = _Platform_incomingPort('inputPort', $elm$json$Json$Decode$value);
+var $author$project$Codenames$inputPort = _Platform_incomingPort('inputPort', $elm$json$Json$Decode$value);
 var $elm$browser$Browser$Events$Document = {$: 'Document'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
@@ -6076,24 +6076,24 @@ var $elm$browser$Browser$Events$on = F3(
 	});
 var $elm$browser$Browser$Events$onKeyUp = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keyup');
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Spymaster$subscriptions = function (_v0) {
+var $author$project$Codenames$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A2($elm$time$Time$every, 1000, $author$project$Spymaster$Tick),
-				$author$project$Spymaster$inputPort($author$project$Spymaster$GetJSON),
+				A2($elm$time$Time$every, 1000, $author$project$Codenames$Tick),
+				$author$project$Codenames$inputPort($author$project$Codenames$GetJSON),
 				$elm$browser$Browser$Events$onKeyUp(
 				A2(
 					$elm$json$Json$Decode$map,
-					$author$project$Spymaster$KeyChanged,
+					$author$project$Codenames$KeyChanged,
 					A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string)))
 			]));
 };
-var $author$project$Spymaster$ClearUI = {$: 'ClearUI'};
-var $author$project$Spymaster$NewGame = {$: 'NewGame'};
-var $author$project$Spymaster$PassTurn = {$: 'PassTurn'};
-var $author$project$Spymaster$ToggleQR = {$: 'ToggleQR'};
-var $author$project$Spymaster$ToggleSidebar = {$: 'ToggleSidebar'};
+var $author$project$Codenames$ClearUI = {$: 'ClearUI'};
+var $author$project$Codenames$NewGame = {$: 'NewGame'};
+var $author$project$Codenames$PassTurn = {$: 'PassTurn'};
+var $author$project$Codenames$ToggleQR = {$: 'ToggleQR'};
+var $author$project$Codenames$ToggleSidebar = {$: 'ToggleSidebar'};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
@@ -6145,7 +6145,7 @@ var $elm$core$Array$set = F3(
 			A4($elm$core$Array$setHelp, startShift, index, value, tree),
 			tail));
 	});
-var $author$project$Spymaster$ammendArray = F4(
+var $author$project$Codenames$ammendArray = F4(
 	function (ids, digits, msb, lsb) {
 		if (ids.b) {
 			var i = ids.a;
@@ -6158,7 +6158,7 @@ var $author$project$Spymaster$ammendArray = F4(
 					$elm$core$Array$set,
 					50 - (2 * i),
 					lsb,
-					A4($author$project$Spymaster$ammendArray, is, digits, msb, lsb)));
+					A4($author$project$Codenames$ammendArray, is, digits, msb, lsb)));
 		} else {
 			return digits;
 		}
@@ -6940,7 +6940,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Spymaster$base32Encode = function (input) {
+var $author$project$Codenames$base32Encode = function (input) {
 	if (A2(
 		$cmditch$elm_bigint$BigInt$gt,
 		input,
@@ -6972,7 +6972,7 @@ var $author$project$Spymaster$base32Encode = function (input) {
 			$elm$core$String$toInt(
 				$cmditch$elm_bigint$BigInt$toString(m)));
 		return _Utils_ap(
-			$author$project$Spymaster$base32Encode(d),
+			$author$project$Codenames$base32Encode(d),
 			A2(
 				$elm$core$Maybe$withDefault,
 				'',
@@ -7108,7 +7108,7 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
-var $author$project$Spymaster$colorCards = F5(
+var $author$project$Codenames$colorCards = F5(
 	function (assassinID, redIDs, blueIDs, index, card) {
 		return _Utils_eq(index, assassinID) ? _Utils_update(
 			card,
@@ -7128,13 +7128,13 @@ var $elm$core$List$concatMap = F2(
 		return $elm$core$List$concat(
 			A2($elm$core$List$map, f, list));
 	});
-var $author$project$Spymaster$JSONMessage = F2(
+var $author$project$Codenames$JSONMessage = F2(
 	function (action, content) {
 		return {action: action, content: content};
 	});
-var $author$project$Spymaster$decodeJSON = A3(
+var $author$project$Codenames$decodeJSON = A3(
 	$elm$json$Json$Decode$map2,
-	$author$project$Spymaster$JSONMessage,
+	$author$project$Codenames$JSONMessage,
 	A2($elm$json$Json$Decode$field, 'action', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'content', $elm$json$Json$Decode$value));
 var $elm$json$Json$Decode$decodeValue = _Json_run;
@@ -7162,14 +7162,14 @@ var $elm$core$Set$insert = F2(
 var $elm$core$Set$fromList = function (list) {
 	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
 };
-var $author$project$Spymaster$hiddenBlue = function (c) {
+var $author$project$Codenames$hiddenBlue = function (c) {
 	return (!function ($) {
 		return $.uncovered;
 	}(c)) && (function ($) {
 		return $.team;
 	}(c) === 2);
 };
-var $author$project$Spymaster$hiddenRed = function (c) {
+var $author$project$Codenames$hiddenRed = function (c) {
 	return (!function ($) {
 		return $.uncovered;
 	}(c)) && (function ($) {
@@ -7177,7 +7177,7 @@ var $author$project$Spymaster$hiddenRed = function (c) {
 	}(c) === 1);
 };
 var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $author$project$Spymaster$isNotEmpty = function (str) {
+var $author$project$Codenames$isNotEmpty = function (str) {
 	return !$elm$core$String$isEmpty(str);
 };
 var $elm$core$Maybe$map2 = F3(
@@ -7801,7 +7801,7 @@ var $rtfeldman$elm_hex$Hex$toString = function (num) {
 			_Utils_chr('-'),
 			A2($rtfeldman$elm_hex$Hex$unsafePositiveToDigits, _List_Nil, -num)) : A2($rtfeldman$elm_hex$Hex$unsafePositiveToDigits, _List_Nil, num));
 };
-var $author$project$Spymaster$getHexString = function (digits) {
+var $author$project$Codenames$getHexString = function (digits) {
 	if (((digits.b && digits.b.b) && digits.b.b.b) && digits.b.b.b.b) {
 		var a = digits.a;
 		var _v1 = digits.b;
@@ -7814,14 +7814,14 @@ var $author$project$Spymaster$getHexString = function (digits) {
 		return _Utils_ap(
 			$rtfeldman$elm_hex$Hex$toString(
 				(((a ? 8 : 0) + (b ? 4 : 0)) + (c ? 2 : 0)) + (d ? 1 : 0)),
-			$author$project$Spymaster$getHexString(es));
+			$author$project$Codenames$getHexString(es));
 	} else {
 		return '';
 	}
 };
-var $author$project$Spymaster$listBoolToBigInt = function (digits) {
+var $author$project$Codenames$listBoolToBigInt = function (digits) {
 	var _v0 = $cmditch$elm_bigint$BigInt$fromHexString(
-		$author$project$Spymaster$getHexString(digits));
+		$author$project$Codenames$getHexString(digits));
 	if (_v0.$ === 'Just') {
 		var bi = _v0.a;
 		return bi;
@@ -7830,7 +7830,7 @@ var $author$project$Spymaster$listBoolToBigInt = function (digits) {
 	}
 };
 var $elm$core$Debug$log = _Debug_log;
-var $author$project$Spymaster$maybeToggle = F2(
+var $author$project$Codenames$maybeToggle = F2(
 	function (key, wordlist) {
 		return _Utils_eq(key, wordlist.key) ? _Utils_update(
 			wordlist,
@@ -7850,8 +7850,8 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Spymaster$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
-var $author$project$Spymaster$populateCards = F2(
+var $author$project$Codenames$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
+var $author$project$Codenames$populateCards = F2(
 	function (cards, words) {
 		if (cards.b) {
 			var c = cards.a;
@@ -7864,14 +7864,14 @@ var $author$project$Spymaster$populateCards = F2(
 					_Utils_update(
 						c,
 						{word: w}),
-					A2($author$project$Spymaster$populateCards, cs, ws));
+					A2($author$project$Codenames$populateCards, cs, ws));
 			} else {
 				return A2(
 					$elm$core$List$cons,
 					_Utils_update(
 						c,
 						{word: 'Not Enough Words!'}),
-					A2($author$project$Spymaster$populateCards, cs, _List_Nil));
+					A2($author$project$Codenames$populateCards, cs, _List_Nil));
 			}
 		} else {
 			return _List_Nil;
@@ -8288,39 +8288,47 @@ var $elm$random$Random$step = F2(
 		return generator(seed);
 	});
 var $elm$core$String$trim = _String_trim;
-var $author$project$Spymaster$uncover = F3(
-	function (index, target, cards) {
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Basics$xor = _Basics_xor;
+var $author$project$Codenames$uncover = F4(
+	function (index, target, cards, turn) {
 		if (cards.b) {
 			var c = cards.a;
 			var cs = cards.b;
-			var newCard = _Utils_eq(index, target) ? _Utils_update(
-				c,
-				{uncovered: true}) : c;
-			return A2(
-				$elm$core$List$cons,
-				newCard,
-				A3($author$project$Spymaster$uncover, index + 1, target, cs));
+			var _v1 = _Utils_eq(index, target) ? _Utils_Tuple2(
+				(turn && (c.team !== 1)) || ((!turn) && (c.team !== 2)),
+				_Utils_update(
+					c,
+					{uncovered: true})) : _Utils_Tuple2(false, c);
+			var switchTurn = _v1.a;
+			var newCard = _v1.b;
+			var _v2 = A4($author$project$Codenames$uncover, index + 1, target, cs, turn);
+			var switchTurnLater = _v2.a;
+			var moreCards = _v2.b;
+			var newCards = A2($elm$core$List$cons, newCard, moreCards);
+			return _Utils_Tuple2(switchTurn !== switchTurnLater, newCards);
 		} else {
-			return _List_Nil;
+			return _Utils_Tuple2(false, _List_Nil);
 		}
 	});
-var $elm$core$Basics$xor = _Basics_xor;
-var $author$project$Spymaster$update = F2(
+var $author$project$Codenames$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
 			switch (msg.$) {
 				case 'UncoverCard':
 					var index = msg.a;
-					var newCards = A3($author$project$Spymaster$uncover, 0, index, model.cards);
-					var redRemaining = $elm$core$List$length(
-						A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newCards));
+					var _v1 = A4($author$project$Codenames$uncover, 0, index, model.cards, model.turn);
+					var newTurn = _v1.a;
+					var newCards = _v1.b;
 					var blueRemaining = $elm$core$List$length(
-						A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newCards));
+						A2($elm$core$List$filter, $author$project$Codenames$hiddenBlue, newCards));
+					var redRemaining = $elm$core$List$length(
+						A2($elm$core$List$filter, $author$project$Codenames$hiddenRed, newCards));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{blueRemaining: blueRemaining, cards: newCards, redRemaining: redRemaining}),
+							{blueRemaining: blueRemaining, cards: newCards, redRemaining: redRemaining, turn: model.turn !== newTurn}),
 						$elm$core$Platform$Cmd$none);
 				case 'ToggleLightbox':
 					return _Utils_Tuple2(
@@ -8366,7 +8374,7 @@ var $author$project$Spymaster$update = F2(
 					var key = msg.a;
 					var wordlists = A2(
 						$elm$core$List$map,
-						$author$project$Spymaster$maybeToggle(key),
+						$author$project$Codenames$maybeToggle(key),
 						model.wordlists);
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -8395,7 +8403,7 @@ var $author$project$Spymaster$update = F2(
 						$elm$core$Set$fromList(
 							A2(
 								$elm$core$List$filter,
-								$author$project$Spymaster$isNotEmpty,
+								$author$project$Codenames$isNotEmpty,
 								A2(
 									$elm$core$List$map,
 									$elm$core$String$trim,
@@ -8436,28 +8444,28 @@ var $author$project$Spymaster$update = F2(
 						model.settings.customWords ? model.customWords : _List_Nil);
 					var myPrime = _List_fromArray(
 						[true, false, true, false, true, true, false, false, true, true, true, true, false, true, false, false, false, false, true, true, false, false, false, true, true, true, true, false, true, false, false, false, false, true, false, true, true, false, false, false, false, true, false, false, false, false, true, false, true, false, true, true]);
-					var _v1 = A2(
+					var _v2 = A2(
 						$elm$random$Random$step,
 						$elm_community$random_extra$Random$List$shuffle(wordlist),
 						model.seed);
-					var newWords = _v1.a;
-					var seed1 = _v1.b;
-					var _v2 = A2($elm$random$Random$step, $elm_community$random_extra$Random$Extra$bool, seed1);
-					var newTurn = _v2.a;
-					var seed2 = _v2.b;
+					var newWords = _v2.a;
+					var seed1 = _v2.b;
+					var _v3 = A2($elm$random$Random$step, $elm_community$random_extra$Random$Extra$bool, seed1);
+					var newTurn = _v3.a;
+					var seed2 = _v3.b;
 					var boolList1 = A3(
 						$elm$core$Array$set,
 						0,
 						newTurn,
 						A2($elm$core$Array$repeat, 53, false));
-					var _v3 = A2(
+					var _v4 = A2(
 						$elm$random$Random$step,
 						$elm_community$random_extra$Random$Array$shuffle(
 							$elm$core$Array$fromList(
 								A2($elm$core$List$range, 0, 24))),
 						seed2);
-					var newIDs = _v3.a;
-					var seed3 = _v3.b;
+					var newIDs = _v4.a;
+					var seed3 = _v4.b;
 					var assassinID = A2(
 						$elm$core$Maybe$withDefault,
 						0,
@@ -8480,37 +8488,37 @@ var $author$project$Spymaster$update = F2(
 							newTurn ? 10 : 9,
 							newIDs));
 					var boolList3 = A4(
-						$author$project$Spymaster$ammendArray,
+						$author$project$Codenames$ammendArray,
 						blueIDs,
-						A4($author$project$Spymaster$ammendArray, redIDs, boolList2, true, false),
+						A4($author$project$Codenames$ammendArray, redIDs, boolList2, true, false),
 						false,
 						true);
-					var bigint1 = $author$project$Spymaster$listBoolToBigInt(
+					var bigint1 = $author$project$Codenames$listBoolToBigInt(
 						A3(
 							$elm$core$List$map2,
 							$elm$core$Basics$xor,
 							myPrime,
 							$elm$core$Array$toList(boolList3)));
-					var newPassword = $author$project$Spymaster$base32Encode(bigint1);
+					var newPassword = $author$project$Codenames$base32Encode(bigint1);
 					var newShuffledCards = A2(
 						$elm$core$List$indexedMap,
-						A3($author$project$Spymaster$colorCards, assassinID, redIDs, blueIDs),
-						A2($author$project$Spymaster$populateCards, model.cards, newWords));
+						A3($author$project$Codenames$colorCards, assassinID, redIDs, blueIDs),
+						A2($author$project$Codenames$populateCards, model.cards, newWords));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
 								allWords: wordlist,
 								blueRemaining: $elm$core$List$length(
-									A2($elm$core$List$filter, $author$project$Spymaster$hiddenBlue, newShuffledCards)),
+									A2($elm$core$List$filter, $author$project$Codenames$hiddenBlue, newShuffledCards)),
 								cards: newShuffledCards,
 								password: newPassword,
 								redRemaining: $elm$core$List$length(
-									A2($elm$core$List$filter, $author$project$Spymaster$hiddenRed, newShuffledCards)),
+									A2($elm$core$List$filter, $author$project$Codenames$hiddenRed, newShuffledCards)),
 								seed: seed3,
 								turn: newTurn
 							}),
-						$author$project$Spymaster$outputPort(
+						$author$project$Codenames$outputPort(
 							A2(
 								$elm$json$Json$Encode$encode,
 								0,
@@ -8542,22 +8550,22 @@ var $author$project$Spymaster$update = F2(
 						switch (key) {
 							case ' ':
 								return $elm$core$Maybe$Just(
-									A2($author$project$Spymaster$update, $author$project$Spymaster$PassTurn, model));
+									A2($author$project$Codenames$update, $author$project$Codenames$PassTurn, model));
 							case 'Escape':
 								return $elm$core$Maybe$Just(
-									A2($author$project$Spymaster$update, $author$project$Spymaster$ClearUI, model));
+									A2($author$project$Codenames$update, $author$project$Codenames$ClearUI, model));
 							case 'q':
 								return $elm$core$Maybe$Just(
-									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleQR, model));
+									A2($author$project$Codenames$update, $author$project$Codenames$ToggleQR, model));
 							case 'Q':
 								return $elm$core$Maybe$Just(
-									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleQR, model));
+									A2($author$project$Codenames$update, $author$project$Codenames$ToggleQR, model));
 							case 's':
 								return $elm$core$Maybe$Just(
-									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleSidebar, model));
+									A2($author$project$Codenames$update, $author$project$Codenames$ToggleSidebar, model));
 							case 'S':
 								return $elm$core$Maybe$Just(
-									A2($author$project$Spymaster$update, $author$project$Spymaster$ToggleSidebar, model));
+									A2($author$project$Codenames$update, $author$project$Codenames$ToggleSidebar, model));
 							default:
 								return $elm$core$Maybe$Nothing;
 						}
@@ -8570,15 +8578,15 @@ var $author$project$Spymaster$update = F2(
 					}
 				default:
 					var json = msg.a;
-					var _v6 = A2($elm$json$Json$Decode$decodeValue, $author$project$Spymaster$decodeJSON, json);
-					if (_v6.$ === 'Ok') {
-						var action = _v6.a.action;
-						var content = _v6.a.content;
+					var _v7 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeJSON, json);
+					if (_v7.$ === 'Ok') {
+						var action = _v7.a.action;
+						var content = _v7.a.content;
 						if (action === 'set_game') {
-							var _v8 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
-							if (_v8.$ === 'Ok') {
-								var num = _v8.a;
-								var $temp$msg = $author$project$Spymaster$NewGame,
+							var _v9 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
+							if (_v9.$ === 'Ok') {
+								var num = _v9.a;
+								var $temp$msg = $author$project$Codenames$NewGame,
 									$temp$model = _Utils_update(
 									model,
 									{
@@ -8588,7 +8596,7 @@ var $author$project$Spymaster$update = F2(
 								model = $temp$model;
 								continue update;
 							} else {
-								var $temp$msg = $author$project$Spymaster$NewGame,
+								var $temp$msg = $author$project$Codenames$NewGame,
 									$temp$model = model;
 								msg = $temp$msg;
 								model = $temp$model;
@@ -8611,16 +8619,16 @@ var $author$project$Spymaster$update = F2(
 			}
 		}
 	});
-var $author$project$Spymaster$CancelCustomWords = {$: 'CancelCustomWords'};
-var $author$project$Spymaster$SaveCustomWords = {$: 'SaveCustomWords'};
-var $author$project$Spymaster$SetCustomWords = function (a) {
+var $author$project$Codenames$CancelCustomWords = {$: 'CancelCustomWords'};
+var $author$project$Codenames$SaveCustomWords = {$: 'SaveCustomWords'};
+var $author$project$Codenames$SetCustomWords = function (a) {
 	return {$: 'SetCustomWords', a: a};
 };
-var $author$project$Spymaster$ToggleCustomWords = {$: 'ToggleCustomWords'};
-var $author$project$Spymaster$ToggleCustomWordsEntry = {$: 'ToggleCustomWordsEntry'};
-var $author$project$Spymaster$ToggleLightbox = {$: 'ToggleLightbox'};
-var $author$project$Spymaster$ToggleSoundEffects = {$: 'ToggleSoundEffects'};
-var $author$project$Spymaster$ToggleSpies = {$: 'ToggleSpies'};
+var $author$project$Codenames$ToggleCustomWords = {$: 'ToggleCustomWords'};
+var $author$project$Codenames$ToggleCustomWordsEntry = {$: 'ToggleCustomWordsEntry'};
+var $author$project$Codenames$ToggleLightbox = {$: 'ToggleLightbox'};
+var $author$project$Codenames$ToggleSoundEffects = {$: 'ToggleSoundEffects'};
+var $author$project$Codenames$ToggleSpies = {$: 'ToggleSpies'};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -8632,7 +8640,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Spymaster$UncoverCard = function (a) {
+var $author$project$Codenames$UncoverCard = function (a) {
 	return {$: 'UncoverCard', a: a};
 };
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
@@ -8656,7 +8664,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Spymaster$drawCard = F2(
+var $author$project$Codenames$drawCard = F2(
 	function (index, cards) {
 		if (cards.b) {
 			var c = cards.a;
@@ -8677,7 +8685,7 @@ var $author$project$Spymaster$drawCard = F2(
 							$elm$html$Html$Attributes$id(
 							'c' + $elm$core$String$fromInt(index)),
 							$elm$html$Html$Events$onClick(
-							$author$project$Spymaster$UncoverCard(index))
+							$author$project$Codenames$UncoverCard(index))
 						]),
 					_List_fromArray(
 						[
@@ -8726,16 +8734,16 @@ var $author$project$Spymaster$drawCard = F2(
 										]))
 								]))
 						])),
-				A2($author$project$Spymaster$drawCard, index + 1, cs));
+				A2($author$project$Codenames$drawCard, index + 1, cs));
 		} else {
 			return _List_Nil;
 		}
 	});
-var $author$project$Spymaster$ToggleWordlist = function (a) {
+var $author$project$Codenames$ToggleWordlist = function (a) {
 	return {$: 'ToggleWordlist', a: a};
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $author$project$Spymaster$drawWordlistToggle = function (wordlist) {
+var $author$project$Codenames$drawWordlistToggle = function (wordlist) {
 	return A2(
 		$elm$html$Html$li,
 		_List_Nil,
@@ -8747,7 +8755,7 @@ var $author$project$Spymaster$drawWordlistToggle = function (wordlist) {
 					[
 						$elm$html$Html$Attributes$class(''),
 						$elm$html$Html$Events$onClick(
-						$author$project$Spymaster$ToggleWordlist(wordlist.key))
+						$author$project$Codenames$ToggleWordlist(wordlist.key))
 					]),
 				_List_fromArray(
 					[
@@ -8765,7 +8773,7 @@ var $author$project$Spymaster$drawWordlistToggle = function (wordlist) {
 };
 var $elm$html$Html$blockquote = _VirtualDom_node('blockquote');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $author$project$Spymaster$lightboxInfo = _List_fromArray(
+var $author$project$Codenames$lightboxInfo = _List_fromArray(
 	[
 		A2(
 		$elm$html$Html$div,
@@ -8885,10 +8893,10 @@ var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProp
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Spymaster$view = function (model) {
-	var wordlistToggles = A2($elm$core$List$map, $author$project$Spymaster$drawWordlistToggle, model.wordlists);
+var $author$project$Codenames$view = function (model) {
+	var wordlistToggles = A2($elm$core$List$map, $author$project$Codenames$drawWordlistToggle, model.wordlists);
 	var addCards = function (cards) {
-		return A2($author$project$Spymaster$drawCard, 0, cards);
+		return A2($author$project$Codenames$drawCard, 0, cards);
 	};
 	return A2(
 		$elm$html$Html$div,
@@ -8904,11 +8912,11 @@ var $author$project$Spymaster$view = function (model) {
 					[
 						$elm$html$Html$Attributes$class(
 						'lightbox' + (model.toggleLightbox ? ' show' : ' hidden')),
-						$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleLightbox)
+						$elm$html$Html$Events$onClick($author$project$Codenames$ToggleLightbox)
 					]),
 				_List_fromArray(
 					[
-						A2($elm$html$Html$div, _List_Nil, $author$project$Spymaster$lightboxInfo)
+						A2($elm$html$Html$div, _List_Nil, $author$project$Codenames$lightboxInfo)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -8916,7 +8924,7 @@ var $author$project$Spymaster$view = function (model) {
 					[
 						$elm$html$Html$Attributes$class(
 						'lightbox' + (model.toggleQR ? ' show' : ' hidden')),
-						$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleQR)
+						$elm$html$Html$Events$onClick($author$project$Codenames$ToggleQR)
 					]),
 				_List_fromArray(
 					[
@@ -8959,7 +8967,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleSpies)
+												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleSpies)
 											]),
 										_List_fromArray(
 											[
@@ -8984,7 +8992,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleSoundEffects)
+												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleSoundEffects)
 											]),
 										_List_fromArray(
 											[
@@ -9018,7 +9026,7 @@ var $author$project$Spymaster$view = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class(''),
-													$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleCustomWords)
+													$elm$html$Html$Events$onClick($author$project$Codenames$ToggleCustomWords)
 												]),
 											_List_fromArray(
 												[
@@ -9049,7 +9057,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleCustomWordsEntry)
+												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleCustomWordsEntry)
 											]),
 										_List_fromArray(
 											[
@@ -9073,7 +9081,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class(''),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleSidebar)
+												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleSidebar)
 											]),
 										_List_fromArray(
 											[
@@ -9111,7 +9119,7 @@ var $author$project$Spymaster$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$placeholder('Enter one word per line'),
-										$elm$html$Html$Events$onInput($author$project$Spymaster$SetCustomWords),
+										$elm$html$Html$Events$onInput($author$project$Codenames$SetCustomWords),
 										$elm$html$Html$Attributes$value(model.customWordsString)
 									]),
 								_List_Nil)
@@ -9128,7 +9136,7 @@ var $author$project$Spymaster$view = function (model) {
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Spymaster$SaveCustomWords)
+										$elm$html$Html$Events$onClick($author$project$Codenames$SaveCustomWords)
 									]),
 								_List_fromArray(
 									[
@@ -9138,7 +9146,7 @@ var $author$project$Spymaster$view = function (model) {
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Spymaster$CancelCustomWords),
+										$elm$html$Html$Events$onClick($author$project$Codenames$CancelCustomWords),
 										$elm$html$Html$Attributes$class('button--cancel')
 									]),
 								_List_fromArray(
@@ -9186,7 +9194,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('settings_button'),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleSidebar)
+												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleSidebar)
 											]),
 										_List_Nil)
 									])),
@@ -9203,7 +9211,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('turn_text button'),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$PassTurn)
+												$elm$html$Html$Events$onClick($author$project$Codenames$PassTurn)
 											]),
 										_List_fromArray(
 											[
@@ -9272,7 +9280,7 @@ var $author$project$Spymaster$view = function (model) {
 												$elm$html$Html$a,
 												_List_fromArray(
 													[
-														$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleQR)
+														$elm$html$Html$Events$onClick($author$project$Codenames$ToggleQR)
 													]),
 												_List_fromArray(
 													[
@@ -9319,7 +9327,7 @@ var $author$project$Spymaster$view = function (model) {
 												$elm$html$Html$a,
 												_List_fromArray(
 													[
-														$elm$html$Html$Events$onClick($author$project$Spymaster$NewGame)
+														$elm$html$Html$Events$onClick($author$project$Codenames$NewGame)
 													]),
 												_List_fromArray(
 													[
@@ -9350,7 +9358,7 @@ var $author$project$Spymaster$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('info_button'),
-												$elm$html$Html$Events$onClick($author$project$Spymaster$ToggleLightbox)
+												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleLightbox)
 											]),
 										_List_Nil)
 									]))
@@ -9358,7 +9366,7 @@ var $author$project$Spymaster$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Spymaster$main = $elm$browser$Browser$element(
-	{init: $author$project$Spymaster$init, subscriptions: $author$project$Spymaster$subscriptions, update: $author$project$Spymaster$update, view: $author$project$Spymaster$view});
-_Platform_export({'Spymaster':{'init':$author$project$Spymaster$main(
+var $author$project$Codenames$main = $elm$browser$Browser$element(
+	{init: $author$project$Codenames$init, subscriptions: $author$project$Codenames$subscriptions, update: $author$project$Codenames$update, view: $author$project$Codenames$view});
+_Platform_export({'Codenames':{'init':$author$project$Codenames$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
