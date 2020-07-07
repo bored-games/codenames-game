@@ -1,64 +1,79 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Codenames</title>
+    <meta charset="UTF-8">
+    <title>Codenames</title>
 
-	<meta name="description" content="">
-	<meta name="keywords" content="codeblocks">
-	<link rel="icon" type="image/png" href="assets/static/favicon.png" />
+    <meta name="description" content="A portable, personal use version of the team-based board game Codenames.">
+    <meta name="keywords" content="codeblocks">
+    <link rel="icon" type="image/png" href="assets/static/favicon.png" />
 
-	<!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/style.css">
-		
-	<!-- Fonts -->
-	<link href='http://fonts.googleapis.com/css?family=Oswald:300,400,700' rel='stylesheet' type='text/css'>
-	<link href='https://fonts.googleapis.com/css?family=Gloria+Hallelujah' rel='stylesheet' type='text/css'>
-    
-  <script src="assets/js/qrcode.min.js"></script>
-  <script src="assets/js/main.js"></script>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Oswald:300,400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Gloria+Hallelujah' rel='stylesheet' type='text/css'>
+
+    <!-- Javascript -->
+    <script src="./assets/js/qrcode.min.js"></script>
+    <script src="./assets/js/main.js"></script>
 
 </head>
+
 <body>
-  <main id="elm-node"></main>
+    <main id="elm-node"></main>
 
-  <script type="text/javascript">
-    // prevent backspace from redirecting browser
-    window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+0008'||e.keyIdentifier=='Backspace'||e.keyCode==8){if(e.target==document.body){e.preventDefault();return false;}}},true);
-    var app = Elm.Codenames.init({node:document.getElementById('elm-node')});
+    <script type="text/javascript">
+        // prevent backspace from redirecting browser
+        window.addEventListener('keydown', function(e) {
+            if (e.keyIdentifier == 'U+0008' || e.keyIdentifier == 'Backspace' || e.keyCode == 8) {
+                if (e.target == document.body) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        }, true);
+        var app = Elm.Codenames.init({
+            node: document.getElementById('elm-node')
+        });
 
 
-    app.ports.outputPort.subscribe(function (data) {
-        data = JSON.parse(data);
-        console.log("Message from client:")
-        console.log(data);
-        console.log(data['content']);
+        app.ports.outputPort.subscribe(function(data) {
+            data = JSON.parse(data);
+            console.log("Message from client:")
+            console.log(data);
+            console.log(data['content']);
 
-        if (data["action"] == "new_game") {
-          var sizepx = Math.round(Math.min(window.innerWidth*.85, window.innerHeight*.85));
-          const qrcodeContainer = document.getElementById("qrcode");
-          qrcodeContainer.innerHTML = ""; 
-          const qrcode = new QRCode(qrcodeContainer, {
-            width : sizepx,
-            height : sizepx,
-            correctLevel : QRCode.CorrectLevel.M
-          });
-          qrcode.makeCode(data["content"]);
+            if (data["action"] == "new_game") {
+                var sizepx = Math.round(Math.min(window.innerWidth * .85, window.innerHeight * .85));
+                const qrcodeContainer = document.getElementById("qrcode");
+                qrcodeContainer.innerHTML = "";
+                const qrcode = new QRCode(qrcodeContainer, {
+                    width: sizepx,
+                    height: sizepx,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+                qrcode.makeCode(data["content"]);
+            }
+        });
+
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var seed = urlParams.get('s');
+        if (seed != null) {
+            seed = parseInt(seed);
+        } else {
+            seed = Math.floor(Date.now() / 1000)
         }
-    });
 
-    
-		var urlParams = new URLSearchParams(window.location.search);
-		var seed = urlParams.get('s');
-    if (seed != null ) {
-			seed = parseInt(seed);
-    } else {
-      seed = Math.floor(Date.now() / 1000)
-    }
-    
-    app.ports.inputPort.send( {"action": "set_game", "content": seed} );
-        
-  </script>
+        app.ports.inputPort.send({
+            "action": "set_game",
+            "content": seed
+        });
+    </script>
 
 </body>
+
 </html>
