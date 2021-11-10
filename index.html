@@ -25,6 +25,7 @@
 <body>
     <main id="elm-node"></main>
 
+    <script type="text/javascript" src="./assets/js/config.js"></script>
     <script type="text/javascript">
         // prevent backspace from redirecting browser
         window.addEventListener('keydown', function(e) {
@@ -38,7 +39,6 @@
         var app = Elm.Codenames.init({
             node: document.getElementById('elm-node')
         });
-
 
         app.ports.outputPort.subscribe(function(data) {
             data = JSON.parse(data);
