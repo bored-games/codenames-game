@@ -10,7 +10,9 @@
     <link rel="icon" type="image/png" href="assets/static/favicon.png" />
 
     <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/gameboy.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/toast.css">
 
     <!-- Fonts -->
     <link href='https://fonts.googleapis.com/css?family=Oswald:300,400,700' rel='stylesheet' type='text/css'>
@@ -36,17 +38,48 @@
                 }
             }
         }, true);
-        var app = Elm.Codenames.init({
-            node: document.getElementById('elm-node')
+        var app = Elm.Codenames.init({node: document.getElementById('elm-node')});
+
+
+        
+    function setupSocket() {
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const room_name = urlParams.get('room');
+      socket = new WebSocket(server_host + room_name, "TEMP_KEY")
+
+      socket.onclose = function() {
+        alert("Connection to the server has been lost.");
+      }
+
+      socket.onerror = function() {
+        alert("Server connection has experienced an unknown error.");
+      }
+
+      socket.onopen = function() {
+        
+        app.ports.outputPort.subscribe(function (data) {
+          console.log("Message from client:")
+          console.log(data);
+          socket.send(data);
         });
 
-        app.ports.outputPort.subscribe(function(data) {
-            data = JSON.parse(data);
-            console.log("Message from client:")
-            console.log(data);
-            console.log(data['content']);
+      }
 
-            if (data["action"] == "new_game") {
+      // reconnect on socket close?
+      socket.addEventListener("close", () => {
+        this.setupSocket()
+      })
+
+      // got message from server
+      socket.addEventListener("message", (event) => {
+        console.log("Message from server: ")
+        newJSON = JSON.parse(event.data)
+        console.log( newJSON );
+        app.ports.inputPort.send( newJSON );
+
+        /*
+        if (data["action"] == "new_game") {
                 var sizepx = Math.round(Math.min(window.innerWidth * .85, window.innerHeight * .85));
                 const qrcodeContainer = document.getElementById("qrcode");
                 qrcodeContainer.innerHTML = "";
@@ -57,21 +90,15 @@
                 });
                 qrcode.makeCode(data["content"]);
             }
-        });
+        */
+      })
+    }
 
 
-        var urlParams = new URLSearchParams(window.location.search);
-        var seed = urlParams.get('s');
-        if (seed != null) {
-            seed = parseInt(seed);
-        } else {
-            seed = Math.floor(Date.now() / 1000)
-        }
-
-        app.ports.inputPort.send({
-            "action": "set_game",
-            "content": seed
-        });
+    window.onload = function() {
+      setupSocket();
+    }
+  
     </script>
 
 </body>

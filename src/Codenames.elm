@@ -1,10 +1,13 @@
 port module Codenames exposing (Model, Msg(..), init, main, update, inputPort, outputPort, subscriptions, view)
 
+import Toast
+
 import Browser
 import Browser.Dom
 import Browser.Events
-import Html exposing (Html, div, span, text, h2, blockquote, ul, li, a, main_, textarea, button, strong, br ,p)
-import Html.Attributes exposing (class, id, placeholder, value, href, target)
+import Dict
+import Html exposing (Html, div, span, text, h2, h3, h4, blockquote, ul, li, a, main_, textarea, button, strong, br, p, em, input, option, select)
+import Html.Attributes exposing (class, type_, id, placeholder, value, href, target, attribute, disabled, selected)
 import Html.Events exposing (onClick, onInput, onFocus, onBlur)
 import Random exposing (Seed, initialSeed, step)
 import Array exposing (Array, fromList, get, slice)
@@ -19,6 +22,9 @@ import Hex exposing (toString)
 import Json.Encode
 import Json.Decode
 import Task
+
+import Chat exposing (Chatline)
+import User exposing (User, getUserByName)
 
 -- MAIN
 
@@ -38,11 +44,29 @@ type alias JSONMessage =
   , content : Json.Encode.Value
   }
 
-
 type alias Card =
   { word : String
   , team : Int -- 0 = spectator, -1 = assassin, 1 = red, 2 = blue
   , uncovered : Bool
+  }
+
+type alias CardTwo =
+  { word : String
+  , team : Maybe Int
+  , id : Int
+  }
+
+type alias Status =
+  { turn : Bool -- True = red, False = blue
+  , text : String
+  , clue : Maybe String
+  , remaining_guesses: Int
+  }
+
+type alias BoardInfo =
+  { redRemaining: Int,
+    blueRemaining: Int,
+    cards: List (CardTwo)
   }
 
 type alias Wordlist =
@@ -54,18 +78,21 @@ type alias Wordlist =
 
 type alias Model =
     { seed : Seed
-    , turn : Bool -- True = red, False = blue
+    , chat : List Chatline
     , currentTimer : Int
     , blockKeyShortcuts : Bool
     , debugString : String
+    , topMessage : String
+    , toastMessages :  Toast.Stack Toast.Toast
     , toggleLightbox : Bool     -- True = show
-    , toggleQR : Bool           -- True = show
-    , toggleSidebar : Bool      -- True = show
-    , toggleCustomWordsEntry : Bool -- True = show
-    , toggleSoundEffects : Bool -- True = show
+    , toggleQR : Bool          
+    , toggleSidebar : Bool     
+    , toggleCustomWordsEntry : Bool
+    , toggleSoundEffects : Bool
+    , toggleSpymasterModal : Bool
+    , toggleTeamModal : Bool
     , settings :
-      { spies: Bool,
-      customWords: Bool }
+      { spies: Bool, customWords: Bool, override: Bool }
     , redRemaining : Int
     , blueRemaining : Int
     , password : String
@@ -74,6 +101,13 @@ type alias Model =
     , wordlists : List (Wordlist)
     , allWords : List (String)
     , cards : List (Card)
+    , user : Maybe User
+    , users : List (User)
+    , red_spymaster : Maybe User
+    , blue_spymaster : Maybe User
+    , status : Status
+    , clueInProgress : String
+    , guessesInProgress : String
     }
 
 
@@ -81,17 +115,20 @@ init : () -> (Model, Cmd Msg)
 init _ =
     (Model
       (Random.initialSeed 99999999)      -- seed: to do: randomize
-      False                              -- turn: True = red, False = blue
+      [ ]                                -- chat
       0                                  -- currentTimer: to do: enable
       False                              -- blockKeyShortcuts during Focus of textareas
       ""                                 -- debugString
+      ""                                 -- topMessage
+      Toast.initialState                 -- initial toasts
       False                              -- toggleLightbox: for info, true = open
       False                              -- toggleQR: toggle QR display, true = open
       False                              -- toggleSidebar: toggle sidebar, true = open
       False                              -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
       False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
-      { spies = True
-      , customWords = True }            -- settings
+      True                               -- toggleSpymasterModal
+      False                              -- toggleTeamModal
+      { spies = False, customWords = True, override = False }            -- settings
       0                                  -- remainingRed: remaining red cards
       0                                  -- remainingBlue: remaining blue cards
       ""                                 -- password: the encoded game board string
@@ -107,6 +144,13 @@ init _ =
       ]
       []                                 -- allWords: list of all possible card words
       (List.repeat 25 (Card "" 0 False)) -- cards: list of 25 cards, initially blank
+      Nothing
+      []
+      Nothing                            -- red spymaster
+      Nothing                            -- blue spymaster
+      (Status False "Connecting..." Nothing 0) -- status_msg
+      ""
+      ""
     , Cmd.none)
 
 
@@ -114,13 +158,15 @@ init _ =
 
 
 type Msg
-    = UncoverCard Int
-    | ToggleLightbox
+    = ToggleLightbox
     | ToggleQR
     | ToggleSidebar
     | ToggleCustomWordsEntry
+    | ToggleSpymasterModal
+    | ToggleTeamModal
     | ToggleSoundEffects
     | ToggleSpies
+    | ToggleOverride
     | ToggleWordlist Int
     | ToggleCustomWords
     | SetCustomWords String
@@ -128,26 +174,33 @@ type Msg
     | CancelCustomWords
     | PassTurn
     | NewGame
-    | Tick Time.Posix
     | ClearUI
     | BlockKeyShortcuts Bool
     | KeyChanged String
+    | Tick Time.Posix
+    | Ping Time.Posix
     | GetJSON Json.Encode.Value   -- Parse incoming JSON
+    | GetUsersList Json.Encode.Value
+    | GetUser Json.Encode.Value
+    | GetSpymasters Json.Encode.Value
+    | GetBoard Json.Encode.Value
+    | GetChat Json.Encode.Value
+    | GetStatus Json.Encode.Value
+    | GetFlashMessage Json.Encode.Value
+    | GetPassword Json.Encode.Value
+    | AddToastMessage (Toast.Msg Toast.Toast)
+    | SetTeam Int
+    | SetSpymaster Int
+    | UncoverCard Int
+    | SubmitClue
+    | SetClue String
+    | SetGuesses String
     | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg)
 update msg model =
     case msg of
-      UncoverCard index ->
-        let
-          (newTurn, newCards) = uncover 0 index model.cards model.turn
-          redRemaining = List.length (List.filter hiddenRed newCards)
-          blueRemaining = List.length (List.filter hiddenBlue newCards)
-        in
-          ( { model | cards = newCards, redRemaining = redRemaining, blueRemaining = blueRemaining, turn = xor model.turn newTurn },
-          Cmd.none)
-
       ToggleLightbox ->
           ( { model | toggleLightbox = not model.toggleLightbox }
           , Cmd.none)
@@ -158,6 +211,14 @@ update msg model =
 
       ToggleSidebar ->
           ( { model | toggleSidebar = not model.toggleSidebar }
+          , Cmd.none)
+
+      ToggleSpymasterModal ->
+          ( { model | toggleSpymasterModal = not model.toggleSpymasterModal }
+          , Cmd.none)
+
+      ToggleTeamModal ->
+          ( { model | toggleTeamModal = not model.toggleTeamModal }
           , Cmd.none)
 
       ToggleCustomWordsEntry ->
@@ -175,7 +236,14 @@ update msg model =
           in
             ( { model | settings = newSettings }
             , Cmd.none)
-
+            
+      ToggleOverride ->
+          let
+            oldSettings = model.settings
+            newSettings = { oldSettings | override = not oldSettings.override }
+          in
+            ( { model | settings = newSettings }
+            , Cmd.none)
 
       ToggleWordlist key ->
           let
@@ -212,41 +280,17 @@ update msg model =
           , Cmd.none)
     
       PassTurn ->
-          ( { model | turn = not model.turn }
-          , Cmd.none)
+        ( model, outputPort (Json.Encode.encode 0 (Json.Encode.object [ ("action", Json.Encode.string "pass_turn"), ("content", Json.Encode.string "") ] ) ) )
 
       NewGame ->
-        let
-            wordlist = List.append 
-                          (List.concatMap .words (List.filter .include model.wordlists))
-                          (if model.settings.customWords then model.customWords else [])
-            
-            (newWords, seed1) = Random.step (Random.List.shuffle wordlist) model.seed
-            (newTurn, seed2) = Random.step Random.Extra.bool seed1
-            (newIDs, seed3) = Random.step (Random.Array.shuffle (Array.fromList (List.range 0 24))) seed2
-            assassinID = Maybe.withDefault 0 (Array.get 0 newIDs)
-            redIDs = Array.toList <| Array.slice 1 (if newTurn then 10 else 9) newIDs
-            blueIDs = Array.toList <| Array.slice (if newTurn then 10 else 9) 18 newIDs
-            newShuffledCards = List.indexedMap (colorCards assassinID redIDs blueIDs) (populateCards model.cards newWords)
-            boolList1 = Array.set 0 newTurn (Array.repeat 53 False)       -- set to initial team
-            boolList2 = Array.set (51-(2*assassinID)) True (Array.set (50-(2*assassinID)) True boolList1)
-            boolList3 = ammendArray blueIDs (ammendArray redIDs boolList2 True False) False True
-            myPrime = [True, False, True, False, True, True, False, False, True, True, True, True, False, True, False, False, False, False, True, True, False, False, False, True, True, True, True, False, True, False, False, False, False, True, False, True, True, False, False, False, False, True, False, False, False, False, True, False, True, False, True, True]
-            bigint1 = listBoolToBigInt <| List.map2 xor myPrime (Array.toList boolList3)
-            newPassword = base32Encode bigint1
-        in
-          ( { model | cards = newShuffledCards
-                    , seed = seed3
-                    , turn = newTurn
-                    , redRemaining = List.length (List.filter hiddenRed newShuffledCards)
-                    , blueRemaining = List.length (List.filter hiddenBlue newShuffledCards)
-                    , password = newPassword
-                    , allWords = wordlist
-                    }
-        , outputPort (Json.Encode.encode 0 (Json.Encode.object [ ("action", Json.Encode.string "new_game"), ("content", Json.Encode.string newPassword) ] ) ) )
-
-      Tick _ ->
-        ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
+        ( model, outputPort
+        ( Json.Encode.encode
+          0
+          ( Json.Encode.object
+            [ ("action", Json.Encode.string "game_action")
+            , ("content", Json.Encode.object
+              [ ("action", Json.Encode.string "new_game"),
+                ("content", Json.Encode.string "") ] ) ] ) ) )
 
       ClearUI -> 
         ( { model | toggleLightbox = False, toggleQR = False, toggleSidebar = False, toggleCustomWordsEntry = False},
@@ -278,11 +322,117 @@ update msg model =
             _ ->
               ( model, Cmd.none )
 
+      GetUsersList json ->
+        case Json.Decode.decodeValue User.decodeUsersList json of
+          Ok usersList ->
+            ( { model | users = Dict.values usersList}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing userlist JSON"}, Cmd.none )
+            
+      GetUser json ->
+        case Json.Decode.decodeValue User.decodeUser json of
+          Ok user ->
+            ( { model | user = Just user}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing user JSON"}, Cmd.none )
+            
+      GetSpymasters json ->
+        case Json.Decode.decodeValue decodeSpymasters json of
+          Ok (red_sm, blue_sm) ->
+            let
+              users = model.users
+            in
+              ( { model | red_spymaster = getUserByName red_sm users, blue_spymaster = getUserByName blue_sm users}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing spymasters JSON"}, Cmd.none )
+
+      GetBoard json ->
+        case Json.Decode.decodeValue decodeBoardInfo json of
+          Ok boardInfo ->
+            let
+              newcards = List.map toCard boardInfo.cards
+            in
+              ( { model | cards = newcards, redRemaining = boardInfo.redRemaining, blueRemaining = boardInfo.blueRemaining}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Critical error getting board"}, Cmd.none )
+            
+      GetChat json ->
+        case Json.Decode.decodeValue Chat.decodeChatline json of
+          Ok chatline ->
+            ( { model | chat = chatline::model.chat}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing chat JSON"}, Cmd.none )
+            
+      GetStatus json ->
+        case Json.Decode.decodeValue decodeStatus json of
+          Ok status ->
+            let
+              turn = status.turn
+            in
+              ( { model | status = status}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing status JSON"}, Cmd.none )
+
+      GetFlashMessage json ->
+        case Json.Decode.decodeValue Json.Decode.string json of
+          Ok message ->
+            ( { model | debugString = message}, Cmd.none )
+              |> addToast (Toast.Success "" message)
+          Err _ ->
+            ( { model | debugString = "Error parsing Flash Message JSON"}, Cmd.none )
+
+      GetPassword json ->
+        case Json.Decode.decodeValue Json.Decode.string json of
+          Ok password ->
+            ( { model | password = password}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing Password JSON"}, Cmd.none )
+            
+      AddToastMessage subMsg ->
+          Toast.update toastConfig AddToastMessage subMsg model
+          
+      Tick _ ->
+        ( { model | currentTimer = model.currentTimer + 1 }, Cmd.none )
+
+      Ping newTime ->
+        ( { model | currentTimer = (model.currentTimer + 1) }
+          , outputPort (Json.Encode.encode
+                          0
+                        ( Json.Encode.object
+                        [ ( "action", Json.Encode.string "ping"),
+                          ( "content", Json.Encode.string "ping" ) ] ) )
+        )
 
       GetJSON json ->
         case Json.Decode.decodeValue decodeJSON json of
           Ok {action, content} ->
             case action of
+              "update_scoreboard" ->
+                update (GetUsersList content) model
+              "update_user" ->
+                update (GetUser content) model
+              "update_board" ->
+                update (GetBoard content) model
+              "update_status" ->
+                update (GetStatus content) model
+              "update_spymasters" ->
+                update (GetSpymasters content) model
+              "connect_to_server" ->
+                ( model, Cmd.none )
+              "update_chat" ->
+                update (GetChat content) model
+              "player_chat_new_message" ->
+                update (GetChat content) model
+              "system_chat_new_message" ->
+                update (GetChat content) model
+              "system_chat_to_player_new_message" ->
+                update (GetChat content) model
+              "update_flash_msg" ->
+                update (GetFlashMessage content) model
+              "new_game" ->
+                update (GetPassword content) model
+              "ping" ->
+                ( model, Cmd.none )
               "set_game"   ->
                 case Json.Decode.decodeValue Json.Decode.int content of
                 Ok num ->
@@ -296,10 +446,109 @@ update msg model =
           Err _ ->
             ( { model | debugString = "Bad JSON: " ++ Json.Encode.encode 0 json}, Cmd.none )
 
+      SetTeam team ->
+        ( model, outputPort
+              ( Json.Encode.encode
+                0
+                ( Json.Encode.object
+                  [ ("action", Json.Encode.string "game_action")
+                  , ("content", Json.Encode.object
+                    [ ("action", Json.Encode.string "set_team"),
+                      ("content", Json.Encode.int team) ] ) ] ) ) )
+
+      SetSpymaster team ->
+        ( model, outputPort
+              ( Json.Encode.encode
+                0
+                ( Json.Encode.object
+                  [ ("action", Json.Encode.string "game_action")
+                  , ("content", Json.Encode.object
+                    [ ("action", Json.Encode.string "set_spymaster"),
+                      ("content", Json.Encode.int team) ] ) ] ) ) )
+                      
+      UncoverCard id ->
+        ( model,
+          outputPort
+            ( Json.Encode.encode
+              0
+              ( Json.Encode.object
+                [ ("action", Json.Encode.string "game_action")
+                , ("content", Json.Encode.object
+                  [ ("action", Json.Encode.string "uncover_card"),
+                    ("content", Json.Encode.object
+                    [ ("id", Json.Encode.int id)
+                    , ("override", Json.Encode.bool model.settings.override)
+                    ] ) ] ) ] ) ) )
+
+      SubmitClue ->
+        let
+          clue = model.clueInProgress
+          guesses = model.guessesInProgress
+        in
+          ( { model | clueInProgress = "", guessesInProgress = ""}, outputPort
+                ( Json.Encode.encode
+                0
+                ( Json.Encode.object
+                  [ ("action", Json.Encode.string "game_action")
+                  , ("content", Json.Encode.object
+                    [ ("action", Json.Encode.string "submit_clue"),
+                      ("content", Json.Encode.object
+                      [ ("clue", Json.Encode.string clue)
+                      , ("guesses", Json.Encode.string guesses)
+                      ] ) ] ) ] ) ) )
+
+      SetClue word ->
+        ( { model | clueInProgress = word }, Cmd.none )
+          
+      SetGuesses guesses ->
+        ( { model | guessesInProgress = guesses }, Cmd.none )
+        
       NoOp ->
           ( model, Cmd.none)
 
 
+
+toCard : CardTwo -> Card
+toCard c =
+  Card
+   c.word
+   (Maybe.withDefault 0 c.team)
+   (c.team /= Nothing)
+
+decodeCard : Json.Decode.Decoder CardTwo
+decodeCard =
+  Json.Decode.map3
+    CardTwo
+      (Json.Decode.field "word" Json.Decode.string)
+      (Json.Decode.field "team" (Json.Decode.nullable Json.Decode.int))
+      (Json.Decode.field "id" Json.Decode.int)
+  
+decodeCardList : Json.Decode.Decoder (List CardTwo)
+decodeCardList =
+  Json.Decode.list decodeCard
+  
+decodeBoardInfo : Json.Decode.Decoder BoardInfo
+decodeBoardInfo =
+  Json.Decode.map3
+    BoardInfo
+      (Json.Decode.field "red_remaining" Json.Decode.int)
+      (Json.Decode.field "blue_remaining" Json.Decode.int)
+      (Json.Decode.field "board" decodeCardList)
+
+decodeStatus : Json.Decode.Decoder Status
+decodeStatus =
+  Json.Decode.map4
+    Status
+      (Json.Decode.field "turn" Json.Decode.bool)
+      (Json.Decode.field "text" Json.Decode.string)
+      (Json.Decode.field "clue" (Json.Decode.nullable Json.Decode.string))
+      (Json.Decode.field "remaining_guesses" Json.Decode.int)
+
+decodeSpymasters : Json.Decode.Decoder (Maybe String, Maybe String)
+decodeSpymasters = 
+  Json.Decode.map2 Tuple.pair
+    (Json.Decode.index 0 (Json.Decode.nullable Json.Decode.string))
+    (Json.Decode.index 1 (Json.Decode.nullable Json.Decode.string))
 
 maybeToggle : Int -> Wordlist -> Wordlist
 maybeToggle key wordlist =
@@ -375,20 +624,6 @@ colorCards assassinID redIDs blueIDs index card  =
             { card | team = 0, uncovered = False }
 
 
-
-{- Add word from `words` to each card in `cards` -}
-populateCards : List (Card) -> List (String) -> List (Card)
-populateCards cards words =
-  case cards of
-    c :: cs ->
-      case words of
-        w :: ws ->
-          {c | word = w} :: populateCards cs ws
-        _ ->
-          {c | word = "Not Enough Words!"} :: populateCards cs []
-    
-    _ -> []
-
 {- Uncover the 'target' card; return new turn and list of new cards -}
 uncover : Int -> Int -> List (Card) -> Bool -> (Bool, List (Card))
 uncover index target cards turn =
@@ -430,6 +665,13 @@ drawCard index cards =
     _ ->
       []
 
+toastConfig : Toast.Config Msg
+toastConfig =
+    Toast.defaultConfig |> Toast.delay 3300
+
+addToast : Toast.Toast -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+addToast toast ( model, cmd ) =
+    Toast.addToast toastConfig AddToastMessage toast ( model, cmd )
 
 decodeJSON : Json.Decode.Decoder JSONMessage
 decodeJSON =
@@ -447,12 +689,12 @@ port inputPort : (Json.Encode.Value -> msg) -> Sub msg
 subscriptions : Model -> Sub Msg
 subscriptions _ =
   Sub.batch
-    [ Time.every 1000 Tick
+    [ Time.every 30000 Ping
+    , Time.every 1000 Tick
     , inputPort GetJSON
     , Browser.Events.onKeyUp (Json.Decode.map KeyChanged (Json.Decode.field "key" Json.Decode.string))
     {-- , Browser.Events.onKeyDown (Json.Decode.map (KeyChanged True) (Json.Decode.field "key" Json.Decode.string)) --}
     ]
-
 
 -- VIEW
 lightboxInfo : String -> List (Html Msg)
@@ -480,6 +722,164 @@ lightboxInfo password = [ div [ class "instructions" ]
                   ]
                 ]
 
+isSpymaster : Maybe User -> Maybe User -> Bool
+isSpymaster user spymaster =
+  case user of
+    Nothing -> False
+    Just u ->
+      case spymaster of
+        Nothing -> False
+        Just s -> s.nickname == u.nickname
+
+
+isSameUser : Maybe User -> Maybe User -> Bool
+isSameUser u1 u2 =
+  case u1 of
+     Nothing -> False
+     Just a ->
+      case u2 of
+        Nothing -> False
+        Just b -> a.username == b.username
+
+formatName : Maybe User -> String -> Bool -> List ( Html Msg )
+formatName user color isUser =
+  case user of
+     Nothing ->
+      [ div [ class ("s " ++ color) ] []
+      , span []
+        [ text "Waiting..."
+        , em [] [ text "0" ]
+        ]
+      ]
+     Just u  ->
+      [ div [ class ("s " ++ color) ] []
+        , span (if isUser then [class "bold", attribute "flow" "up", attribute "tooltip" "This is you!"] else [])
+          [ text u.nickname
+          , em [] [ text (String.fromInt u.score) ]
+          ]
+        ]
+
+modalSpectators : Maybe User -> Maybe User -> List ( User )-> String
+modalSpectators red_user blue_user all_users =
+  let
+    spectators = List.filter (\x -> x.team /= 1 && x.team /= 2) all_users
+  in
+    String.join ", " (List.map .nickname spectators)
+
+modalUser : Maybe User -> Maybe User -> String -> Int -> List User -> Html Msg
+modalUser user spymaster color teamid users =
+  let
+    spymaster_html = 
+      case spymaster of
+        Nothing -> text "No spymaster" 
+        Just u -> text u.nickname
+  in
+    div [ class ("modal_" ++ color)] [
+      div [ class "pad" ] [
+        h3 [] [ text (color ++ " team") ]
+      , h4 [] [ spymaster_html ]
+      , div [] [ text (String.join ", " (List.map .nickname (List.filter (\x -> x.team == teamid) users))) ] ] ]
+
+showModal : Maybe User -> Maybe User -> Maybe User -> List (User) -> Html Msg
+showModal user red_sm blue_sm users = 
+  let
+    spectator_button =
+      case user of
+        Nothing -> text ""
+        Just u ->
+          if u.team /= 1 && u.team /= 2 then
+            text ""
+          else
+            button [ onClick (SetTeam 0) ] [ text "Become spectator" ]
+    red_button =
+      case user of
+        Nothing -> text ""
+        Just u ->
+          if u.team == 1 then
+            if user == red_sm then
+              text ""
+            else
+              button [ onClick (SetSpymaster 1) ] [ text "Become red spymaster" ]
+          else
+            button [ onClick (SetTeam 1) ] [ text "Join red team" ]
+    blue_button =
+      case user of
+        Nothing -> text ""
+        Just u ->
+          if u.team == 2 then
+            if user == blue_sm then
+              text ""
+            else
+              button [ onClick (SetSpymaster 1) ] [ text "Become blue spymaster" ]
+          else
+            button [ onClick (SetTeam 2) ] [ text "Join blue team" ]
+  in
+    div [ class "lightbox" ]
+    [ div [ class "modal"]
+      [ div [ class "flex_row" ] 
+        [ div [ class "flex_fill" ] []
+        , span [ class "close_button", onClick ToggleTeamModal ] [] ]
+      , div [ class "flex_container" ]
+        [ modalUser user red_sm "red" 1 users
+        , modalUser user blue_sm "blue" 2 users
+        , div [ class "modal_spectators" ]
+          [ h3 [] [ text "Spectators" ]
+          , text (modalSpectators red_sm blue_sm users)
+          ]
+        , div [] [
+            spectator_button
+          , red_button
+          , blue_button ]
+        ]
+      ]
+    ]
+
+
+spymasterModal : Maybe User -> Maybe User -> Maybe User -> String -> Html Msg
+spymasterModal user red_sm blue_sm clueInProgress = 
+  let
+    is_red_sm = isSpymaster user red_sm
+    is_blue_sm = isSpymaster user blue_sm
+    header_msg =
+      if is_red_sm then "You are the red spymaster."
+      else if is_blue_sm then "You are the blue spymaster."
+      else "You are not a spymaster!"
+    clue_html =
+      if is_red_sm || is_blue_sm then
+        [ h3 [] [ text "Clue" ]
+        , input [ type_ "text", onInput SetClue, placeholder "Enter a clue", value clueInProgress ] []
+        , h3 [] [ text "Guesses" ]
+        , select [ onInput SetGuesses ]
+          [ option [ value "", disabled True, selected True] [ text "Select a value" ]
+          , option [ value "0"] [ text "0" ]
+          , option [ value "1"] [ text "1" ]
+          , option [ value "2"] [ text "2" ]
+          , option [ value "3"] [ text "3" ]
+          , option [ value "4"] [ text "4" ]
+          , option [ value "5"] [ text "5" ]
+          , option [ value "6"] [ text "6" ]
+          , option [ value "7"] [ text "7" ]
+          , option [ value "8"] [ text "8" ]
+          , option [ value "9"] [ text "9 " ]
+          , option [ value "∞"] [ text "∞" ]
+          ]
+        , button [ onClick SubmitClue ] [ text "Submit clue" ]
+        ]
+      else
+        []
+
+  in
+    div [ class "lightbox" ]
+    [ div [ class "modal"]
+      [ div [ class "flex_row" ] 
+        [ div [ class "flex_fill" ] [  h3 [] [ text header_msg ] ]
+        , span [ class "close_button", onClick ToggleSpymasterModal ] [] ]
+      , div [ class "flex_container" ]
+        clue_html
+      ]
+    ]
+  
+
 drawWordlistToggle : Wordlist -> Html Msg
 drawWordlistToggle wordlist =
   li [] [ a [ class "", onClick (ToggleWordlist wordlist.key) ] [ span [ class ("icon " ++ if wordlist.include then "checked" else "unchecked")] [], text ("Use " ++ wordlist.name)] ]
@@ -489,18 +889,24 @@ view : Model -> Html Msg
 view model =
   let
     wordlistToggles = List.map drawWordlistToggle model.wordlists
-    addCards cards =
-     drawCard 0 cards
+    addCards cards = drawCard 0 cards
   in
     div [ class "container" ]
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] (lightboxInfo model.password) ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [ id "qrcode" ] [] ]
+      , if model.toggleTeamModal then (showModal model.user model.red_spymaster model.blue_spymaster model.users) else text ""
+      , if model.toggleSpymasterModal then (spymasterModal model.user model.red_spymaster model.blue_spymaster model.clueInProgress) else text ""
       , div [ class "debug" ] [ {- text model.debugString -} ]
+      , div [ class "top" ]
+        [ div [ class "top_message" ] [ text model.topMessage ]
+        , div [ class "toast_container"] [ Toast.view toastConfig Toast.defaultView AddToastMessage model.toastMessages ]
+        ]
       , div
         [ class ("sidebar" ++ (if model.toggleSidebar then "" else " hidden"))]
           [ ul []
             [ li [] [ a [ class "", onClick ToggleSpies ] [ span [ class ("icon " ++ if model.settings.spies then "checked" else "unchecked")] [], text "Show spies"] ]
-            , li [] [ a [ class "", onClick ToggleSoundEffects ] [ span [ class ("icon " ++ if model.toggleSoundEffects then "checked" else "unchecked")] [], text "Enable sound effects"] ]
+            , li [] [ a [ class "", onClick ToggleOverride ] [ span [ class ("icon " ++ if model.settings.override then "checked" else "unchecked")] [], text "Bypass turn control"] ]
+            , li [] [ a [ class "disabled", onClick ToggleSoundEffects ] [ span [ class ("icon " ++ if model.toggleSoundEffects then "checked" else "unchecked")] [], text "Enable sound effects"] ]
             ]
           , ul []
             (List.append
@@ -520,14 +926,14 @@ view model =
             ]
           ]
       , div [ class "center" ]
-        [ main_ [ class ((if model.turn then "red-turn" else "blue-turn") ++ (if model.settings.spies then "" else " hide_spies")) ]
+        [ main_ [ class ((if model.status.turn then "red-turn" else "blue-turn") ++ (if model.settings.spies then "" else " hide_spies")) ]
           (addCards model.cards)
         , div [ class "bottom" ]
             [ div [ class "bottom_left bottom_no_stretch" ]
               [ span [ class "settings_button", onClick ToggleSidebar ] [] ]
             , div [ class "bottom_left" ]
               [ span [ class "turn_text button", onClick PassTurn ]
-                [ text ((if model.turn then "Red" else "Blue") ++ " team's turn!")
+                [ text ((if model.status.turn then "Red" else "Blue") ++ " team's turn")
                 , span [ class "bottom_span" ] [ text "Click here or press space to pass" ]
                 ]
               ]
@@ -535,9 +941,17 @@ view model =
                 [ div [ class "red_remaining" ] [ text (String.fromInt model.redRemaining ++ " remaining") ]
                 , div [ class "blue_remaining" ] [ text (String.fromInt model.blueRemaining ++ " remaining") ]
                 ]
-            , div [ class "bottom_right" ] [ div [ class "button" ] [ a [ onClick ToggleQR ] [ span [ class "password" ] [ text model.password ], span [ class "bottom_span" ] [ text "Click for QR code" ] ] ] ]
-            , div [ class "bottom_right" ] [ div [ class "button" ] [ a [ onClick NewGame ] [ text "New game", span [ class "bottom_span" ] [ text "Click here" ] ] ] ]
+            , div [ class "bottom_left turn_info" ]
+              [ span [ class "turn_text button" ]
+                [ text model.status.text
+                , span [ class "bottom_span" ] [ text ((if model.status.remaining_guesses == 1 then "1 guess" else String.fromInt model.status.remaining_guesses ++ " guesses") ++ " remaining") ]
+                ]
+              ]
+            , if (isSpymaster model.user model.red_spymaster || isSpymaster model.user model.blue_spymaster) then div [ class "bottom_right bottom_no_stretch" ] [ span [ class "spymaster_button", onClick ToggleSpymasterModal ] [] ] else text ""
+            , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "qr_button", onClick ToggleQR ] [] ]
+            , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "new_game_button", onClick NewGame ] [] ]
             , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "info_button", onClick ToggleLightbox ] [] ]
+            , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "teams_button", onClick ToggleTeamModal ] [] ]
             ]
           ]
       ]

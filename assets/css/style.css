@@ -41,6 +41,7 @@ main {
   justify-content: space-around;
   align-items: center;
   transition: .1s linear all;
+  padding: 0 1.2%;
 }
 
 .sidebar {
@@ -361,7 +362,6 @@ button:hover {
 
 
 .bottom > div {
-  flex: 0 0 auto;
   padding: 0.5rem;
   text-shadow: -2px -3px 4px rgba(0, 0, 0, .4);
 }
@@ -384,7 +384,8 @@ button:hover {
   text-align: center;
 }
 
-.settings_button, .info_button {
+.settings_button, .info_button, .close_button, .teams_button, .new_game_button, .qr_button, .spymaster_button {
+  display: inline-block;
   height: 6.5vh;
   width: 6.5vh;
   border-radius: .5vh;
@@ -394,12 +395,38 @@ button:hover {
   cursor: pointer;
 }
 
-.settings_button:hover, .info_button:hover {
+.settings_button:hover, .info_button:hover, .teams_button:hover, .new_game_button:hover, .qr_button:hover, .spymaster_button:hover {
   background-color: rgba(255, 255, 255, .1);
+}
+
+.close_button {
+  background-image: url('../static/images/close.png');
+  opacity: 0.7;
+  transition: .15s linear opacity;
 }
 
 .info_button {
   background-image: url('../static/info.svg');
+}
+
+.qr_button {
+  background-image: url('../static/images/qr.png');
+}
+
+.spymaster_button {
+  background-image: url('../static/images/decoder-preview.png');
+}
+
+.new_game_button {
+  background-image: url('../static/images/new_game.png');
+}
+
+.teams_button {
+  background-image: url('../static/images/teams.png');
+}
+
+.close_button:hover {
+  opacity: 1;
 }
 
 .red_remaining {
@@ -538,6 +565,109 @@ em {
   margin: 1.0rem 0 1.0rem 0;
   padding: 0;
 }
+
+.flex_row {
+  display: flex;
+  flex: 0 0 100%;
+}
+
+.flex_fill {
+  flex: 1 1 auto;
+}
+
+.modal {
+  background: #1a1c1f;
+  border: 1px solid #323539;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1.0rem 1.0rem 1.5rem 1.0rem;
+  border-radius: 8px;
+  box-shadow: 0 0 15px 8px rgba(0, 0, 0, .4);
+  max-width: 60%;
+  min-width: 30%;
+  flex-wrap: wrap;
+}
+
+.flex_container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+}
+
+.flex_container h2 {
+  flex: 1 1 100%;  
+}
+
+.flex_container h3 {
+  text-transform: uppercase;
+  font-family: "Oswald";
+  font-size: 1.3rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  text-shadow: 1px 0px 1px rgba(255, 255, 255, .4);
+}
+
+.flex_container h4 {
+  font-size: 26px;
+  font-weight: 200;
+  margin: 1.0rem 0.5rem;
+  padding: 0;
+}
+
+.modal_red {
+  flex: 0 0 50%;
+  color: rgb(197, 74, 86);
+  text-align: center;
+  transition: .25s linear transform;
+}
+
+.modal_red h3 {
+  text-align: center;
+}
+
+.modal_blue {
+  flex: 0 0 50%;
+  color: rgb(73, 86, 201);
+  text-align: center;
+  transition: .15s linear transform;
+}
+
+.modal .pad {
+  padding: 1.0rem;
+}
+
+.modal_red.inactive,
+.modal_blue.inactive {
+  cursor: default;
+}
+
+.modal_red.inactive:hover h4,
+.modal_blue.inactive:hover h4 {
+  transform: none !important;
+}
+
+.modal_blue h3 {
+  text-align: center;
+}
+
+.modal_spectators {
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex: 1 1 100%;
+  color: #4b4b4b;
+  text-align: center;
+}
+
+.modal_spectators h3 {
+  text-align: center;
+}
+
+.modal p {
+  flex: 1 1 100%;
+}
+
 
 blockquote {
   font-style: italic;
@@ -688,4 +818,9 @@ blockquote {
   to {
     transform: rotate(-4deg) translate(0px, 0px);
   }
+}
+
+.toast_container {
+  color: #fff;
+  text-shadow: 0 0 4px rgba(0, 0, 0, .7);
 }
