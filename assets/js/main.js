@@ -5362,7 +5362,7 @@ var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
 var $author$project$Codenames$init = function (_v0) {
 	return _Utils_Tuple2(
 		$author$project$Codenames$Model(
-			$elm$random$Random$initialSeed(99999999))(_List_Nil)(0)(false)('')('')($author$project$Toast$initialState)(false)(false)(false)(false)(false)(true)(false)(
+			$elm$random$Random$initialSeed(99999999))(_List_Nil)(0)(false)('')('')($author$project$Toast$initialState)(false)(false)(false)(false)(false)(false)(true)(
 			{customWords: true, override: false, spies: false})(0)(0)('')('')(_List_Nil)(
 			_List_fromArray(
 				[

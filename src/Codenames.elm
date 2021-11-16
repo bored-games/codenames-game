@@ -126,8 +126,8 @@ init _ =
       False                              -- toggleSidebar: toggle sidebar, true = open
       False                              -- toggleCustomWordsEntry: toggle edit-custom-words sidebar, true = open
       False                              -- toggleSoundEffects: toggle sound effects, if that's ever added
-      True                               -- toggleSpymasterModal
-      False                              -- toggleTeamModal
+      False                              -- toggleSpymasterModal
+      True                               -- toggleTeamModal
       { spies = False, customWords = True, override = False }            -- settings
       0                                  -- remainingRed: remaining red cards
       0                                  -- remainingBlue: remaining blue cards
