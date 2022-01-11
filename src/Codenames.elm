@@ -57,7 +57,8 @@ type alias CardTwo =
   }
 
 type alias Status =
-  { turn : Bool -- True = red, False = blue
+  { game_over : Bool
+  , turn : Bool -- True = red, False = blue
   , text : String
   , clue : Maybe String
   , remaining_guesses: Int
@@ -149,7 +150,7 @@ init _ =
       []
       Nothing                            -- red spymaster
       Nothing                            -- blue spymaster
-      (Status False "Connecting..." Nothing 0) -- status_msg
+      (Status True False "Connecting..." Nothing 0) -- status_msg
       ""
       ""
     , Cmd.none)
@@ -556,8 +557,9 @@ decodeBoardInfo =
 
 decodeStatus : Json.Decode.Decoder Status
 decodeStatus =
-  Json.Decode.map4
+  Json.Decode.map5
     Status
+      (Json.Decode.field "game_over" Json.Decode.bool)
       (Json.Decode.field "turn" Json.Decode.bool)
       (Json.Decode.field "text" Json.Decode.string)
       (Json.Decode.field "clue" (Json.Decode.nullable Json.Decode.string))
@@ -885,7 +887,7 @@ spymasterModal user red_sm blue_sm clueInProgress =
           , option [ value "7"] [ text "7" ]
           , option [ value "8"] [ text "8" ]
           , option [ value "9"] [ text "9 " ]
-          , option [ value "∞"] [ text "∞" ]
+          , option [ value "infinity"] [ text "∞" ]
           ]
         , button [ onClick SubmitClue ] [ text "Submit clue" ]
         ]
@@ -913,6 +915,21 @@ view model =
   let
     wordlistToggles = List.map drawWordlistToggle model.wordlists
     addCards cards = drawCard 0 cards
+    left_turn_text =
+      if model.status.game_over then
+        ""
+      else
+        (if model.status.turn then "Red" else "Blue") ++ " team's turn"
+    left_turn_text_bottom = 
+      if model.status.game_over then
+        ""
+      else
+        "Click here or press space to pass"
+    right_turn_text_bottom =
+      if model.status.game_over then
+        "Select New Game to play again"
+      else
+        (if model.status.remaining_guesses == 1 then "1 guess" else String.fromInt model.status.remaining_guesses ++ " guesses") ++ " remaining"
   in
     div [ class "container" ]
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] (lightboxInfo model.password) ]
@@ -956,8 +973,8 @@ view model =
               [ span [ class "settings_button", onClick ToggleSidebar ] [] ]
             , div [ class "bottom_left" ]
               [ span [ class "turn_text button", onClick PassTurn ]
-                [ text ((if model.status.turn then "Red" else "Blue") ++ " team's turn")
-                , span [ class "bottom_span" ] [ text "Click here or press space to pass" ]
+                [ text left_turn_text
+                , span [ class "bottom_span" ] [ text left_turn_text_bottom ]
                 ]
               ]
             , div [ class "bottom_left cards_remaining" ]
@@ -967,7 +984,7 @@ view model =
             , div [ class "bottom_left turn_info" ]
               [ span [ class "turn_text button" ]
                 [ text model.status.text
-                , span [ class "bottom_span" ] [ text ((if model.status.remaining_guesses == 1 then "1 guess" else String.fromInt model.status.remaining_guesses ++ " guesses") ++ " remaining") ]
+                , span [ class "bottom_span" ] [ text right_turn_text_bottom ]
                 ]
               ]
             , if (isSpymaster model.user model.red_spymaster || isSpymaster model.user model.blue_spymaster) then div [ class "bottom_right bottom_no_stretch" ] [ span [ class "spymaster_button", onClick ToggleSpymasterModal ] [] ] else text ""

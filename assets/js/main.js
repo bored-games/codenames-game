@@ -5292,9 +5292,9 @@ var $author$project$Codenames$Model = function (seed) {
 		};
 	};
 };
-var $author$project$Codenames$Status = F4(
-	function (turn, text, clue, remaining_guesses) {
-		return {clue: clue, remaining_guesses: remaining_guesses, text: text, turn: turn};
+var $author$project$Codenames$Status = F5(
+	function (game_over, turn, text, clue, remaining_guesses) {
+		return {clue: clue, game_over: game_over, remaining_guesses: remaining_guesses, text: text, turn: turn};
 	});
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
@@ -5378,7 +5378,7 @@ var $author$project$Codenames$init = function (_v0) {
 				$elm$core$List$repeat,
 				25,
 				A3($author$project$Codenames$Card, '', 0, false)))($elm$core$Maybe$Nothing)(_List_Nil)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
-			A4($author$project$Codenames$Status, false, 'Connecting...', $elm$core$Maybe$Nothing, 0))('')(''),
+			A5($author$project$Codenames$Status, true, false, 'Connecting...', $elm$core$Maybe$Nothing, 0))('')(''),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Codenames$GetJSON = function (a) {
@@ -6420,9 +6420,11 @@ var $author$project$Codenames$decodeSpymasters = A3(
 		$elm$json$Json$Decode$index,
 		1,
 		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)));
-var $author$project$Codenames$decodeStatus = A5(
-	$elm$json$Json$Decode$map4,
+var $elm$json$Json$Decode$map5 = _Json_map5;
+var $author$project$Codenames$decodeStatus = A6(
+	$elm$json$Json$Decode$map5,
 	$author$project$Codenames$Status,
+	A2($elm$json$Json$Decode$field, 'game_over', $elm$json$Json$Decode$bool),
 	A2($elm$json$Json$Decode$field, 'turn', $elm$json$Json$Decode$bool),
 	A2($elm$json$Json$Decode$field, 'text', $elm$json$Json$Decode$string),
 	A2(
@@ -7628,7 +7630,7 @@ var $author$project$Codenames$lightboxInfo = function (password) {
 					$elm$html$Html$a,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$href('./spymaster/index.html?passphrase' + password),
+							$elm$html$Html$Attributes$href('./spymaster/index.html?passphrase=' + password),
 							$elm$html$Html$Attributes$target('_blank'),
 							$elm$html$Html$Attributes$class('spymaster')
 						]),
@@ -8174,7 +8176,7 @@ var $author$project$Codenames$spymasterModal = F4(
 						$elm$html$Html$option,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$value('∞')
+								$elm$html$Html$Attributes$value('infinity')
 							]),
 						_List_fromArray(
 							[
@@ -8309,6 +8311,9 @@ var $author$project$Toast$view = F4(
 	});
 var $author$project$Codenames$view = function (model) {
 	var wordlistToggles = A2($elm$core$List$map, $author$project$Codenames$drawWordlistToggle, model.wordlists);
+	var right_turn_text_bottom = model.status.game_over ? 'Select New Game to play again' : (((model.status.remaining_guesses === 1) ? '1 guess' : ($elm$core$String$fromInt(model.status.remaining_guesses) + ' guesses')) + ' remaining');
+	var left_turn_text_bottom = model.status.game_over ? '' : 'Click here or press space to pass';
+	var left_turn_text = model.status.game_over ? '' : ((model.status.turn ? 'Red' : 'Blue') + ' team\'s turn');
 	var addCards = function (cards) {
 		return A2($author$project$Codenames$drawCard, 0, cards);
 	};
@@ -8693,8 +8698,7 @@ var $author$project$Codenames$view = function (model) {
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text(
-												(model.status.turn ? 'Red' : 'Blue') + ' team\'s turn'),
+												$elm$html$Html$text(left_turn_text),
 												A2(
 												$elm$html$Html$span,
 												_List_fromArray(
@@ -8703,7 +8707,7 @@ var $author$project$Codenames$view = function (model) {
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Click here or press space to pass')
+														$elm$html$Html$text(left_turn_text_bottom)
 													]))
 											]))
 									])),
@@ -8763,8 +8767,7 @@ var $author$project$Codenames$view = function (model) {
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text(
-														((model.status.remaining_guesses === 1) ? '1 guess' : ($elm$core$String$fromInt(model.status.remaining_guesses) + ' guesses')) + ' remaining')
+														$elm$html$Html$text(right_turn_text_bottom)
 													]))
 											]))
 									])),

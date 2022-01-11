@@ -261,7 +261,7 @@ button:hover {
   display: flex;
   align-items: center;
   line-height: 3.2rem;
-  font-family: Lato, "Sego UI";
+  font-family: "Brandon Printed", Lato, "Segoe UI";
   position: relative;
   width: 100%;
   z-index: 5;
