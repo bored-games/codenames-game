@@ -68,7 +68,8 @@
 
       // reconnect on socket close?
       socket.addEventListener("close", () => {
-        this.setupSocket()
+        alert('Reopened??')
+        this.setupSocket();
       })
 
       // got message from server

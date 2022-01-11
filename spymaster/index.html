@@ -52,36 +52,35 @@
 				imgs.push( document.getElementById("i23") );
 				imgs.push( document.getElementById("i24") );
 				
-        for (ii = 0; ii < 25; ii++) {
-						var decoded = ( bigInt(0b11).and(passphraseDecimal.shiftRight( (2 * ii)) ));
-						if (decoded == 0) { // spectator
-							imgs[ii].childNodes[1].className = "content spectator"
-            } else if (decoded == 1) { // red
-							imgs[ii].childNodes[1].className = "content red"
-            } else if (decoded == 2) { // blue
-							imgs[ii].childNodes[1].className = "content blue"
-            } else { // assassin
-							imgs[ii].childNodes[1].className = "content assassin"
-            }
+				for (ii = 0; ii < 25; ii++) {
+								var decoded = ( bigInt(0b11).and(passphraseDecimal.shiftRight( (2 * ii)) ));
+								if (decoded == 0) { // spectator
+									imgs[ii].childNodes[1].className = "content spectator"
+					} else if (decoded == 1) { // red
+									imgs[ii].childNodes[1].className = "content red"
+					} else if (decoded == 2) { // blue
+									imgs[ii].childNodes[1].className = "content blue"
+					} else { // assassin
+									imgs[ii].childNodes[1].className = "content assassin"
+					}
 				}
 				
 				
 				var firstPlayer = ((bigInt(1).shiftLeft(49)).and(passphraseDecimal)).shiftRight(49);
 	
 				const turnElement = document.getElementById("turn-text");
-        if (firstPlayer == 0) {
-					turnElement.textContent = ("Red goes first!");
-					turnElement.className = "red-turn";
-        } else {
-					turnElement.textContent = ("Blue goes first!");
-					turnElement.className = "blue-turn";
-        }
+					if (firstPlayer == 0) {
+								turnElement.textContent = ("Red goes first!");
+								turnElement.className = "red-turn";
+					} else {
+								turnElement.textContent = ("Blue goes first!");
+								turnElement.className = "blue-turn";
+					}
 
 				return false;
 
 			}
 
-			// document.onReady(populate();
 		</script>
 	</head>
 	<body class="is-preload">
@@ -211,5 +210,16 @@
 						</form>
 					</footer>
 			</div>
+
+		<script type="text/javascript">
+			const queryString = window.location.search;
+			const urlParams = new URLSearchParams(queryString);
+			if (urlParams.has('passphrase')) {
+				const passphrase = urlParams.get('passphrase');
+				var password = document.getElementById("passphrase");
+				password.value = passphrase;
+				populate();
+			}
+		</script>
 	</body>
 </html>

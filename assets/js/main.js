@@ -6045,6 +6045,9 @@ var $author$project$Codenames$GetFlashMessage = function (a) {
 var $author$project$Codenames$GetPassword = function (a) {
 	return {$: 'GetPassword', a: a};
 };
+var $author$project$Codenames$GetSpymasterModal = function (a) {
+	return {$: 'GetSpymasterModal', a: a};
+};
 var $author$project$Codenames$GetSpymasters = function (a) {
 	return {$: 'GetSpymasters', a: a};
 };
@@ -6312,10 +6315,11 @@ var $elm$core$Task$attempt = F2(
 						task))));
 	});
 var $elm$browser$Browser$Dom$blur = _Browser_call('blur');
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Encode$bool = _Json_wrap;
-var $author$project$Codenames$BoardInfo = F3(
-	function (redRemaining, blueRemaining, cards) {
-		return {blueRemaining: blueRemaining, cards: cards, redRemaining: redRemaining};
+var $author$project$Codenames$BoardInfo = F4(
+	function (password, redRemaining, blueRemaining, cards) {
+		return {blueRemaining: blueRemaining, cards: cards, password: password, redRemaining: redRemaining};
 	});
 var $author$project$Codenames$CardTwo = F3(
 	function (word, team, id) {
@@ -6344,9 +6348,11 @@ var $author$project$Codenames$decodeCard = A4(
 	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int));
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Codenames$decodeCardList = $elm$json$Json$Decode$list($author$project$Codenames$decodeCard);
-var $author$project$Codenames$decodeBoardInfo = A4(
-	$elm$json$Json$Decode$map3,
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $author$project$Codenames$decodeBoardInfo = A5(
+	$elm$json$Json$Decode$map4,
 	$author$project$Codenames$BoardInfo,
+	A2($elm$json$Json$Decode$field, 'password', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'red_remaining', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'blue_remaining', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'board', $author$project$Codenames$decodeCardList));
@@ -6362,7 +6368,6 @@ var $author$project$User$User = F7(
 	function (username, nickname, color, team, score, is_admin, is_muted) {
 		return {color: color, is_admin: is_admin, is_muted: is_muted, nickname: nickname, score: score, team: team, username: username};
 	});
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$map7 = _Json_map7;
 var $author$project$User$decodeUser = A8(
 	$elm$json$Json$Decode$map7,
@@ -6374,7 +6379,6 @@ var $author$project$User$decodeUser = A8(
 	A2($elm$json$Json$Decode$field, 'score', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'is_admin', $elm$json$Json$Decode$bool),
 	A2($elm$json$Json$Decode$field, 'is_muted', $elm$json$Json$Decode$bool));
-var $elm$json$Json$Decode$map4 = _Json_map4;
 var $elm$json$Json$Decode$maybe = function (decoder) {
 	return $elm$json$Json$Decode$oneOf(
 		_List_fromArray(
@@ -6776,10 +6780,19 @@ var $author$project$Codenames$update = F2(
 										[
 											_Utils_Tuple2(
 											'action',
-											$elm$json$Json$Encode$string('pass_turn')),
+											$elm$json$Json$Encode$string('game_action')),
 											_Utils_Tuple2(
 											'content',
-											$elm$json$Json$Encode$string(''))
+											$elm$json$Json$Encode$object(
+												_List_fromArray(
+													[
+														_Utils_Tuple2(
+														'action',
+														$elm$json$Json$Encode$string('pass_turn')),
+														_Utils_Tuple2(
+														'content',
+														$elm$json$Json$Encode$string(''))
+													])))
 										])))));
 				case 'NewGame':
 					return _Utils_Tuple2(
@@ -6927,16 +6940,33 @@ var $author$project$Codenames$update = F2(
 								{debugString: 'Error parsing spymasters JSON'}),
 							$elm$core$Platform$Cmd$none);
 					}
+				case 'GetSpymasterModal':
+					var json = msg.a;
+					var _v9 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$bool, json);
+					if (_v9.$ === 'Ok') {
+						var val = _v9.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{toggleSpymasterModal: val}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{debugString: 'Error parsing spymasters JSON'}),
+							$elm$core$Platform$Cmd$none);
+					}
 				case 'GetBoard':
 					var json = msg.a;
-					var _v9 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeBoardInfo, json);
-					if (_v9.$ === 'Ok') {
-						var boardInfo = _v9.a;
+					var _v10 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeBoardInfo, json);
+					if (_v10.$ === 'Ok') {
+						var boardInfo = _v10.a;
 						var newcards = A2($elm$core$List$map, $author$project$Codenames$toCard, boardInfo.cards);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{blueRemaining: boardInfo.blueRemaining, cards: newcards, redRemaining: boardInfo.redRemaining}),
+								{blueRemaining: boardInfo.blueRemaining, cards: newcards, password: boardInfo.password, redRemaining: boardInfo.redRemaining}),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return _Utils_Tuple2(
@@ -6947,9 +6977,9 @@ var $author$project$Codenames$update = F2(
 					}
 				case 'GetChat':
 					var json = msg.a;
-					var _v10 = A2($elm$json$Json$Decode$decodeValue, $author$project$Chat$decodeChatline, json);
-					if (_v10.$ === 'Ok') {
-						var chatline = _v10.a;
+					var _v11 = A2($elm$json$Json$Decode$decodeValue, $author$project$Chat$decodeChatline, json);
+					if (_v11.$ === 'Ok') {
+						var chatline = _v11.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -6966,9 +6996,9 @@ var $author$project$Codenames$update = F2(
 					}
 				case 'GetStatus':
 					var json = msg.a;
-					var _v11 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeStatus, json);
-					if (_v11.$ === 'Ok') {
-						var status = _v11.a;
+					var _v12 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeStatus, json);
+					if (_v12.$ === 'Ok') {
+						var status = _v12.a;
 						var turn = status.turn;
 						return _Utils_Tuple2(
 							_Utils_update(
@@ -6984,9 +7014,9 @@ var $author$project$Codenames$update = F2(
 					}
 				case 'GetFlashMessage':
 					var json = msg.a;
-					var _v12 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$string, json);
-					if (_v12.$ === 'Ok') {
-						var message = _v12.a;
+					var _v13 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$string, json);
+					if (_v13.$ === 'Ok') {
+						var message = _v13.a;
 						return A2(
 							$author$project$Codenames$addToast,
 							A2($author$project$Toast$Success, '', message),
@@ -7004,9 +7034,9 @@ var $author$project$Codenames$update = F2(
 					}
 				case 'GetPassword':
 					var json = msg.a;
-					var _v13 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$string, json);
-					if (_v13.$ === 'Ok') {
-						var password = _v13.a;
+					var _v14 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$string, json);
+					if (_v14.$ === 'Ok') {
+						var password = _v14.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7050,10 +7080,10 @@ var $author$project$Codenames$update = F2(
 										])))));
 				case 'GetJSON':
 					var json = msg.a;
-					var _v14 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeJSON, json);
-					if (_v14.$ === 'Ok') {
-						var action = _v14.a.action;
-						var content = _v14.a.content;
+					var _v15 = A2($elm$json$Json$Decode$decodeValue, $author$project$Codenames$decodeJSON, json);
+					if (_v15.$ === 'Ok') {
+						var action = _v15.a.action;
+						var content = _v15.a.content;
 						switch (action) {
 							case 'update_scoreboard':
 								var $temp$msg = $author$project$Codenames$GetUsersList(content),
@@ -7081,6 +7111,12 @@ var $author$project$Codenames$update = F2(
 								continue update;
 							case 'update_spymasters':
 								var $temp$msg = $author$project$Codenames$GetSpymasters(content),
+									$temp$model = model;
+								msg = $temp$msg;
+								model = $temp$model;
+								continue update;
+							case 'update_spymaster_modal':
+								var $temp$msg = $author$project$Codenames$GetSpymasterModal(content),
 									$temp$model = model;
 								msg = $temp$msg;
 								model = $temp$model;
@@ -7126,9 +7162,9 @@ var $author$project$Codenames$update = F2(
 							case 'ping':
 								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 							case 'set_game':
-								var _v16 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
-								if (_v16.$ === 'Ok') {
-									var num = _v16.a;
+								var _v17 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
+								if (_v17.$ === 'Ok') {
+									var num = _v17.a;
 									var $temp$msg = $author$project$Codenames$NewGame,
 										$temp$model = _Utils_update(
 										model,
@@ -7592,7 +7628,7 @@ var $author$project$Codenames$lightboxInfo = function (password) {
 					$elm$html$Html$a,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$href('./spymaster'),
+							$elm$html$Html$Attributes$href('./spymaster/index.html?passphrase' + password),
 							$elm$html$Html$Attributes$target('_blank'),
 							$elm$html$Html$Attributes$class('spymaster')
 						]),
@@ -7725,8 +7761,40 @@ var $author$project$Codenames$modalSpectators = F3(
 				spectators));
 	});
 var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $author$project$Codenames$modalUser = F5(
 	function (user, spymaster, color, teamid, users) {
+		var team_text = $elm$core$List$isEmpty(
+			A2(
+				$elm$core$List$map,
+				function ($) {
+					return $.nickname;
+				},
+				A2(
+					$elm$core$List$filter,
+					function (x) {
+						return _Utils_eq(x.team, teamid);
+					},
+					users))) ? 'No members' : A2(
+			$elm$core$String$join,
+			', ',
+			A2(
+				$elm$core$List$map,
+				function ($) {
+					return $.nickname;
+				},
+				A2(
+					$elm$core$List$filter,
+					function (x) {
+						return _Utils_eq(x.team, teamid);
+					},
+					users)));
 		var spymaster_html = function () {
 			if (spymaster.$ === 'Nothing') {
 				return $elm$html$Html$text('No spymaster');
@@ -7768,21 +7836,7 @@ var $author$project$Codenames$modalUser = F5(
 							_List_Nil,
 							_List_fromArray(
 								[
-									$elm$html$Html$text(
-									A2(
-										$elm$core$String$join,
-										', ',
-										A2(
-											$elm$core$List$map,
-											function ($) {
-												return $.nickname;
-											},
-											A2(
-												$elm$core$List$filter,
-												function (x) {
-													return _Utils_eq(x.team, teamid);
-												},
-												users))))
+									$elm$html$Html$text(team_text)
 								]))
 						]))
 				]));
@@ -7981,6 +8035,10 @@ var $author$project$Codenames$spymasterModal = F4(
 					[
 						$elm$html$Html$Attributes$type_('text'),
 						$elm$html$Html$Events$onInput($author$project$Codenames$SetClue),
+						$elm$html$Html$Events$onFocus(
+						$author$project$Codenames$BlockKeyShortcuts(true)),
+						$elm$html$Html$Events$onBlur(
+						$author$project$Codenames$BlockKeyShortcuts(false)),
 						$elm$html$Html$Attributes$placeholder('Enter a clue'),
 						$elm$html$Html$Attributes$value(clueInProgress)
 					]),
@@ -8195,13 +8253,6 @@ var $author$project$Codenames$spymasterModal = F4(
 	});
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
 var $author$project$Toast$itemContainer = F4(
 	function (_v0, tagger, _v1, toastView) {
 		var cfg = _v0.a;

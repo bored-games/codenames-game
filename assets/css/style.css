@@ -590,6 +590,15 @@ em {
   flex-wrap: wrap;
 }
 
+.modal input[type='text'], .modal select {
+  margin: 0 -.25rem 1.5rem;
+  background: #e5e5e5;
+  box-shadow: none;
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  color: #4f4f4f;
+}
+
 .flex_container {
   display: flex;
   flex-wrap: wrap;

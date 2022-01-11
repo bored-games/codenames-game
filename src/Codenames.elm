@@ -64,7 +64,8 @@ type alias Status =
   }
 
 type alias BoardInfo =
-  { redRemaining: Int,
+  { password: String,
+    redRemaining: Int,
     blueRemaining: Int,
     cards: List (CardTwo)
   }
@@ -183,6 +184,7 @@ type Msg
     | GetUsersList Json.Encode.Value
     | GetUser Json.Encode.Value
     | GetSpymasters Json.Encode.Value
+    | GetSpymasterModal Json.Encode.Value
     | GetBoard Json.Encode.Value
     | GetChat Json.Encode.Value
     | GetStatus Json.Encode.Value
@@ -280,7 +282,14 @@ update msg model =
           , Cmd.none)
     
       PassTurn ->
-        ( model, outputPort (Json.Encode.encode 0 (Json.Encode.object [ ("action", Json.Encode.string "pass_turn"), ("content", Json.Encode.string "") ] ) ) )
+        ( model, outputPort
+        ( Json.Encode.encode
+          0
+          ( Json.Encode.object
+            [ ("action", Json.Encode.string "game_action")
+            , ("content", Json.Encode.object
+              [ ("action", Json.Encode.string "pass_turn"),
+                ("content", Json.Encode.string "") ] ) ] ) ) )
 
       NewGame ->
         ( model, outputPort
@@ -345,6 +354,13 @@ update msg model =
               ( { model | red_spymaster = getUserByName red_sm users, blue_spymaster = getUserByName blue_sm users}, Cmd.none )
           Err _ ->
             ( { model | debugString = "Error parsing spymasters JSON"}, Cmd.none )
+            
+      GetSpymasterModal json ->
+        case Json.Decode.decodeValue Json.Decode.bool json of
+          Ok (val) ->
+            ( { model | toggleSpymasterModal = val}, Cmd.none )
+          Err _ ->
+            ( { model | debugString = "Error parsing spymasters JSON"}, Cmd.none )
 
       GetBoard json ->
         case Json.Decode.decodeValue decodeBoardInfo json of
@@ -352,7 +368,7 @@ update msg model =
             let
               newcards = List.map toCard boardInfo.cards
             in
-              ( { model | cards = newcards, redRemaining = boardInfo.redRemaining, blueRemaining = boardInfo.blueRemaining}, Cmd.none )
+              ( { model | password = boardInfo.password, cards = newcards, redRemaining = boardInfo.redRemaining, blueRemaining = boardInfo.blueRemaining}, Cmd.none )
           Err _ ->
             ( { model | debugString = "Critical error getting board"}, Cmd.none )
             
@@ -417,6 +433,8 @@ update msg model =
                 update (GetStatus content) model
               "update_spymasters" ->
                 update (GetSpymasters content) model
+              "update_spymaster_modal" ->
+                update (GetSpymasterModal content) model
               "connect_to_server" ->
                 ( model, Cmd.none )
               "update_chat" ->
@@ -529,8 +547,9 @@ decodeCardList =
   
 decodeBoardInfo : Json.Decode.Decoder BoardInfo
 decodeBoardInfo =
-  Json.Decode.map3
+  Json.Decode.map4
     BoardInfo
+      (Json.Decode.field "password" Json.Decode.string)
       (Json.Decode.field "red_remaining" Json.Decode.int)
       (Json.Decode.field "blue_remaining" Json.Decode.int)
       (Json.Decode.field "board" decodeCardList)
@@ -706,7 +725,7 @@ lightboxInfo password = [ div [ class "instructions" ]
                    ]
                  ]
                  , div [ class "right-side"]
-                  [ a  [ href "./spymaster", target "_blank", class "spymaster" ]
+                  [ a  [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank", class "spymaster" ]
                     [ div [ class "spymaster-preview" ] []
                     , div [] [ strong [] [ text "Click here to access the Decryptor. " ]
                               , br [] []
@@ -773,12 +792,17 @@ modalUser user spymaster color teamid users =
       case spymaster of
         Nothing -> text "No spymaster" 
         Just u -> text u.nickname
+    team_text =
+      if List.isEmpty (List.map .nickname (List.filter (\x -> x.team == teamid) users)) then
+        "No members"
+      else
+        (String.join ", " (List.map .nickname (List.filter (\x -> x.team == teamid) users)))
   in
     div [ class ("modal_" ++ color)] [
       div [ class "pad" ] [
         h3 [] [ text (color ++ " team") ]
       , h4 [] [ spymaster_html ]
-      , div [] [ text (String.join ", " (List.map .nickname (List.filter (\x -> x.team == teamid) users))) ] ] ]
+      , div [] [ text team_text ] ] ]
 
 showModal : Maybe User -> Maybe User -> Maybe User -> List (User) -> Html Msg
 showModal user red_sm blue_sm users = 
@@ -847,7 +871,7 @@ spymasterModal user red_sm blue_sm clueInProgress =
     clue_html =
       if is_red_sm || is_blue_sm then
         [ h3 [] [ text "Clue" ]
-        , input [ type_ "text", onInput SetClue, placeholder "Enter a clue", value clueInProgress ] []
+        , input [ type_ "text", onInput SetClue, onFocus (BlockKeyShortcuts True), onBlur (BlockKeyShortcuts False), placeholder "Enter a clue", value clueInProgress ] []
         , h3 [] [ text "Guesses" ]
         , select [ onInput SetGuesses ]
           [ option [ value "", disabled True, selected True] [ text "Select a value" ]
@@ -867,7 +891,6 @@ spymasterModal user red_sm blue_sm clueInProgress =
         ]
       else
         []
-
   in
     div [ class "lightbox" ]
     [ div [ class "modal"]
