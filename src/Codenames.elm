@@ -9,7 +9,6 @@ import Dict
 import Html exposing (Html, div, span, text, h2, h3, h4, blockquote, ul, li, a, main_, textarea, button, strong, br, p, em, input, option, select)
 import Html.Attributes exposing (class, type_, id, placeholder, value, href, target, attribute, disabled, selected)
 import Html.Events exposing (onClick, onInput, onFocus, onBlur)
-import Random exposing (Seed, initialSeed, step)
 import Array exposing (Array, fromList, get, slice)
 import Random.Array exposing (shuffle)
 import Random.List exposing (shuffle)
@@ -79,8 +78,7 @@ type alias Wordlist =
   }
 
 type alias Model =
-    { seed : Seed
-    , chat : List Chatline
+    { chat : List Chatline
     , currentTimer : Int
     , blockKeyShortcuts : Bool
     , debugString : String
@@ -116,7 +114,6 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
     (Model
-      (Random.initialSeed 99999999)      -- seed: to do: randomize
       [ ]                                -- chat
       0                                  -- currentTimer: to do: enable
       False                              -- blockKeyShortcuts during Focus of textareas
@@ -452,12 +449,6 @@ update msg model =
                 update (GetPassword content) model
               "ping" ->
                 ( model, Cmd.none )
-              "set_game"   ->
-                case Json.Decode.decodeValue Json.Decode.int content of
-                Ok num ->
-                  update NewGame { model | seed = Random.initialSeed num }
-                _ ->
-                  update NewGame model
 
               _ ->
                 (Debug.log "Error: unknown code in JSON message" model, Cmd.none ) -- Error: missing code
@@ -917,7 +908,7 @@ view model =
     addCards cards = drawCard 0 cards
     left_turn_text =
       if model.status.game_over then
-        ""
+        "Select New Game to play again"
       else
         (if model.status.turn then "Red" else "Blue") ++ " team's turn"
     left_turn_text_bottom = 
@@ -927,7 +918,7 @@ view model =
         "Click here or press space to pass"
     right_turn_text_bottom =
       if model.status.game_over then
-        "Select New Game to play again"
+        ""
       else
         (if model.status.remaining_guesses == 1 then "1 guess" else String.fromInt model.status.remaining_guesses ++ " guesses") ++ " remaining"
   in

@@ -5231,38 +5231,36 @@ var $author$project$Codenames$Card = F3(
 	function (word, team, uncovered) {
 		return {team: team, uncovered: uncovered, word: word};
 	});
-var $author$project$Codenames$Model = function (seed) {
-	return function (chat) {
-		return function (currentTimer) {
-			return function (blockKeyShortcuts) {
-				return function (debugString) {
-					return function (topMessage) {
-						return function (toastMessages) {
-							return function (toggleLightbox) {
-								return function (toggleQR) {
-									return function (toggleSidebar) {
-										return function (toggleCustomWordsEntry) {
-											return function (toggleSoundEffects) {
-												return function (toggleSpymasterModal) {
-													return function (toggleTeamModal) {
-														return function (settings) {
-															return function (redRemaining) {
-																return function (blueRemaining) {
-																	return function (password) {
-																		return function (customWordsString) {
-																			return function (customWords) {
-																				return function (wordlists) {
-																					return function (allWords) {
-																						return function (cards) {
-																							return function (user) {
-																								return function (users) {
-																									return function (red_spymaster) {
-																										return function (blue_spymaster) {
-																											return function (status) {
-																												return function (clueInProgress) {
-																													return function (guessesInProgress) {
-																														return {allWords: allWords, blockKeyShortcuts: blockKeyShortcuts, blueRemaining: blueRemaining, blue_spymaster: blue_spymaster, cards: cards, chat: chat, clueInProgress: clueInProgress, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, guessesInProgress: guessesInProgress, password: password, redRemaining: redRemaining, red_spymaster: red_spymaster, seed: seed, settings: settings, status: status, toastMessages: toastMessages, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, toggleSpymasterModal: toggleSpymasterModal, toggleTeamModal: toggleTeamModal, topMessage: topMessage, user: user, users: users, wordlists: wordlists};
-																													};
+var $author$project$Codenames$Model = function (chat) {
+	return function (currentTimer) {
+		return function (blockKeyShortcuts) {
+			return function (debugString) {
+				return function (topMessage) {
+					return function (toastMessages) {
+						return function (toggleLightbox) {
+							return function (toggleQR) {
+								return function (toggleSidebar) {
+									return function (toggleCustomWordsEntry) {
+										return function (toggleSoundEffects) {
+											return function (toggleSpymasterModal) {
+												return function (toggleTeamModal) {
+													return function (settings) {
+														return function (redRemaining) {
+															return function (blueRemaining) {
+																return function (password) {
+																	return function (customWordsString) {
+																		return function (customWords) {
+																			return function (wordlists) {
+																				return function (allWords) {
+																					return function (cards) {
+																						return function (user) {
+																							return function (users) {
+																								return function (red_spymaster) {
+																									return function (blue_spymaster) {
+																										return function (status) {
+																											return function (clueInProgress) {
+																												return function (guessesInProgress) {
+																													return {allWords: allWords, blockKeyShortcuts: blockKeyShortcuts, blueRemaining: blueRemaining, blue_spymaster: blue_spymaster, cards: cards, chat: chat, clueInProgress: clueInProgress, currentTimer: currentTimer, customWords: customWords, customWordsString: customWordsString, debugString: debugString, guessesInProgress: guessesInProgress, password: password, redRemaining: redRemaining, red_spymaster: red_spymaster, settings: settings, status: status, toastMessages: toastMessages, toggleCustomWordsEntry: toggleCustomWordsEntry, toggleLightbox: toggleLightbox, toggleQR: toggleQR, toggleSidebar: toggleSidebar, toggleSoundEffects: toggleSoundEffects, toggleSpymasterModal: toggleSpymasterModal, toggleTeamModal: toggleTeamModal, topMessage: topMessage, user: user, users: users, wordlists: wordlists};
 																												};
 																											};
 																										};
@@ -5296,6 +5294,10 @@ var $author$project$Codenames$Status = F5(
 	function (game_over, turn, text, clue, remaining_guesses) {
 		return {clue: clue, game_over: game_over, remaining_guesses: remaining_guesses, text: text, turn: turn};
 	});
+var $author$project$Toast$Stack = F2(
+	function (a, b) {
+		return {$: 'Stack', a: a, b: b};
+	});
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
 		return {$: 'Seed', a: a, b: b};
@@ -5315,10 +5317,6 @@ var $elm$random$Random$initialSeed = function (x) {
 	return $elm$random$Random$next(
 		A2($elm$random$Random$Seed, state2, incr));
 };
-var $author$project$Toast$Stack = F2(
-	function (a, b) {
-		return {$: 'Stack', a: a, b: b};
-	});
 var $author$project$Toast$initialState = A2(
 	$author$project$Toast$Stack,
 	_List_Nil,
@@ -5361,8 +5359,7 @@ var $author$project$Wordlist$wordlistHalloween = _List_fromArray(
 	['abnormal', 'abominable', 'afraid', 'afterlife', 'agony ', 'alarming', 'alien', 'angel', 'apparition', 'autumn', 'axe ', 'banshee', 'basilisk', 'bat', 'beast', 'behemoth', 'black', 'blood ', 'bogeyman', 'bones', 'boo', 'broom', 'bury', 'cadaver', 'candy', 'carve', 'casket', 'cat', 'cauldron', 'cemetery', 'Cerberus', 'changeling', 'chill', 'cider', 'claws', 'clown', 'coffin', 'cold ', 'convulse ', 'corpse', 'costume', 'creak ', 'creepy', 'crone', 'crypt', 'dark', 'dead', 'demon ', 'devil ', 'dire', 'disease', 'disguise', 'disturbed ', 'donuts', 'Dracula', 'dragon', 'dread ', 'drown ', 'ecto-plasm', 'eerie', 'evil', 'eye', 'fangs', 'fatal ', 'fear ', 'fiend', 'fog', 'Frankenstein', 'freak', 'fright', 'gargoyle', 'ghastly', 'ghost ', 'ghoul', 'goblin', 'goo', 'gore ', 'grave', 'gruesome', 'Halloween', 'haunted', 'hayride', 'heart', 'Hell ', 'helpless', 'horror', 'howl', 'insane', 'jack-o\'-lantern', 'kill ', 'leaves', 'macabre', 'magic', 'mask', 'mausoleum', 'menace ', 'midnight', 'monster ', 'moon ', 'morbid', 'mummy', 'murder', 'mutant', 'mystery', 'mystical', 'night', 'occult', 'October', 'ogre', 'ominous', 'orange', 'owl', 'pagan', 'pain ', 'paranormal', 'party', 'phantasm', 'phantom', 'poltergeist', 'potion', 'pumpkin', 'putrid ', 'raven', 'reaper', 'rotten ', 'scare', 'scream ', 'shadow', 'shiver', 'silence', 'sinister ', 'skeleton ', 'skull', 'slime', 'specter', 'spell', 'spider', 'spirit', 'spooky', 'stab', 'stalk ', 'strange', 'strangle', 'suicide ', 'supernatural', 'superstition', 'sweets', 'tarantula', 'tense ', 'terrify ', 'thrill', 'tomb', 'torture ', 'treat', 'tremble', 'trick', 'troll', 'undead', 'unearth', 'vampire', 'villain', 'wand', 'warlock', 'web', 'weird', 'werewolf', 'wicked', 'witch', 'wizard', 'wraith', 'zombie ']);
 var $author$project$Codenames$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Codenames$Model(
-			$elm$random$Random$initialSeed(99999999))(_List_Nil)(0)(false)('')('')($author$project$Toast$initialState)(false)(false)(false)(false)(false)(false)(true)(
+		$author$project$Codenames$Model(_List_Nil)(0)(false)('')('')($author$project$Toast$initialState)(false)(false)(false)(false)(false)(false)(true)(
 			{customWords: true, override: false, spies: false})(0)(0)('')('')(_List_Nil)(
 			_List_fromArray(
 				[
@@ -6060,7 +6057,6 @@ var $author$project$Codenames$GetUser = function (a) {
 var $author$project$Codenames$GetUsersList = function (a) {
 	return {$: 'GetUsersList', a: a};
 };
-var $author$project$Codenames$NewGame = {$: 'NewGame'};
 var $author$project$Codenames$NoOp = {$: 'NoOp'};
 var $author$project$Codenames$PassTurn = {$: 'PassTurn'};
 var $author$project$Toast$Success = F2(
@@ -7163,26 +7159,6 @@ var $author$project$Codenames$update = F2(
 								continue update;
 							case 'ping':
 								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-							case 'set_game':
-								var _v17 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$int, content);
-								if (_v17.$ === 'Ok') {
-									var num = _v17.a;
-									var $temp$msg = $author$project$Codenames$NewGame,
-										$temp$model = _Utils_update(
-										model,
-										{
-											seed: $elm$random$Random$initialSeed(num)
-										});
-									msg = $temp$msg;
-									model = $temp$model;
-									continue update;
-								} else {
-									var $temp$msg = $author$project$Codenames$NewGame,
-										$temp$model = model;
-									msg = $temp$msg;
-									model = $temp$model;
-									continue update;
-								}
 							default:
 								return _Utils_Tuple2(
 									A2($elm$core$Debug$log, 'Error: unknown code in JSON message', model),
@@ -7349,6 +7325,7 @@ var $author$project$Codenames$BlockKeyShortcuts = function (a) {
 	return {$: 'BlockKeyShortcuts', a: a};
 };
 var $author$project$Codenames$CancelCustomWords = {$: 'CancelCustomWords'};
+var $author$project$Codenames$NewGame = {$: 'NewGame'};
 var $author$project$Codenames$SaveCustomWords = {$: 'SaveCustomWords'};
 var $author$project$Codenames$SetCustomWords = function (a) {
 	return {$: 'SetCustomWords', a: a};
@@ -8311,9 +8288,9 @@ var $author$project$Toast$view = F4(
 	});
 var $author$project$Codenames$view = function (model) {
 	var wordlistToggles = A2($elm$core$List$map, $author$project$Codenames$drawWordlistToggle, model.wordlists);
-	var right_turn_text_bottom = model.status.game_over ? 'Select New Game to play again' : (((model.status.remaining_guesses === 1) ? '1 guess' : ($elm$core$String$fromInt(model.status.remaining_guesses) + ' guesses')) + ' remaining');
+	var right_turn_text_bottom = model.status.game_over ? '' : (((model.status.remaining_guesses === 1) ? '1 guess' : ($elm$core$String$fromInt(model.status.remaining_guesses) + ' guesses')) + ' remaining');
 	var left_turn_text_bottom = model.status.game_over ? '' : 'Click here or press space to pass';
-	var left_turn_text = model.status.game_over ? '' : ((model.status.turn ? 'Red' : 'Blue') + ' team\'s turn');
+	var left_turn_text = model.status.game_over ? 'Select New Game to play again' : ((model.status.turn ? 'Red' : 'Blue') + ' team\'s turn');
 	var addCards = function (cards) {
 		return A2($author$project$Codenames$drawCard, 0, cards);
 	};
