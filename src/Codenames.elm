@@ -852,8 +852,8 @@ showModal user red_sm blue_sm users =
     ]
 
 
-spymasterModal : Maybe User -> Maybe User -> Maybe User -> String -> Html Msg
-spymasterModal user red_sm blue_sm clueInProgress = 
+spymasterModal : Maybe User -> Maybe User -> Maybe User -> String -> String -> Html Msg
+spymasterModal user red_sm blue_sm clueInProgress password = 
   let
     is_red_sm = isSpymaster user red_sm
     is_blue_sm = isSpymaster user blue_sm
@@ -926,7 +926,7 @@ view model =
       [ div [ class ("lightbox" ++ (if model.toggleLightbox then " show" else " hidden")), onClick ToggleLightbox ] [ div [] (lightboxInfo model.password) ]
       , div [ class ("lightbox" ++ (if model.toggleQR then " show" else " hidden")), onClick ToggleQR ] [ div [ id "qrcode" ] [] ]
       , if model.toggleTeamModal then (showModal model.user model.red_spymaster model.blue_spymaster model.users) else text ""
-      , if model.toggleSpymasterModal then (spymasterModal model.user model.red_spymaster model.blue_spymaster model.clueInProgress) else text ""
+      , if model.toggleSpymasterModal then (spymasterModal model.user model.red_spymaster model.blue_spymaster model.clueInProgress model.password) else text ""
       , div [ class "debug" ] [ {- text model.debugString -} ]
       , div [ class "top" ]
         [ div [ class "top_message" ] [ text model.topMessage ]

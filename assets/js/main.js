@@ -7633,7 +7633,7 @@ var $author$project$Codenames$lightboxInfo = function (password) {
 											$elm$html$Html$text('Click here to access the Decryptor. ')
 										])),
 									A2($elm$html$Html$br, _List_Nil, _List_Nil),
-									$elm$html$Html$text('Paste in the password provided at the bottom of the screen (' + (password + ') to find the correct board.'))
+									$elm$html$Html$text('Paste in the password (' + (password + ') to find the correct board.'))
 								]))
 						])),
 					A2(
@@ -7994,11 +7994,42 @@ var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Codenames$spymasterModal = F4(
-	function (user, red_sm, blue_sm, clueInProgress) {
+var $author$project$Codenames$spymasterModal = F5(
+	function (user, red_sm, blue_sm, clueInProgress, password) {
 		var is_red_sm = A2($author$project$Codenames$isSpymaster, user, red_sm);
 		var is_blue_sm = A2($author$project$Codenames$isSpymaster, user, blue_sm);
-		var header_msg = is_red_sm ? 'You are the red spymaster.' : (is_blue_sm ? 'You are the blue spymaster.' : 'You are not a spymaster!');
+		var header_msg = is_red_sm ? _List_fromArray(
+			[
+				$elm$html$Html$text('You are the red spymaster.'),
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$href('./spymaster/index.html?passphrase=' + password),
+						$elm$html$Html$Attributes$target('_blank')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Decryptor')
+					]))
+			]) : (is_blue_sm ? _List_fromArray(
+			[
+				$elm$html$Html$text('You are the blue spymaster.'),
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$href('./spymaster/index.html?passphrase=' + password),
+						$elm$html$Html$Attributes$target('_blank')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Decryptor')
+					]))
+			]) : _List_fromArray(
+			[
+				$elm$html$Html$text('You are not a spymaster!')
+			]));
 		var clue_html = (is_red_sm || is_blue_sm) ? _List_fromArray(
 			[
 				A2(
@@ -8203,13 +8234,7 @@ var $author$project$Codenames$spymasterModal = F4(
 										]),
 									_List_fromArray(
 										[
-											A2(
-											$elm$html$Html$h3,
-											_List_Nil,
-											_List_fromArray(
-												[
-													$elm$html$Html$text(header_msg)
-												]))
+											A2($elm$html$Html$h3, _List_Nil, header_msg)
 										])),
 									A2(
 									$elm$html$Html$span,
@@ -8336,7 +8361,7 @@ var $author$project$Codenames$view = function (model) {
 						_List_Nil)
 					])),
 				model.toggleTeamModal ? A4($author$project$Codenames$showModal, model.user, model.red_spymaster, model.blue_spymaster, model.users) : $elm$html$Html$text(''),
-				model.toggleSpymasterModal ? A4($author$project$Codenames$spymasterModal, model.user, model.red_spymaster, model.blue_spymaster, model.clueInProgress) : $elm$html$Html$text(''),
+				model.toggleSpymasterModal ? A5($author$project$Codenames$spymasterModal, model.user, model.red_spymaster, model.blue_spymaster, model.clueInProgress, model.password) : $elm$html$Html$text(''),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
