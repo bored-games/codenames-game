@@ -8802,23 +8802,6 @@ var $author$project$Codenames$view = function (model) {
 										$elm$html$Html$span,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('qr_button'),
-												$elm$html$Html$Events$onClick($author$project$Codenames$ToggleQR)
-											]),
-										_List_Nil)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('bottom_right bottom_no_stretch')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$span,
-										_List_fromArray(
-											[
 												$elm$html$Html$Attributes$class('new_game_button'),
 												$elm$html$Html$Events$onClick($author$project$Codenames$NewGame)
 											]),

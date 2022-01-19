@@ -979,7 +979,7 @@ view model =
                 ]
               ]
             , if (isSpymaster model.user model.red_spymaster || isSpymaster model.user model.blue_spymaster) then div [ class "bottom_right bottom_no_stretch" ] [ span [ class "spymaster_button", onClick ToggleSpymasterModal ] [] ] else text ""
-            , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "qr_button", onClick ToggleQR ] [] ]
+            -- , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "qr_button", onClick ToggleQR ] [] ]
             , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "new_game_button", onClick NewGame ] [] ]
             , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "info_button", onClick ToggleLightbox ] [] ]
             , div [ class "bottom_right bottom_no_stretch" ] [ span [ class "teams_button", onClick ToggleTeamModal ] [] ]
