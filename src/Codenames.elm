@@ -722,7 +722,7 @@ lightboxInfo password = [ div [ class "instructions" ]
                     [ div [ class "spymaster-preview" ] []
                     , div [] [ strong [] [ text "Click here to access the Decryptor. " ]
                               , br [] []
-                              , text ("Paste in the password provided at the bottom of the screen (" ++ password ++ ") to find the correct board.") ]
+                              , text ("Paste in the password (" ++ password ++ ") to find the correct board.") ]
                     ]
                   , div [ class "legal" ]
                     [ h2 [] [ text "Legal & copyright"]
@@ -858,9 +858,9 @@ spymasterModal user red_sm blue_sm clueInProgress =
     is_red_sm = isSpymaster user red_sm
     is_blue_sm = isSpymaster user blue_sm
     header_msg =
-      if is_red_sm then "You are the red spymaster."
-      else if is_blue_sm then "You are the blue spymaster."
-      else "You are not a spymaster!"
+      if is_red_sm then [ text "You are the red spymaster.", a [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank", class "spymaster" ] [ text "Decryptor" ] ]
+      else if is_blue_sm then [ text "You are the blue spymaster.", a [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank", class "spymaster" ] [ text "Decryptor" ] ]
+      else [ text "You are not a spymaster!" ]
     clue_html =
       if is_red_sm || is_blue_sm then
         [ h3 [] [ text "Clue" ]
@@ -888,7 +888,7 @@ spymasterModal user red_sm blue_sm clueInProgress =
     div [ class "lightbox" ]
     [ div [ class "modal"]
       [ div [ class "flex_row" ] 
-        [ div [ class "flex_fill" ] [  h3 [] [ text header_msg ] ]
+        [ div [ class "flex_fill" ] [  h3 [] header_msg ]
         , span [ class "close_button", onClick ToggleSpymasterModal ] [] ]
       , div [ class "flex_container" ]
         clue_html
