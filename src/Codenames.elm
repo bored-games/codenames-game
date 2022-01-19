@@ -858,8 +858,8 @@ spymasterModal user red_sm blue_sm clueInProgress password =
     is_red_sm = isSpymaster user red_sm
     is_blue_sm = isSpymaster user blue_sm
     header_msg =
-      if is_red_sm then [ text "You are the red spymaster.", a [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank" ] [ text "Decryptor" ] ]
-      else if is_blue_sm then [ text "You are the blue spymaster.", a [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank" ] [ text "Decryptor" ] ]
+      if is_red_sm then [ text "You are the red spymaster. ", a [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank" ] [ text "Open Decryptor" ] ]
+      else if is_blue_sm then [ text "You are the blue spymaster. ", a [ href ("./spymaster/index.html?passphrase=" ++ password), target "_blank" ] [ text "Open Decryptor" ] ]
       else [ text "You are not a spymaster!" ]
     clue_html =
       if is_red_sm || is_blue_sm then

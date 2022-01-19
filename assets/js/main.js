@@ -8000,7 +8000,7 @@ var $author$project$Codenames$spymasterModal = F5(
 		var is_blue_sm = A2($author$project$Codenames$isSpymaster, user, blue_sm);
 		var header_msg = is_red_sm ? _List_fromArray(
 			[
-				$elm$html$Html$text('You are the red spymaster.'),
+				$elm$html$Html$text('You are the red spymaster. '),
 				A2(
 				$elm$html$Html$a,
 				_List_fromArray(
@@ -8010,11 +8010,11 @@ var $author$project$Codenames$spymasterModal = F5(
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Decryptor')
+						$elm$html$Html$text('Open Decryptor')
 					]))
 			]) : (is_blue_sm ? _List_fromArray(
 			[
-				$elm$html$Html$text('You are the blue spymaster.'),
+				$elm$html$Html$text('You are the blue spymaster. '),
 				A2(
 				$elm$html$Html$a,
 				_List_fromArray(
@@ -8024,7 +8024,7 @@ var $author$project$Codenames$spymasterModal = F5(
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Decryptor')
+						$elm$html$Html$text('Open Decryptor')
 					]))
 			]) : _List_fromArray(
 			[
